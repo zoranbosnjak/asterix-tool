@@ -33,9 +33,9 @@ let
       ./.;
     buildInputs = deps;
     installPhase = ''
-      mkdir -p $out
+      mkdir -p $out/bin
 
-      ln -s ${ast-tool-py}/bin/ast-tool-py $out/ast-tool-py
+      ln -s ${ast-tool-py}/bin/ast-tool-py $out/bin/ast-tool-py
     '';
   };
 
