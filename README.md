@@ -1,17 +1,33 @@
-# Asterix processing tool
+# Asterix data processing tool
 
 A versatile asterix data related command line tool.
 
-**Note**: Multiple implementations of the same tool are foreseen,
-with the same or similar command line interface. For example:
+This project uses
+[comet](https://zoranbosnjak.github.io/comet/) library generator,
+which in turn uses
+[asterix-specs](https://zoranbosnjak.github.io/asterix-specs/)
+definition files. To add support for additional asterix
+category/edition, please contribute patch to
+[asterix-specs repository](https://github.com/zoranbosnjak/asterix-specs)
+and this project will inherit the change automatically.
 
-- `ast-tool-py` - python implementation
-- `ast-tool-hs` - haskell implementation
+Project dependency graph:
+```
+asterix-specs -> generated asterix lib (comet) -> asterix-tool
+```
+
+**Note**: Multiple implementations of the same asterix tool are foreseen,
+with the same or similar command line interface:
+
+- [python implementation](ast-tool-py/README.md)
+- haskell implementation (work in progress)
+
+See individual implementation subdirectory for install instructions.
 
 This tutorial is using a `bash` alias to refer to the specific implementation.
 
 ```bash
-alias ast-tool=ast-tool-py # use 'python' version
+alias ast-tool=ast-tool-py # use 'python' implementation
 ast-tool -h                # get help
 ast-tool {subcommand} -h   # get help for a particular subcommand
 ```
@@ -48,9 +64,7 @@ ast-tool random | awk '{print "0: "$1}'
 ### Examples
 
 ```bash
-ast-tool decode -h
-
-# decode random data (deep)
+# decode random data
 ast-tool random | ast-tool decode
 
 # decode random data, truncate output to 80 chars
@@ -67,14 +81,14 @@ ast-tool random | ast-tool decode --parsing-level 3
 ### Examples
 
 ```bash
-# decode received data
-ast-tool from-udp from-udp --unicast 127.0.0.1 56789 | ast-tool decode
+# send random data to UDP
+ast-tool random | ast-tool to-udp --unicast 127.0.0.1 56780
 
 # forward UDP from one port to another
-ast-tool from-udp from-udp --unicast 127.0.0.1 56788 | ast-tool to-udp --unicast 127.0.0.1 56789
+ast-tool from-udp --unicast 127.0.0.1 56780 | ast-tool to-udp --unicast 127.0.0.1 56781
 
-# send random data to UDP
-ast-tool random | ast-tool to-udp --unicast 127.0.0.1 56789
+# decode data from UDP
+ast-tool from-udp --unicast 127.0.0.1 56781 | ast-tool decode
 ```
 
 ## Tips and tricks
@@ -83,7 +97,8 @@ ast-tool random | ast-tool to-udp --unicast 127.0.0.1 56789
 
 `bash` pipe operator can be used with arbitrary stdin/stdout enabled commands.
 For example, use `xxd` and `socat` external tools to send UDP datagrams.
-Note: This is for demonstration purposes only. `to-udp` command offers a simpler solution.
+
+**Note**: This is for demonstration purposes only. `to-udp` command offers a simpler solution.
 
 ```bash
 ast-tool random | while read x; do echo $x | xxd -r -p | socat -u stdin udp-sendto:127.0.0.1:59123; sleep 0.5; done
@@ -113,7 +128,7 @@ and run it:
 ### Run simple self test
 
 Check if the tool can decode it's own random data, ignore decoding results.
-This bash pipeline shall run untill interrupted.
+This bash pipeline shall run without error until interrupted.
 
 ```bash
 ast-tool random | ast-tool decode --stop-on-error > /dev/null
