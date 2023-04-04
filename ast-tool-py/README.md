@@ -11,3 +11,13 @@ pip install "git+https://github.com/zoranbosnjak/asterix-tool.git#subdirectory=a
 ast-tool-py -h
 ```
 
+## Development
+
+```bash
+nix-shell
+./update-comet.sh
+python3 ./src/main.py --version
+python3 ./src/main.py -h
+exit
+```
+

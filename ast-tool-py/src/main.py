@@ -10,8 +10,11 @@ import sys
 import datetime
 import socket
 import selectors
+import importlib.metadata
 
 from asterix import *
+
+__version__ = importlib.metadata.version(__package__)
 
 def output(*args):
     """Like 'print', but handle broken pipe exception and flush."""
@@ -403,6 +406,10 @@ def to_udp(args):
 def main():
 
     parser = argparse.ArgumentParser(description='Asterix data processor.')
+
+    parser.add_argument('--version', action='version',
+        version='%(prog)s {}'.format(__version__),
+        help='show the version number and exit')
 
     parser.add_argument('--empty-selection', action='store_true',
         help='Use empty initial cat/ref selection instead of latest editions')
