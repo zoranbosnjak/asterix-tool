@@ -14,7 +14,10 @@ import importlib.metadata
 
 from asterix import *
 
-__version__ = importlib.metadata.version(__package__)
+try:
+    __version__ = importlib.metadata.version(__package__)
+except:
+    __version__ = "(unable to determine package version)"
 
 def output(*args):
     """Like 'print', but handle broken pipe exception and flush."""

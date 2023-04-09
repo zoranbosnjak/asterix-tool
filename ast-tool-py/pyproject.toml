@@ -1,6 +1,6 @@
 [project]
 name = "ast-tool"
-version = "0.2.0"
+version = "0.2.1"
 authors = [
   { name="Zoran Bošnjak", email="zoran.bosnjak@sloveniacontrol.si" },
 ]
@@ -11,6 +11,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+]
+
+dependencies = [
+    'typing_extensions; python_version < "3.10"',
 ]
 
 [project.scripts]
