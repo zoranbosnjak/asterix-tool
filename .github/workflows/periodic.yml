@@ -12,11 +12,11 @@ jobs:
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          ./update-comet.sh
+          ./update-from-upstream.sh
           update=$(git status --short)
           if [ -n "$update" ]; then
             git add .
-            export REV=$(git ls-remote https://github.com/zoranbosnjak/comet HEAD | awk '{print $1}')
+            export REV=$(git ls-remote https://github.com/zoranbosnjak/asterix-lib-generator HEAD | awk '{print $1}')
             git commit -m "Periodic sync with upstream #${REV::7}"
             git push
           fi

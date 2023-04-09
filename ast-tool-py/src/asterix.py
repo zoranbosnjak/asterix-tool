@@ -3,7 +3,7 @@
 #
 # This file is generated, DO NOT EDIT!
 # For more details, see:
-#    - https://github.com/zoranbosnjak/comet
+#    - https://github.com/zoranbosnjak/asterix-lib-generator
 #    - https://github.com/zoranbosnjak/asterix-specs
 """Asterix data manipulation routines, generic code.
 """

@@ -15,7 +15,7 @@ ast-tool-py -h
 
 ```bash
 nix-shell
-./update-comet.sh
+./update-from-upstream.sh
 python3 ./src/main.py --version
 python3 ./src/main.py -h
 exit

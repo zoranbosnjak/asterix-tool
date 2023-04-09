@@ -3,8 +3,8 @@
 A versatile asterix data related command line tool.
 
 This project uses
-[comet](https://zoranbosnjak.github.io/comet/) library generator,
-which in turn uses
+[asterix-lib-generator](https://zoranbosnjak.github.io/asterix-lib-generator/)
+library generator, which in turn uses
 [asterix-specs](https://zoranbosnjak.github.io/asterix-specs/)
 definition files. To add support for additional asterix
 category/edition, please contribute patch to
@@ -13,7 +13,7 @@ and this project will inherit the change automatically.
 
 Project dependency graph:
 ```
-asterix-specs -> generated asterix lib (comet) -> asterix-tool
+asterix-specs -> asterix-lib-generator -> asterix-tool
 ```
 
 **Note**: Multiple implementations of the same asterix tool are foreseen,
