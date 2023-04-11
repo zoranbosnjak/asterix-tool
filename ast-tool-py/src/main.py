@@ -6,12 +6,14 @@
 import argparse
 import fileinput
 import random
+import os
 import sys
 import datetime
 import socket
 import selectors
 import importlib.metadata
 
+import asterix as ast
 from asterix import *
 
 try:
@@ -406,6 +408,30 @@ def to_udp(args):
         for (sock, ip, port) in sockets:
             sock.sendto(s, (ip, port))
 
+def custom(args):
+    # import custom script
+    filename = args.script
+    p = os.path.dirname(os.path.abspath(filename))
+    sys.path.insert(0, p)
+    with open(filename, 'r') as f:
+        code = compile(f.read(), filename, 'exec')
+    run_globals = {
+        '__name__': None,
+        '__file__': None,
+        '__loader__': None,
+        '__package__': None,
+    }
+    exec(code, run_globals)
+    sys.path.pop(0)
+
+    # Call function with the following arguments
+    #   - asterix module (already imported)
+    #   - file input object (rx from stdin)
+    #   - output function (tx to stdout)
+    #   Custom modul can process lines, for example: for line in rx: tx(line)
+    f = run_globals[args.call]
+    f(ast, fileinput.input('-'), output, args.args)
+
 def main():
 
     parser = argparse.ArgumentParser(description='Asterix data processor.')
@@ -477,6 +503,16 @@ def main():
         default=[], nargs=2, metavar=('ip', 'port'))
     parser_to_udp.add_argument('--multicast', action='append', help='Multicast UDP output',
         default=[], nargs=3, metavar=('mcast-ip', 'port', 'local-ip'))
+
+    # 'custom' command
+    parser_custom = subparsers.add_parser('custom', help='run custom python script')
+    parser_custom.set_defaults(func=custom)
+    parser_custom.add_argument('--script', help='File to import',
+        required=True, metavar='filename')
+    parser_custom.add_argument('--call', help='Function to call',
+        required=True, metavar='callable')
+    parser_custom.add_argument('--args', help='Additional arguments (string)',
+        metavar='args')
 
     args = parser.parse_args()
     try:
