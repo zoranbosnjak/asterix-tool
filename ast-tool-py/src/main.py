@@ -75,7 +75,7 @@ def string_to_edition(ed):
     a,b = ed.split('.')
     return (int(a), int(b))
 
-def show_manifest(args):
+def cmd_show_manifest(args):
 
     def fmt(what, n, ed): # type: ignore
         return '{} {}, edition {}'.format(what, str(n).zfill(3), ed)
@@ -204,7 +204,7 @@ class AsterixSamples:
         db = cls.make_datablock([rec])
         return db.unparse()
 
-def gen_random(args):
+def cmd_gen_random(args):
     """Generate random samples."""
     sel = get_selection(args.empty_selection, args.cat or [], args.ref or [])
     exp = get_expansions(sel, args.expand or [])
@@ -216,7 +216,7 @@ def gen_random(args):
     for sample in AsterixSamples(gen, sel, exp, populate_all_items):
         output(sample.hex())
 
-def asterix_decoder(args):
+def cmd_asterix_decoder(args):
     sel = get_selection(args.empty_selection, args.cat or [], args.ref or [])
     exp = get_expansions(sel, args.expand or [])
     if args.truncate:
@@ -354,7 +354,7 @@ def asterix_decoder(args):
         truncate('timestamp: {}'.format(t if t is not None else '<unknown>'))
         handle_datagram(1, s)
 
-def from_udp(args):
+def cmd_from_udp(args):
     sel = selectors.DefaultSelector()
     for (ip, port) in args.unicast:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -391,7 +391,7 @@ def check_ttl(arg):
         raise argparse.ArgumentTypeError('must be in interval [{},{}]'.format(ttlInterval[0], ttlInterval[1]))
     return val
 
-def to_udp(args):
+def cmd_to_udp(args):
     sockets = []
     for (ip, port) in args.unicast:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -408,7 +408,58 @@ def to_udp(args):
         for (sock, ip, port) in sockets:
             sock.sendto(s, (ip, port))
 
-def custom(args):
+def cmd_inspect_editions(args):
+    hex_errors = 0
+    raw_datablock_errors = 0
+    unknown_categories = set()
+    processed_categories = set()
+    parse_errors = dict()
+    try:
+        for line in fileinput.input('-'):
+            try:
+                s = bytes.fromhex(line)
+            except ValueError:
+                hex_errors += 1
+                continue
+            try:
+                raw_datablocks = ast.RawDatablock.parse(s)
+            except AsterixError:
+                raw_datablock_errors += 1
+            for raw_db in raw_datablocks:
+                cat = raw_db.category
+                editions = ast.manifest['CATS'].get(cat)
+                if editions is None:
+                    unknown_categories.add(cat)
+                processed_categories.add(cat)
+                for ed in editions:
+                    Spec = ast.manifest['CATS'][cat][ed]
+                    try:
+                        db = Spec.parse(raw_db)
+                    except AsterixError:
+                        problems = parse_errors.get(cat, set())
+                        problems.add(ed)
+                        parse_errors[cat] = problems
+    except KeyboardInterrupt:
+        pass
+
+    print('done...')
+    print('hex errors: {}'.format(hex_errors))
+    print('datablock erros: {}'.format(raw_datablock_errors))
+    print('unknown categories: {}'.format(sorted(unknown_categories)))
+    print('success category/edition:')
+    for cat in sorted(processed_categories):
+        editions = set(ast.manifest['CATS'][cat].keys())
+        problems = parse_errors.get(cat, set())
+        editions.difference_update(problems)
+        print('{} -> {}'.format(cat, sorted(editions, key=string_to_edition)))
+    print('problems category/edition:')
+    for cat in sorted(processed_categories):
+        problems = parse_errors.get(cat)
+        if not problems:
+            continue
+        print('{} -> {}'.format(cat, sorted(problems, key=string_to_edition)))
+
+def cmd_custom(args):
     # import custom script
     filename = args.script
     p = os.path.dirname(os.path.abspath(filename))
@@ -459,13 +510,13 @@ def main():
 
     # 'manifest' command
     parser_manifest = subparsers.add_parser('manifest', help='show available categories')
-    parser_manifest.set_defaults(func=show_manifest)
+    parser_manifest.set_defaults(func=cmd_show_manifest)
     parser_manifest.add_argument('--latest', action='store_true',
         help='show latest editions only')
 
     # 'random' command
     parser_random = subparsers.add_parser('random', help='asterix sample generator')
-    parser_random.set_defaults(func=gen_random)
+    parser_random.set_defaults(func=cmd_gen_random)
     parser_random.add_argument('--seed', type=int,
         help='randomm generator seed value')
     parser_random.add_argument('--populate-all-items', action='store_true',
@@ -473,7 +524,7 @@ def main():
 
     # 'decode' command
     parser_decode = subparsers.add_parser('decode', help='asterix decoder')
-    parser_decode.set_defaults(func=asterix_decoder)
+    parser_decode.set_defaults(func=cmd_asterix_decoder)
     parser_decode.add_argument('--truncate', type=int,
         metavar='N', default=0,
         help='truncate long data lines to N characters or 0 for none, default: %(default)s')
@@ -486,7 +537,7 @@ def main():
 
     # 'from-udp' command
     parser_from_udp = subparsers.add_parser('from-udp', help='UDP datagram receiver')
-    parser_from_udp.set_defaults(func=from_udp)
+    parser_from_udp.set_defaults(func=cmd_from_udp)
     parser_from_udp.add_argument('--unicast', action='append', help='Unicast UDP input',
         default=[], nargs=2, metavar=('ip', 'port'))
     parser_from_udp.add_argument('--multicast', action='append', help='Multicast UDP input',
@@ -498,15 +549,20 @@ def main():
 
     # 'to-udp' command
     parser_to_udp = subparsers.add_parser('to-udp', help='UDP datagram transmitter')
-    parser_to_udp.set_defaults(func=to_udp)
+    parser_to_udp.set_defaults(func=cmd_to_udp)
     parser_to_udp.add_argument('--unicast', action='append', help='Unicast UDP output',
         default=[], nargs=2, metavar=('ip', 'port'))
     parser_to_udp.add_argument('--multicast', action='append', help='Multicast UDP output',
         default=[], nargs=3, metavar=('mcast-ip', 'port', 'local-ip'))
 
+    # 'inspect-editions' command
+    parser_inspect_editions = subparsers.add_parser('inspect-editions',
+        help='report asterix parsing status per category/edition')
+    parser_inspect_editions.set_defaults(func=cmd_inspect_editions)
+
     # 'custom' command
     parser_custom = subparsers.add_parser('custom', help='run custom python script')
-    parser_custom.set_defaults(func=custom)
+    parser_custom.set_defaults(func=cmd_custom)
     parser_custom.add_argument('--script', help='File to import',
         required=True, metavar='filename')
     parser_custom.add_argument('--call', help='Function to call',

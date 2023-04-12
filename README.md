@@ -22,7 +22,8 @@ with the same or similar command line interface:
 - [python implementation](ast-tool-py/README.md)
 - haskell implementation (work in progress)
 
-See individual implementation subdirectory for install instructions.
+See individual implementation subdirectory for install instructions
+and details about additional commands.
 
 This tutorial is using a `bash` alias to refer to the specific implementation.
 
@@ -89,6 +90,20 @@ ast-tool from-udp --unicast 127.0.0.1 56780 | ast-tool to-udp --unicast 127.0.0.
 
 # decode data from UDP
 ast-tool from-udp --unicast 127.0.0.1 56781 | ast-tool decode
+```
+
+## `inspect-editions` command
+
+*Detect valid/invalid asterix editions in a stream*
+
+This command inspects a stream and tryes to decode asterix with all defined
+asterix category/edition combinations. It runs until the stream is exhausted
+or until the process is interrupted.
+
+Example: inspect random samples:
+
+```bash
+ast-tool random | head -n 1000 | ast-tool inspect-editions
 ```
 
 ## Tips and tricks
