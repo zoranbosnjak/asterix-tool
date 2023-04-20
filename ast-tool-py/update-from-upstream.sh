@@ -10,6 +10,6 @@ if [ -n "$update" ]; then
     ver=$(cat pyproject.toml | grep "version.*=" | cut -f2- -d"=" | tr -d '"' | xargs)
     a=$(echo $ver | cut --delimiter="." -f 1)
     b=$(echo $ver | cut --delimiter="." -f 2)
-    sed -i "s/version.*/version = \"$a.$((b+1)).0\"/" pyproject.toml
+    sed -i "s/^version.*/version = \"$a.$((b+1)).0\"/" pyproject.toml
 fi
 
