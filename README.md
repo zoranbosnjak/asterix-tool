@@ -92,7 +92,7 @@ ast-tool from-udp --unicast 127.0.0.1 56780 | ast-tool to-udp --unicast 127.0.0.
 ast-tool from-udp --unicast 127.0.0.1 56781 | ast-tool decode
 ```
 
-## `inspect-editions` command
+## `inspect` command
 
 *Detect valid/invalid asterix editions in a stream*
 
@@ -103,7 +103,7 @@ or until the process is interrupted.
 Example: inspect random samples:
 
 ```bash
-ast-tool random | head -n 1000 | ast-tool inspect-editions
+ast-tool random | head -n 1000 | ast-tool inspect
 ```
 
 ## Tips and tricks

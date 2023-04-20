@@ -8,6 +8,7 @@ import fileinput
 import random
 import os
 import sys
+import time
 import datetime
 import socket
 import selectors
@@ -349,7 +350,7 @@ def cmd_asterix_decoder(args):
             handle_datablock(i+1, db)
 
     for line in fileinput.input('-'):
-        t = datetime.datetime.now()
+        t = datetime.datetime.now(tz=datetime.timezone.utc)
         s = bytes.fromhex(line)
         truncate('timestamp: {}'.format(t if t is not None else '<unknown>'))
         handle_datagram(1, s)
@@ -408,7 +409,7 @@ def cmd_to_udp(args):
         for (sock, ip, port) in sockets:
             sock.sendto(s, (ip, port))
 
-def cmd_inspect_editions(args):
+def cmd_inspect(args):
     hex_errors = 0
     raw_datablock_errors = 0
     unknown_categories = set()
@@ -555,10 +556,10 @@ def main():
     parser_to_udp.add_argument('--multicast', action='append', help='Multicast UDP output',
         default=[], nargs=3, metavar=('mcast-ip', 'port', 'local-ip'))
 
-    # 'inspect-editions' command
-    parser_inspect_editions = subparsers.add_parser('inspect-editions',
+    # 'inspect' command
+    parser_inspect = subparsers.add_parser('inspect',
         help='report asterix parsing status per category/edition')
-    parser_inspect_editions.set_defaults(func=cmd_inspect_editions)
+    parser_inspect.set_defaults(func=cmd_inspect)
 
     # 'custom' command
     parser_custom = subparsers.add_parser('custom', help='run custom python script')
