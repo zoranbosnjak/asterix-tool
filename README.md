@@ -33,6 +33,19 @@ ast-tool -h                # get help
 ast-tool {subcommand} -h   # get help for a particular subcommand
 ```
 
+## category, edition and expansion selection
+
+Some commands (`random`, `decode`...) need selection of asterix categories
+and edition. By default all available categories and the latest editions
+are used. The following command line arguments are available to adjust the
+setting (can be specified multiple times).
+
+- `--empty-selection` - start with empty selection instead of *all latest*
+- `--cat CAT EDITION` - add/replace category with explicit edition
+- `--ref CAT EDITION` - add/replace expansion with explicit edition
+- `--expand CAT ITEM-NAME` - Use expansion definition with selected topitem,
+  for example `--expand 62 RE`
+
 ## `random` command
 
 *Random asterix data generator*
@@ -46,6 +59,9 @@ ast-tool random
 # generate only asterix category 062, edition 1.19
 ast-tool manifest # show available editions
 ast-tool --empty-selection --cat 062 1.19 random
+
+# generate all categories and for cat062, generate 'RE' expansion field too
+ast-tool --expand 62 RE random
 
 # limit number of generated samples
 ast-tool random | head -n 10
@@ -73,6 +89,9 @@ ast-tool random | ast-tool decode --truncate 80
 
 # decode random data, parse only up to the level of 'records'
 ast-tool random | ast-tool decode --parsing-level 3
+
+# generate and decode 'RE' expansion field too
+ast-tool --expand 62 RE random | ast-tool --expand 62 RE decode
 ```
 
 ## `from-udp`, `to-udp` commands
@@ -100,10 +119,14 @@ This command inspects a stream and tryes to decode asterix with all defined
 asterix category/edition combinations. It runs until the stream is exhausted
 or until the process is interrupted.
 
-Example: inspect random samples:
+### Examples
 
 ```bash
+# inspect random samples:
 ast-tool random | head -n 1000 | ast-tool inspect
+
+# inspect network traffic (CTRL-C to stop after some observation time)
+ast-tool from-udp --unicast 127.0.0.1 56781 | ast-tool inspect
 ```
 
 ## Tips and tricks
