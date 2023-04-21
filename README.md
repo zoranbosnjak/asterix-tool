@@ -64,9 +64,10 @@ ast-tool --empty-selection --cat 062 1.19 random
 ast-tool --expand 62 RE random
 
 # limit number of generated samples
-ast-tool random | head -n 10
+ast-tool random | stdbuf -oL head -n 10
 
 # limit sample generation speed/rate
+ast-tool random --sleep 0.5
 ast-tool random | while read x; do echo "$x"; sleep 0.5; done
 ast-tool random | pv -qL 300
 
@@ -111,6 +112,21 @@ ast-tool from-udp --unicast 127.0.0.1 56780 | ast-tool to-udp --unicast 127.0.0.
 ast-tool from-udp --unicast 127.0.0.1 56781 | ast-tool decode
 ```
 
+## `record`, `replay` commands
+
+*Record/replay data to/from file*
+
+### Examples
+
+```bash
+# save random data
+ast-tool random --sleep 0.2 | stdbuf -oL  head -n 10 | ast-tool record --format vcr > recording.vcr
+
+# replay at normal/full speed
+ast-tool replay --format vcr recording.vcr
+ast-tool replay --format vcr recording.vcr --full-speed
+```
+
 ## `inspect` command
 
 *Detect valid/invalid asterix editions in a stream*
@@ -123,7 +139,7 @@ or until the process is interrupted.
 
 ```bash
 # inspect random samples:
-ast-tool random | head -n 1000 | ast-tool inspect
+ast-tool random | stdbuf -oL head -n 1000 | ast-tool inspect
 
 # inspect network traffic (CTRL-C to stop after some observation time)
 ast-tool from-udp --unicast 127.0.0.1 56781 | ast-tool inspect

@@ -12,7 +12,10 @@ import time
 import datetime
 import socket
 import selectors
+import uuid
+import json
 import importlib.metadata
+from scapy.all import rdpcap, IP, UDP
 
 import asterix as ast
 from asterix import *
@@ -70,6 +73,103 @@ class PCG32:
                 return val % pow(2,bitsize)
             size += 32
             val = val*pow(2,32) + self.next()
+
+class Fmt:
+    name : str
+
+    def __init__(self, channel=None, sender=None):
+        pass
+
+class FmtSimple(Fmt):
+    """Simple line oriented data format: {timestamp-iso} {hex data}"""
+    name = 'simple'
+
+    def write_event(self, t_mono, t_utc, data):
+        output('{} {}'.format(t_utc.isoformat(), data))
+
+    def events(self, infile):
+        for line in fileinput.input(infile or '-'):
+            (t, data) = line.split()
+            t = datetime.datetime.fromisoformat(t)
+            yield(t.timestamp(), data)
+
+class FmtVcr(Fmt):
+    """JSON based time format from the 'vcr' recording/replay project."""
+    name = 'vcr'
+    period = 0x100000000
+
+    def __init__(self, channel=None, sender=None):
+        self.channel = channel
+        self.sender = sender
+        self.session = str(uuid.uuid4())[0:8]
+        self.track = str(uuid.uuid4())[0:8]
+        self.sequence = 0
+
+    def write_event(self, t_mono, t_utc, data):
+        rec = {
+            "channel": self.channel,
+            "tMono": round(t_mono*1000*1000*1000),
+            "tUtc": t_utc.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            "session": self.session,
+            "track": self.track,
+            "sequence": self.sequence,
+            "value": {
+                "data": data,
+                "sender": self.sender,
+                },
+        }
+        self.sequence = (self.sequence + 1) % self.__class__.period
+        s = json.dumps(rec)
+        output(s)
+
+    def events(self, infile):
+        for line in fileinput.input(infile or '-'):
+            o = json.loads(line)
+            if self.channel is not None:
+                if o['channel'] != self.channel:
+                    continue
+            yield ((o['tMono']/(1000*1000*1000), o['value']['data']))
+
+
+class FmtPcap(Fmt):
+    """Wireshark/tcpdump file format."""
+    name = 'pcap'
+
+    def events(self, infile):
+        if infile is None:
+            return
+        scapy_cap = rdpcap(infile)
+        for packet in scapy_cap:
+            try:
+                data = bytes(packet[UDP].payload)
+            except IndexError:
+                continue
+            yield (float(packet.time), data.hex())
+
+class FmtBonita(Fmt):
+    """Simple line oriented data format: {timestamp.seconds} : {hex data}"""
+    name = 'bonita'
+
+    def events(self, infile):
+        for line in fileinput.input(infile or '-'):
+            line = line.strip()
+            if not line:
+                continue
+            if line[0] == '#':
+                continue
+            t, data = line.split(':')
+            t = float(t.strip())
+            data = data.strip()
+            yield (t, data)
+
+format_input  = [FmtSimple, FmtVcr, FmtPcap, FmtBonita]
+format_output = [FmtSimple, FmtVcr]
+
+def format_find(lst, name):
+    for i in lst:
+        if i.name == name:
+            return i
+    return None
 
 def string_to_edition(ed):
     """Convert edition string to a tuple, for example "1.2" -> (1,2)"""
@@ -216,6 +316,8 @@ def cmd_gen_random(args):
     gen = PCG32(seed)
     for sample in AsterixSamples(gen, sel, exp, populate_all_items):
         output(sample.hex())
+        if args.sleep is not None:
+            time.sleep(args.sleep)
 
 def cmd_asterix_decoder(args):
     sel = get_selection(args.empty_selection, args.cat or [], args.ref or [])
@@ -373,8 +475,8 @@ def cmd_from_udp(args):
 
     # processing loop
     while True:
-        events = sel.select()
-        for key, mask in events:
+        select_events = sel.select()
+        for key, mask in select_events:
             sock = key.fileobj
             (s, addr) = sock.recvfrom(pow(2,16))
             output(s.hex())
@@ -460,6 +562,28 @@ def cmd_inspect(args):
             continue
         print('{} -> {}'.format(cat, sorted(problems, key=string_to_edition)))
 
+def cmd_record(args):
+    fmt = format_find(format_output, args.format)(args.channel, args.sender)
+    for line in fileinput.input('-'):
+        t_mono = time.monotonic()
+        t_utc = datetime.datetime.now(tz=datetime.timezone.utc)
+        fmt.write_event(t_mono, t_utc, line.strip())
+
+def cmd_replay(args):
+    fmt = format_find(format_input, args.format)(args.channel)
+    offset = None # not known until the first event
+    for event in fmt.events(args.infile):
+        now = time.monotonic()
+        (t_mono, data) = event
+        if not args.full_speed:
+            if offset is None:
+                offset = now - t_mono
+            t = t_mono + offset
+            delta = t - now
+            if delta > 0:
+                time.sleep(delta)
+        output(data)
+
 def cmd_custom(args):
     # import custom script
     filename = args.script
@@ -518,6 +642,8 @@ def main():
     # 'random' command
     parser_random = subparsers.add_parser('random', help='asterix sample generator')
     parser_random.set_defaults(func=cmd_gen_random)
+    parser_random.add_argument('--sleep', type=float,
+        help="sleep 't' seconds between random samples")
     parser_random.add_argument('--seed', type=int,
         help='randomm generator seed value')
     parser_random.add_argument('--populate-all-items', action='store_true',
@@ -560,6 +686,33 @@ def main():
     parser_inspect = subparsers.add_parser('inspect',
         help='report asterix parsing status per category/edition')
     parser_inspect.set_defaults(func=cmd_inspect)
+
+    # 'record' command
+    parser_record = subparsers.add_parser('record',
+        help='data recorder, augment data with timestamp')
+    parser_record.set_defaults(func=cmd_record)
+    parser_record.add_argument('--channel', metavar='STR',
+        help='Set channel name (not supported on all formats)')
+    parser_record.add_argument('--sender', help='Set sender attribute',
+        nargs=2, metavar=('ip', 'port'))
+    parser_record.add_argument('--format',
+        choices=[fmt.name for fmt in format_output],
+        default=format_output[0].name,
+        help='data format, default: %(default)s')
+
+    # 'replay' command
+    parser_replay = subparsers.add_parser('replay',
+        help='data replay')
+    parser_replay.set_defaults(func=cmd_replay)
+    parser_replay.add_argument('--channel', metavar='STR',
+        help='Set channel name (not supported on all formats)')
+    parser_replay.add_argument('--format',
+        choices=[fmt.name for fmt in format_input],
+        default=format_input[0].name,
+        help='data format, default: %(default)s')
+    parser_replay.add_argument('--full-speed', action='store_true',
+        help='Replay at full speed')
+    parser_replay.add_argument('infile', nargs='?')
 
     # 'custom' command
     parser_custom = subparsers.add_parser('custom', help='run custom python script')
