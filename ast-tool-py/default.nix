@@ -6,6 +6,7 @@ let
   deps = with packages; [
     python3
     python3Packages.setuptools
+    python3Packages.scapy
   ];
 
 in packages.python3Packages.buildPythonPackage rec {

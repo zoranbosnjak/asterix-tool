@@ -1,6 +1,6 @@
 [project]
 name = "ast-tool"
-version = "0.7.0"
+version = "0.7.1"
 authors = [
   { name="Zoran Bošnjak", email="zoran.bosnjak@sloveniacontrol.si" },
 ]

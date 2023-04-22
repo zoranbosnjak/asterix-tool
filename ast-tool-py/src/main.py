@@ -15,6 +15,11 @@ import selectors
 import uuid
 import json
 import importlib.metadata
+
+import warnings
+from cryptography.utils import CryptographyDeprecationWarning
+warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
+
 from scapy.all import rdpcap, IP, UDP
 
 import asterix as ast
