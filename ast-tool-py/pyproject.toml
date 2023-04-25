@@ -1,6 +1,6 @@
 [project]
 name = "ast-tool"
-version = "0.7.2"
+dynamic = ["version"]
 authors = [
   { name="Zoran Bošnjak", email="zoran.bosnjak@sloveniacontrol.si" },
 ]
@@ -25,4 +25,7 @@ ast-tool-py = "main:main"
 [project.urls]
 "Homepage" = "https://zoranbosnjak.github.io/ast-tool/"
 "Bug Tracker" = "https://github.com/zoranbosnjak/ast-tool/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "main.__version__"}
 

@@ -14,7 +14,6 @@ import socket
 import selectors
 import uuid
 import json
-import importlib.metadata
 
 import warnings
 from cryptography.utils import CryptographyDeprecationWarning
@@ -25,10 +24,7 @@ from scapy.all import rdpcap, IP, UDP
 import asterix as ast
 from asterix import *
 
-try:
-    __version__ = importlib.metadata.version(__package__)
-except:
-    __version__ = "(unable to determine package version)"
+__version__ = "0.7.2"
 
 def output(*args):
     """Like 'print', but handle broken pipe exception and flush."""
@@ -618,7 +614,7 @@ def main():
     parser = argparse.ArgumentParser(description='Asterix data processor.')
 
     parser.add_argument('--version', action='version',
-        version='%(prog)s {}'.format(__version__),
+        version='%(prog)s {}, asterix-lib {}'.format(__version__, ast.VERSION),
         help='show the version number and exit')
 
     parser.add_argument('--empty-selection', action='store_true',
