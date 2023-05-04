@@ -17,7 +17,9 @@ ast-tool-py -h
 nix-shell
 ./update-from-upstream.sh
 python3 ./src/main.py --version
-python3 ./src/main.py -h
+# or using alias
+ast-tool --version
+ast-tool -h
 exit
 ```
 

@@ -14,5 +14,8 @@ in packages.python3Packages.buildPythonPackage rec {
   format = "pyproject";
   src = ./.;
   propagatedBuildInputs = deps;
+  shellHook = ''
+    ast-tool() { python ./src/main.py "$@"; }
+  '';
 }
 
