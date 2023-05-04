@@ -788,7 +788,12 @@ def main():
     parser_custom.add_argument('--args', help='Additional arguments (string)',
         metavar='args')
 
-    args = parser.parse_args()
+    # Empty argument raises TypeError on some old pip/python versions.
+    try:
+        args = parser.parse_args()
+    except TypeError:
+        print("Arguments are required, try '--help'.")
+        sys.exit(0)
     try:
         args.func(args)
     except KeyboardInterrupt:
