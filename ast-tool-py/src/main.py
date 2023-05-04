@@ -14,6 +14,7 @@ import socket
 import selectors
 import uuid
 import json
+import locale
 
 import warnings
 from cryptography.utils import CryptographyDeprecationWarning
@@ -24,7 +25,7 @@ from scapy.all import rdpcap, IP, UDP
 import asterix as ast
 from asterix import *
 
-__version__ = "0.7.2"
+__version__ = "0.8.0"
 
 def output(*args):
     """Like 'print', but handle broken pipe exception and flush."""
@@ -82,22 +83,25 @@ class Fmt:
         pass
 
 class FmtSimple(Fmt):
-    """Simple line oriented data format: {timestamp-iso} {hex data}"""
+    """Simple line oriented data format: {timestamp-iso} {hex data} {time-mono-ns}"""
     name = 'simple'
 
     def write_event(self, t_mono, t_utc, data):
-        output('{} {}'.format(t_utc.isoformat(), data))
+        t_mono_ns = round(t_mono*1000*1000*1000)
+        output('{} {} {}'.format(t_utc.isoformat(), data, t_mono_ns))
 
     def events(self, infile):
         for line in fileinput.input(infile or '-'):
-            (t, data) = line.split()
-            t = datetime.datetime.fromisoformat(t)
-            yield(t.timestamp(), data)
+            (t, data, t_mono_ns) = line.split()
+            t_utc = datetime.datetime.fromisoformat(t)
+            t_mono = int(t_mono_ns)/(1000*1000*1000)
+            yield(t_mono, t_utc, data)
 
 class FmtVcr(Fmt):
     """JSON based time format from the 'vcr' recording/replay project."""
     name = 'vcr'
     period = 0x100000000
+    time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
     def __init__(self, channel=None, sender=None):
         self.channel = channel
@@ -110,7 +114,7 @@ class FmtVcr(Fmt):
         rec = {
             "channel": self.channel,
             "tMono": round(t_mono*1000*1000*1000),
-            "tUtc": t_utc.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            "tUtc": t_utc.strftime(self.__class__.time_format),
             "session": self.session,
             "track": self.track,
             "sequence": self.sequence,
@@ -129,8 +133,11 @@ class FmtVcr(Fmt):
             if self.channel is not None:
                 if o['channel'] != self.channel:
                     continue
-            yield ((o['tMono']/(1000*1000*1000), o['value']['data']))
-
+            t_mono = o['tMono']/(1000*1000*1000)
+            t_utc = datetime.datetime.strptime(o['tUtc'], self.__class__.time_format)
+            t_utc = t_utc.replace(tzinfo=datetime.timezone.utc)
+            data = o['value']['data']
+            yield (t_mono, t_utc, data)
 
 class FmtPcap(Fmt):
     """Wireshark/tcpdump file format."""
@@ -138,30 +145,51 @@ class FmtPcap(Fmt):
 
     def events(self, infile):
         if infile is None:
-            return
+            raise Exception('expecting explicit filename')
         scapy_cap = rdpcap(infile)
         for packet in scapy_cap:
             try:
                 data = bytes(packet[UDP].payload)
             except IndexError:
                 continue
-            yield (float(packet.time), data.hex())
+            ts = float(packet.time)
+            t_mono = ts
+            t_utc = datetime.datetime.utcfromtimestamp(ts)
+            t_utc = t_utc.replace(tzinfo=datetime.timezone.utc)
+            yield (t_mono, t_utc, data.hex())
 
 class FmtBonita(Fmt):
     """Simple line oriented data format: {timestamp.seconds} : {hex data}"""
     name = 'bonita'
 
     def events(self, infile):
+        fmt = '%a %b %d %H:%M:%S %Y UTC'
+        start_time = None
+        first_packet_time = None
         for line in fileinput.input(infile or '-'):
             line = line.strip()
             if not line:
                 continue
             if line[0] == '#':
+                line = line[1:].lstrip()
+                loc = locale.getlocale()
+                locale.setlocale(locale.LC_ALL, 'C')
+                start_time = datetime.datetime.strptime(line, fmt)
+                start_time = start_time.replace(tzinfo=datetime.timezone.utc)
+                # problem with setlocale inside nix-shell
+                try: locale.setlocale(locale.LC_ALL, loc)
+                except: pass
                 continue
             t, data = line.split(':')
-            t = float(t.strip())
+            t_mono = float(t.strip())
+            if first_packet_time is None:
+                first_packet_time = t_mono
+            delta = t_mono - first_packet_time
+            t_utc = None
+            if start_time is not None:
+                t_utc = start_time + datetime.timedelta(seconds=delta)
             data = data.strip()
-            yield (t, data)
+            yield (t_mono, t_utc, data)
 
 format_input  = [FmtSimple, FmtVcr, FmtPcap, FmtBonita]
 format_output = [FmtSimple, FmtVcr]
@@ -452,11 +480,20 @@ def cmd_asterix_decoder(args):
         for db in dbs:
             handle_datablock(i+1, db)
 
-    for line in fileinput.input('-'):
-        t = datetime.datetime.now(tz=datetime.timezone.utc)
+    def handle_event(t, line):
         s = bytes.fromhex(line)
         truncate('timestamp: {}'.format(t if t is not None else '<unknown>'))
         handle_datagram(1, s)
+
+    if args.file is None:
+        for line in fileinput.input('-'):
+            t = datetime.datetime.now(tz=datetime.timezone.utc)
+            handle_event(t, line)
+    else:
+        fmt = format_find(format_input, args.format)(args.channel)
+        for event in fmt.events(args.file):
+            (t_mono, t_utc, data) = event
+            handle_event(t_utc, data)
 
 def cmd_from_udp(args):
     sel = selectors.DefaultSelector()
@@ -518,31 +555,41 @@ def cmd_inspect(args):
     unknown_categories = set()
     processed_categories = set()
     parse_errors = dict()
+
+    def handle_event(line):
+        try:
+            s = bytes.fromhex(line)
+        except ValueError:
+            hex_errors += 1
+            return
+        try:
+            raw_datablocks = ast.RawDatablock.parse(s)
+        except AsterixError:
+            raw_datablock_errors += 1
+        for raw_db in raw_datablocks:
+            cat = raw_db.category
+            editions = ast.manifest['CATS'].get(cat)
+            if editions is None:
+                unknown_categories.add(cat)
+            processed_categories.add(cat)
+            for ed in editions:
+                Spec = ast.manifest['CATS'][cat][ed]
+                try:
+                    db = Spec.parse(raw_db)
+                except AsterixError:
+                    problems = parse_errors.get(cat, set())
+                    problems.add(ed)
+                    parse_errors[cat] = problems
+
     try:
-        for line in fileinput.input('-'):
-            try:
-                s = bytes.fromhex(line)
-            except ValueError:
-                hex_errors += 1
-                continue
-            try:
-                raw_datablocks = ast.RawDatablock.parse(s)
-            except AsterixError:
-                raw_datablock_errors += 1
-            for raw_db in raw_datablocks:
-                cat = raw_db.category
-                editions = ast.manifest['CATS'].get(cat)
-                if editions is None:
-                    unknown_categories.add(cat)
-                processed_categories.add(cat)
-                for ed in editions:
-                    Spec = ast.manifest['CATS'][cat][ed]
-                    try:
-                        db = Spec.parse(raw_db)
-                    except AsterixError:
-                        problems = parse_errors.get(cat, set())
-                        problems.add(ed)
-                        parse_errors[cat] = problems
+        if args.file is None:
+            for line in fileinput.input('-'):
+                handle_event(line)
+        else:
+            fmt = format_find(format_input, args.format)(args.channel)
+            for event in fmt.events(args.file):
+                (t_mono, t_utc, data) = event
+                handle_event(data)
     except KeyboardInterrupt:
         pass
 
@@ -575,7 +622,7 @@ def cmd_replay(args):
     offset = None # not known until the first event
     for event in fmt.events(args.infile):
         now = time.monotonic()
-        (t_mono, data) = event
+        (t_mono, t_utc, data) = event
         if not args.full_speed:
             if offset is None:
                 offset = now - t_mono
@@ -662,6 +709,14 @@ def main():
     parser_decode.add_argument('--parsing-level', type=int,
         metavar='N', default=0,
         help='limit parsing depth, 0 for none, default: %(default)s')
+    parser_decode.add_argument('--file', metavar='filename',
+        help='use file input instead of realtime over STDIN')
+    parser_decode.add_argument('--format',
+        choices=[fmt.name for fmt in format_input],
+        default=format_input[0].name,
+        help='file data format, default: %(default)s')
+    parser_decode.add_argument('--channel', metavar='STR',
+        help='Set channel name (not supported on all formats)')
 
     # 'from-udp' command
     parser_from_udp = subparsers.add_parser('from-udp', help='UDP datagram receiver')
@@ -687,6 +742,14 @@ def main():
     parser_inspect = subparsers.add_parser('inspect',
         help='report asterix parsing status per category/edition')
     parser_inspect.set_defaults(func=cmd_inspect)
+    parser_inspect.add_argument('--file', metavar='filename',
+        help='use file input instead of realtime over STDIN')
+    parser_inspect.add_argument('--format',
+        choices=[fmt.name for fmt in format_input],
+        default=format_input[0].name,
+        help='file data format, default: %(default)s')
+    parser_inspect.add_argument('--channel', metavar='STR',
+        help='Set channel name (not supported on all formats)')
 
     # 'record' command
     parser_record = subparsers.add_parser('record',
@@ -703,7 +766,7 @@ def main():
 
     # 'replay' command
     parser_replay = subparsers.add_parser('replay',
-        help='data replay')
+        help='data replay from recording')
     parser_replay.set_defaults(func=cmd_replay)
     parser_replay.add_argument('--channel', metavar='STR',
         help='Set channel name (not supported on all formats)')
