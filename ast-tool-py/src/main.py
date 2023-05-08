@@ -309,7 +309,7 @@ class AsterixSamples:
 
             if issubclass(var, Compound):
                 d = {}
-                for (name, (sub, _fspec)) in var.subitems_dict.items():
+                for (name, (_title, sub, _fspec)) in var.subitems_dict.items():
                     populate_this_item = self.populate_all_items or gen.bool()
                     if populate_this_item:
                         x = random_var(sub, name)
@@ -373,6 +373,10 @@ def cmd_asterix_decoder(args):
     def handle_variation(cat, i, var, path):
         if too_deep(i): return
         cls = var.__class__
+
+        def path_line(name, title, bits):
+            truncate('{}{}: "{}", {}, len={} bits, bin={}'.format('  '*i, path+[name], title, sub.__class__.variation, len(bits), str(bits)))
+
         if isinstance(var, Element):
             x = var.to_uinteger()
             if hasattr(var, 'table_value'):
@@ -391,9 +395,10 @@ def cmd_asterix_decoder(args):
             for j in cls.subitems_list:
                 if type(j) is tuple:
                     name = j[0]
+                    title = cls.subitems_dict[name][0]
                     sub = var.get_item(name)
                     bits = sub.unparse_bits()
-                    truncate('{}{}: {}, len={} bits, bin={}'.format('  '*i, path+[name], sub.__class__.variation, len(bits), str(bits)))
+                    path_line(name, title, bits)
                     handle_variation(cat, i+1, sub, path+[name])
                 else:
                     truncate('{}Spare len={} bits'.format('  '*i, j.bit_size))
@@ -403,11 +408,12 @@ def cmd_asterix_decoder(args):
                 for k in j:
                     if type(k) is tuple:
                         name = k[0]
+                        title = cls.subitems_dict[name][0]
                         sub = var.get_item(name)
                         if sub is None:
                             continue
                         bits = sub.unparse_bits()
-                        truncate('{}{}: {}, len={} bits, bin={}'.format('  '*i, path+[name], sub.__class__.variation, len(bits), str(bits)))
+                        path_line(name, title, bits)
                         handle_variation(cat, i+1, sub, path+[name])
                     else:
                         truncate('{}Spare len={} bits'.format('  '*i, k.bit_size))
@@ -439,11 +445,12 @@ def cmd_asterix_decoder(args):
                 if j is None:
                     continue
                 name = j[0]
+                title = cls.subitems_dict[name][0]
                 sub = var.get_item(name)
                 if sub is None:
                     continue
                 bits = sub.unparse_bits()
-                truncate('{}{}: {}, len={} bits, bin={}'.format('  '*i, path+[name], sub.__class__.variation, len(bits), str(bits)))
+                path_line(name, title, bits)
                 handle_variation(cat, i+1, sub, path+[name])
         else:
             raise Exception('internal error, unexpected variation', var)

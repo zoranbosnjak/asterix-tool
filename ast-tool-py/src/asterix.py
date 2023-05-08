@@ -639,7 +639,7 @@ class Compound(Variation):
     fspec_fx : bool
     fspec_max_bytes : int
     subitems_list : List[Optional[Tuple[ItemName, Any]]]
-    subitems_dict : Dict[ItemName, Tuple[Any, int]]
+    subitems_dict : Dict[ItemName, Tuple[str, Any, int]]
 
     @classmethod
     def _parse_fspec(cls, s : Bits) -> Any:
@@ -688,7 +688,7 @@ class Compound(Variation):
 
     def _fspec(self, parts : List[ItemName]) -> Bits:
         d = self.__class__.subitems_dict
-        fspec = reduce(lambda a,b: a|b, [d[name][1] for name in parts], 0)
+        fspec = reduce(lambda a,b: a|b, [d[name][2] for name in parts], 0)
         n = self.__class__.fspec_max_bytes
         if self.__class__.fspec_fx:
             while (((fspec % 256) == 0) and (n>0)):
@@ -712,7 +712,7 @@ class Compound(Variation):
         return obj
 
     def _set_item(self, name : ItemName, val : Any) -> Any:
-        t, fspec_bit = self.__class__.subitems_dict[name]
+        _title, t, fspec_bit = self.__class__.subitems_dict[name]
         i = mk_item(t, val)
         items = self._items.copy()
         items[name] = i
@@ -3682,25 +3682,25 @@ class Variation_63(Compound):
         ('RFS', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x800000),
-        '020': (Variation_12, 0x400000),
-        '040': (Variation_15, 0x200000),
-        '070': (Variation_20, 0x100000),
-        '090': (Variation_22, 0x080000),
-        '130': (Variation_24, 0x040000),
-        '141': (Variation_25, 0x020000),
-        '050': (Variation_27, 0x018000),
-        '120': (Variation_28, 0x014000),
-        '131': (Variation_29, 0x012000),
-        '080': (Variation_42, 0x011000),
-        '100': (Variation_55, 0x010800),
-        '060': (Variation_42, 0x010400),
-        '030': (Variation_57, 0x010200),
-        '150': (Variation_61, 0x010180),
-        'SP': (Variation_62, 0x010104),
-        'RFS': (Variation_62, 0x010102),
+        '010': ('Data Source Identifier', Variation_1, 0x800000),
+        '020': ('Target Report Descriptor', Variation_12, 0x400000),
+        '040': ('Measured Position in Polar Co-ordinates', Variation_15, 0x200000),
+        '070': ('Mode-3/A Code in Octal Representation', Variation_20, 0x100000),
+        '090': ('Mode-C Code in Binary Representation', Variation_22, 0x080000),
+        '130': ('Radar Plot Characteristics', Variation_24, 0x040000),
+        '141': ('Truncated Time of Day', Variation_25, 0x020000),
+        '050': ('Mode-2 Code in Octal Representation', Variation_27, 0x018000),
+        '120': ('Measured Radial Doppler Speed', Variation_28, 0x014000),
+        '131': ('Received Power', Variation_29, 0x012000),
+        '080': ('Mode-3/A Code Confidence Indicator', Variation_42, 0x011000),
+        '100': ('Mode-C Code and Code Confidence Indicator', Variation_55, 0x010800),
+        '060': ('Mode-2 Code Confidence Indicator', Variation_42, 0x010400),
+        '030': ('Warning/Error Conditions', Variation_57, 0x010200),
+        '150': ('Presence of X-Pulse', Variation_61, 0x010180),
+        'SP': ('Special Purpose Field', Variation_62, 0x010104),
+        'RFS': ('Random Field Sequencing', Variation_62, 0x010102),
     }
 
     @overload
@@ -4821,30 +4821,30 @@ class Variation_78(Compound):
         ('150', Variation_61),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000),
-        '020': (Variation_12, 0x40000000),
-        '161': (Variation_64, 0x20000000),
-        '040': (Variation_15, 0x10000000),
-        '042': (Variation_66, 0x08000000),
-        '200': (Variation_68, 0x04000000),
-        '070': (Variation_20, 0x02000000),
-        '090': (Variation_22, 0x01800000),
-        '141': (Variation_25, 0x01400000),
-        '130': (Variation_24, 0x01200000),
-        '131': (Variation_29, 0x01100000),
-        '120': (Variation_28, 0x01080000),
-        '170': (Variation_76, 0x01040000),
-        '210': (Variation_77, 0x01020000),
-        '050': (Variation_27, 0x01018000),
-        '080': (Variation_42, 0x01014000),
-        '100': (Variation_55, 0x01012000),
-        '060': (Variation_42, 0x01011000),
-        '030': (Variation_57, 0x01010800),
-        'SP': (Variation_62, 0x01010400),
-        'RFS': (Variation_62, 0x01010200),
-        '150': (Variation_61, 0x01010180),
+        '010': ('Data Source Identifier', Variation_1, 0x80000000),
+        '020': ('Target Report Descriptor', Variation_12, 0x40000000),
+        '161': ('Track Plot Number', Variation_64, 0x20000000),
+        '040': ('Measured Position in Polar Co-ordinates', Variation_15, 0x10000000),
+        '042': ('Calculated Position in Cartesian Co-ordinates', Variation_66, 0x08000000),
+        '200': ('Calculated Track Velocity in Polar Co-ordinates', Variation_68, 0x04000000),
+        '070': ('Mode-3/A Code in Octal Representation', Variation_20, 0x02000000),
+        '090': ('Mode-C Code in Binary Representation', Variation_22, 0x01800000),
+        '141': ('Truncated Time of Day', Variation_25, 0x01400000),
+        '130': ('Radar Plot Characteristics', Variation_24, 0x01200000),
+        '131': ('Received Power', Variation_29, 0x01100000),
+        '120': ('Measured Radial Doppler Speed', Variation_28, 0x01080000),
+        '170': ('Track Status', Variation_76, 0x01040000),
+        '210': ('Track Quality', Variation_77, 0x01020000),
+        '050': ('Mode-2 Code in Octal Representation', Variation_27, 0x01018000),
+        '080': ('Mode-3/A Code Confidence Indicator', Variation_42, 0x01014000),
+        '100': ('Mode-C Code and Code Confidence Indicator', Variation_55, 0x01012000),
+        '060': ('Mode-2 Code Confidence Indicator', Variation_42, 0x01011000),
+        '030': ('Warning/Error Conditions', Variation_57, 0x01010800),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010400),
+        'RFS': ('Random Field Sequencing', Variation_62, 0x01010200),
+        '150': ('Presence of X-Pulse', Variation_61, 0x01010180),
     }
 
     @overload
@@ -6090,21 +6090,21 @@ class Variation_94(Compound):
         ('RFS', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_79, 0x4000),
-        '020': (Variation_80, 0x2000),
-        '030': (Variation_81, 0x1000),
-        '041': (Variation_25, 0x0800),
-        '050': (Variation_82, 0x0400),
-        '060': (Variation_83, 0x0200),
-        '070': (Variation_88, 0x0180),
-        '100': (Variation_89, 0x0140),
-        '090': (Variation_92, 0x0120),
-        '080': (Variation_93, 0x0110),
-        'SP': (Variation_62, 0x0104),
-        'RFS': (Variation_62, 0x0102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Message Type', Variation_79, 0x4000),
+        '020': ('Sector Number', Variation_80, 0x2000),
+        '030': ('Time of Day', Variation_81, 0x1000),
+        '041': ('Antenna Rotation Speed', Variation_25, 0x0800),
+        '050': ('Station Configuration Status', Variation_82, 0x0400),
+        '060': ('Station Processing Mode', Variation_83, 0x0200),
+        '070': ('Plot Count Values', Variation_88, 0x0180),
+        '100': ('Dynamic Window Type 1', Variation_89, 0x0140),
+        '090': ('Collimation Error', Variation_92, 0x0120),
+        '080': ('Warning/Error Conditions', Variation_93, 0x0110),
+        'SP': ('Special Purpose Field', Variation_62, 0x0104),
+        'RFS': ('Random Field Sequencing', Variation_62, 0x0102),
     }
 
     @overload
@@ -9706,18 +9706,18 @@ class Variation_170(Compound):
         ('CF1', Variation_169),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'AI1': (Variation_149, 0x8000),
-        'M31': (Variation_150, 0x4000),
-        'CPW': (Variation_153, 0x2000),
-        'CPC': (Variation_156, 0x1000),
-        'TT1': (Variation_81, 0x0800),
-        'DT1': (Variation_157, 0x0400),
-        'AC1': (Variation_165, 0x0200),
-        'MS1': (Variation_166, 0x0180),
-        'FP1': (Variation_168, 0x0140),
-        'CF1': (Variation_169, 0x0120),
+        'AI1': ('Aircraft Identifier (in 7 Characters) of Aircraft 1 Involved in the Conflict', Variation_149, 0x8000),
+        'M31': ('Mode 3/A Code Aircraft 1', Variation_150, 0x4000),
+        'CPW': ('Predicted Conflict Position Target 1 in WGS-84 Coordinates', Variation_153, 0x2000),
+        'CPC': ('Predicted Conflict Position for the Aircraft 1 Involved in the Conflict', Variation_156, 0x1000),
+        'TT1': ('Time to Runway Threshold for First Approaching Aircraft in a RIMCA', Variation_81, 0x0800),
+        'DT1': ('Distance to Runway Threshold for Aircraft 1 Involved in a RIMCA', Variation_157, 0x0400),
+        'AC1': ('Characteristics of Aircraft 1 Involved in the Conflict', Variation_165, 0x0200),
+        'MS1': ('Aircraft Identification Downloaded from Aircraft 1 Involved in the Conflict If Equipped with a Mode-S Transponder', Variation_166, 0x0180),
+        'FP1': ('Number of the Flight Plan Correlated to Aircraft 1 Involved in the Conflict', Variation_168, 0x0140),
+        'CF1': ('Cleared Flight Level for Aircraft 1 Involved in the Conflict', Variation_169, 0x0120),
     }
 
     @overload
@@ -11072,12 +11072,12 @@ class Variation_196(Compound):
         ('CD', Variation_81),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'CN': (Variation_191, 0x80),
-        'CC': (Variation_194, 0x40),
-        'CP': (Variation_195, 0x20),
-        'CD': (Variation_81, 0x10),
+        'CN': ('Conflict Nature', Variation_191, 0x80),
+        'CC': ('Conflict Classification', Variation_194, 0x40),
+        'CP': ('Conflict Probability', Variation_195, 0x20),
+        'CD': ('Conflict Duration', Variation_81, 0x10),
     }
 
     @overload
@@ -11261,14 +11261,14 @@ class Variation_199(Compound):
         ('MVS', Variation_198),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'TC': (Variation_81, 0x80),
-        'TCA': (Variation_81, 0x40),
-        'CHS': (Variation_197, 0x20),
-        'MHS': (Variation_157, 0x10),
-        'CVS': (Variation_198, 0x08),
-        'MVS': (Variation_198, 0x04),
+        'TC': ('Time to Conflict', Variation_81, 0x80),
+        'TCA': ('Time to Closest Approach', Variation_81, 0x40),
+        'CHS': ('Current Horizontal Separation', Variation_197, 0x20),
+        'MHS': ('Estimated Minimum Horizontal Separation', Variation_157, 0x10),
+        'CVS': ('Current Vertical Separation', Variation_198, 0x08),
+        'MVS': ('Estimated Minimum Vertical Separation', Variation_198, 0x04),
     }
 
     @overload
@@ -11496,14 +11496,14 @@ class Variation_202(Compound):
         ('G', Variation_149),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'AN': (Variation_201, 0x80),
-        'CAN': (Variation_149, 0x40),
-        'RT1': (Variation_149, 0x20),
-        'RT2': (Variation_149, 0x10),
-        'SB': (Variation_149, 0x08),
-        'G': (Variation_149, 0x04),
+        'AN': ('Area Name', Variation_201, 0x80),
+        'CAN': ('Crossing Area Name', Variation_149, 0x40),
+        'RT1': ('Runway/Taxiway Designator 1', Variation_149, 0x20),
+        'RT2': ('Runway/Taxiway Designator 2', Variation_149, 0x10),
+        'SB': ('Stop Bar Designator', Variation_149, 0x08),
+        'G': ('Gate Designator', Variation_149, 0x04),
     }
 
     @overload
@@ -11740,18 +11740,18 @@ class Variation_204(Compound):
         ('CF2', Variation_169),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'AI2': (Variation_149, 0x8000),
-        'M32': (Variation_203, 0x4000),
-        'CPW': (Variation_153, 0x2000),
-        'CPL': (Variation_156, 0x1000),
-        'TT2': (Variation_81, 0x0800),
-        'DT2': (Variation_157, 0x0400),
-        'AC2': (Variation_165, 0x0200),
-        'MS2': (Variation_166, 0x0180),
-        'FP2': (Variation_168, 0x0140),
-        'CF2': (Variation_169, 0x0120),
+        'AI2': ('Aircraft Identifier (in 7 Characters) of Aircraft 2 Involved in the Conflict', Variation_149, 0x8000),
+        'M32': ('Mode 3/A Code Aircraft 2', Variation_203, 0x4000),
+        'CPW': ('Predicted Conflict Position Target 2 in WGS-84 Coordinates', Variation_153, 0x2000),
+        'CPL': ('Predicted Conflict Position for the Aircraft 2 Involved in the Conflict', Variation_156, 0x1000),
+        'TT2': ('Time to Runway Threshold for Second Approaching Aircraft in a RIMCA', Variation_81, 0x0800),
+        'DT2': ('Distance to Runway Threshold for Aircraft 2 Involved in a RIMCA', Variation_157, 0x0400),
+        'AC2': ('Characteristics of Aircraft 2 Involved in the Conflict', Variation_165, 0x0200),
+        'MS2': ('Aircraft Identification Downloaded From Aircraft 2 Involved in the Conflict If Eequipped With a Mode-S Transponder', Variation_166, 0x0180),
+        'FP2': ('Number of the Flight Plan Correlated to Aircraft 2 Involved in the Conflict', Variation_168, 0x0140),
+        'CF2': ('Cleared Flight Level for Aircraft 2 Involved in the Conflict', Variation_169, 0x0120),
     }
 
     @overload
@@ -12164,28 +12164,28 @@ class Variation_207(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x800000),
-        '000': (Variation_95, 0x400000),
-        '015': (Variation_96, 0x200000),
-        '020': (Variation_81, 0x100000),
-        '040': (Variation_64, 0x080000),
-        '045': (Variation_98, 0x040000),
-        '060': (Variation_148, 0x020000),
-        '030': (Variation_64, 0x018000),
-        '170': (Variation_170, 0x014000),
-        '120': (Variation_196, 0x012000),
-        '070': (Variation_199, 0x011000),
-        '076': (Variation_155, 0x010800),
-        '074': (Variation_200, 0x010400),
-        '075': (Variation_154, 0x010200),
-        '100': (Variation_202, 0x010180),
-        '035': (Variation_64, 0x010140),
-        '171': (Variation_204, 0x010120),
-        '110': (Variation_206, 0x010110),
-        'RE': (Variation_62, 0x010104),
-        'SP': (Variation_62, 0x010102),
+        '010': ('Data Source Identifier', Variation_1, 0x800000),
+        '000': ('Message Type', Variation_95, 0x400000),
+        '015': ('SDPS Identifier', Variation_96, 0x200000),
+        '020': ('Time of Message', Variation_81, 0x100000),
+        '040': ('Alert Identifier', Variation_64, 0x080000),
+        '045': ('Alert Status', Variation_98, 0x040000),
+        '060': ('Safety Net Function and System Status', Variation_148, 0x020000),
+        '030': ('Track Number 1', Variation_64, 0x018000),
+        '170': ('Aircraft Identification and Characteristics 1', Variation_170, 0x014000),
+        '120': ('Conflict Characteristics', Variation_196, 0x012000),
+        '070': ('Conflict Timing and Separation', Variation_199, 0x011000),
+        '076': ('Vertical Deviation', Variation_155, 0x010800),
+        '074': ('Longitudinal Deviation', Variation_200, 0x010400),
+        '075': ('Transversal Distance Deviation', Variation_154, 0x010200),
+        '100': ('Area Definition', Variation_202, 0x010180),
+        '035': ('Track Number 2', Variation_64, 0x010140),
+        '171': ('Aircraft Identification and Characteristics 2', Variation_204, 0x010120),
+        '110': ('FDPS Sector Control Identification', Variation_206, 0x010110),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x010102),
     }
 
     @overload
@@ -13897,22 +13897,22 @@ class Variation_230(Compound):
         ('RFS', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_208, 0x4000),
-        '020': (Variation_214, 0x2000),
-        '036': (Variation_216, 0x1000),
-        '034': (Variation_218, 0x0800),
-        '040': (Variation_220, 0x0400),
-        '050': (Variation_222, 0x0200),
-        '090': (Variation_81, 0x0180),
-        '100': (Variation_226, 0x0140),
-        '110': (Variation_227, 0x0120),
-        '120': (Variation_64, 0x0110),
-        '038': (Variation_229, 0x0108),
-        'SP': (Variation_62, 0x0104),
-        'RFS': (Variation_62, 0x0102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Message Type', Variation_208, 0x4000),
+        '020': ('Vector Qualifier', Variation_214, 0x2000),
+        '036': ('Sequence of Cartesian Vectors in SPF Notation', Variation_216, 0x1000),
+        '034': ('Sequence of Polar Vectors in SPF Notation', Variation_218, 0x0800),
+        '040': ('Contour Identifier', Variation_220, 0x0400),
+        '050': ('Sequence of Contour Points in SPF Notation', Variation_222, 0x0200),
+        '090': ('Time of Day', Variation_81, 0x0180),
+        '100': ('Processing Status', Variation_226, 0x0140),
+        '110': ('Station Configuration Status', Variation_227, 0x0120),
+        '120': ('Total Number of Items Constituting One Weather Picture', Variation_64, 0x0110),
+        '038': ('Sequence of Weather Vectors in SPF Notation', Variation_229, 0x0108),
+        'SP': ('Special Purpose Field', Variation_62, 0x0104),
+        'RFS': ('Random Field Sequencing', Variation_62, 0x0102),
     }
 
     @overload
@@ -14853,17 +14853,17 @@ class Variation_242(Compound):
         ('100', Variation_64),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_231, 0x4000),
-        '020': (Variation_232, 0x2000),
-        '030': (Variation_235, 0x1000),
-        '060': (Variation_237, 0x0800),
-        '070': (Variation_81, 0x0400),
-        '080': (Variation_226, 0x0200),
-        '090': (Variation_241, 0x0180),
-        '100': (Variation_64, 0x0140),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Message Type', Variation_231, 0x4000),
+        '020': ('Vector Qualifier', Variation_232, 0x2000),
+        '030': ('Sequence of Cartesian Vectors', Variation_235, 0x1000),
+        '060': ('Synchronisation/Control Signal', Variation_237, 0x0800),
+        '070': ('Time of Day', Variation_81, 0x0400),
+        '080': ('Processing Status', Variation_226, 0x0200),
+        '090': ('Radar Configuration and Status', Variation_241, 0x0180),
+        '100': ('Vector Count', Variation_64, 0x0140),
     }
 
     @overload
@@ -18340,35 +18340,35 @@ class Variation_310(Compound):
         ('RE', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000),
-        '000': (Variation_243, 0x40000000),
-        '020': (Variation_255, 0x20000000),
-        '140': (Variation_81, 0x10000000),
-        '041': (Variation_257, 0x08000000),
-        '040': (Variation_259, 0x04000000),
-        '042': (Variation_261, 0x02000000),
-        '200': (Variation_262, 0x01800000),
-        '202': (Variation_264, 0x01400000),
-        '161': (Variation_265, 0x01200000),
-        '170': (Variation_276, 0x01100000),
-        '060': (Variation_278, 0x01080000),
-        '220': (Variation_279, 0x01040000),
-        '245': (Variation_281, 0x01020000),
-        '250': (Variation_285, 0x01018000),
-        '300': (Variation_286, 0x01014000),
-        '090': (Variation_287, 0x01012000),
-        '091': (Variation_288, 0x01011000),
-        '270': (Variation_291, 0x01010800),
-        '550': (Variation_297, 0x01010400),
-        '310': (Variation_300, 0x01010200),
-        '500': (Variation_303, 0x01010180),
-        '280': (Variation_307, 0x01010140),
-        '131': (Variation_0, 0x01010120),
-        '210': (Variation_309, 0x01010110),
-        'SP': (Variation_62, 0x01010104),
-        'RE': (Variation_62, 0x01010102),
+        '010': ('Data Source Identifier', Variation_1, 0x80000000),
+        '000': ('Message Type', Variation_243, 0x40000000),
+        '020': ('Target Report Descriptor', Variation_255, 0x20000000),
+        '140': ('Time of Day', Variation_81, 0x10000000),
+        '041': ('Position in WGS-84 Co-ordinates', Variation_257, 0x08000000),
+        '040': ('Measured Position in Polar Co-ordinates', Variation_259, 0x04000000),
+        '042': ('Position in Cartesian Co-ordinates', Variation_261, 0x02000000),
+        '200': ('Calculated Track Velocity in Polar Co-ordinates', Variation_262, 0x01800000),
+        '202': ('Calculated Track Velocity in Cartesian Co-ordinates', Variation_264, 0x01400000),
+        '161': ('Track Number', Variation_265, 0x01200000),
+        '170': ('Track Status', Variation_276, 0x01100000),
+        '060': ('Mode-3/A Code in Octal Representation', Variation_278, 0x01080000),
+        '220': ('Target Address', Variation_279, 0x01040000),
+        '245': ('Target Identification', Variation_281, 0x01020000),
+        '250': ('Mode S MB Data', Variation_285, 0x01018000),
+        '300': ('Vehicle Fleet Identification', Variation_286, 0x01014000),
+        '090': ('Flight Level in Binary Representation', Variation_287, 0x01012000),
+        '091': ('Measured Height', Variation_288, 0x01011000),
+        '270': ('Target Size and Orientation', Variation_291, 0x01010800),
+        '550': ('System Status', Variation_297, 0x01010400),
+        '310': ('Pre-programmed Message', Variation_300, 0x01010200),
+        '500': ('Standard Deviation of Position', Variation_303, 0x01010180),
+        '280': ('Presence', Variation_307, 0x01010140),
+        '131': ('Amplitude of Primary Plot', Variation_0, 0x01010120),
+        '210': ('Calculated Acceleration', Variation_309, 0x01010110),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010104),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010102),
     }
 
     @overload
@@ -20344,14 +20344,14 @@ class Variation_337(Compound):
         ('AVTECH', Variation_336),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'MB': (Variation_322, 0x8000),
-        'ADR': (Variation_279, 0x4000),
-        'COMACAS': (Variation_330, 0x1000),
-        'ACT': (Variation_331, 0x0180),
-        'ECAT': (Variation_332, 0x0140),
-        'AVTECH': (Variation_336, 0x0110),
+        'MB': ('BDS', Variation_322, 0x8000),
+        'ADR': ('24 Bits Aircraft Address', Variation_279, 0x4000),
+        'COMACAS': ('Communications/ACAS Capability and Flight Status', Variation_330, 0x1000),
+        'ACT': ('Aircraft Derived Aircraft Type', Variation_331, 0x0180),
+        'ECAT': ('Emitter Category', Variation_332, 0x0140),
+        'AVTECH': ('Available Technologies', Variation_336, 0x0110),
     }
 
     @overload
@@ -21405,20 +21405,20 @@ class Variation_359(Compound):
         ('MUL', Variation_357),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'PSR': (Variation_357, 0x8000),
-        'SSR': (Variation_357, 0x4000),
-        'MDA': (Variation_357, 0x2000),
-        'MFL': (Variation_357, 0x1000),
-        'MDS': (Variation_357, 0x0800),
-        'ADS': (Variation_358, 0x0400),
-        'ADB': (Variation_357, 0x0200),
-        'MD1': (Variation_357, 0x0180),
-        'MD2': (Variation_357, 0x0140),
-        'LOP': (Variation_357, 0x0120),
-        'TRK': (Variation_357, 0x0110),
-        'MUL': (Variation_357, 0x0108),
+        'PSR': ('Age of The Last Primary Detection Used to Update the Track', Variation_357, 0x8000),
+        'SSR': ('Age of the Last Secondary Detection Used to Update the Track', Variation_357, 0x4000),
+        'MDA': ('Age of the Last Mode A Detection Used to Update the Track', Variation_357, 0x2000),
+        'MFL': ('Age of the Last Mode C Detection Used to Update the Track', Variation_357, 0x1000),
+        'MDS': ('Age of the Last Mode S Detection Used to Update the Track', Variation_357, 0x0800),
+        'ADS': ('Age of the Last ADS Report Used to Update the Track', Variation_358, 0x0400),
+        'ADB': ('Age of the Last ADS-B Report Used to Update the Track', Variation_357, 0x0200),
+        'MD1': ('Age of the Last Valid Mode 1 Used to Update the Track', Variation_357, 0x0180),
+        'MD2': ('Age of the Last Mode 2 Used to Update the Track', Variation_357, 0x0140),
+        'LOP': ('Age of the Last Magentic Loop Detection', Variation_357, 0x0120),
+        'TRK': ('Actual Track Age Since First Occurrence', Variation_357, 0x0110),
+        'MUL': ('Age of the Last Multilateration Detection', Variation_357, 0x0108),
     }
 
     @overload
@@ -22841,22 +22841,22 @@ class Variation_384(Compound):
         ('STS', Variation_383),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'FPPSID': (Variation_366, 0x8000),
-        'CSN': (Variation_149, 0x4000),
-        'IFPSFLIGHTID': (Variation_369, 0x2000),
-        'FLIGHTCAT': (Variation_370, 0x1000),
-        'TOA': (Variation_331, 0x0800),
-        'WTC': (Variation_371, 0x0400),
-        'ADEP': (Variation_331, 0x0200),
-        'ADES': (Variation_331, 0x0180),
-        'RWY': (Variation_372, 0x0140),
-        'CFL': (Variation_169, 0x0120),
-        'CCP': (Variation_373, 0x0110),
-        'TOD': (Variation_380, 0x0108),
-        'AST': (Variation_166, 0x0104),
-        'STS': (Variation_383, 0x0102),
+        'FPPSID': ('FPPS Identification Tag', Variation_366, 0x8000),
+        'CSN': ('Callsign', Variation_149, 0x4000),
+        'IFPSFLIGHTID': ('IFPS_FLIGHT_ID', Variation_369, 0x2000),
+        'FLIGHTCAT': ('Flight Category', Variation_370, 0x1000),
+        'TOA': ('Type of Aircraft', Variation_331, 0x0800),
+        'WTC': ('Wake Turbulence Category', Variation_371, 0x0400),
+        'ADEP': ('Departure Airport', Variation_331, 0x0200),
+        'ADES': ('Destination Airport', Variation_331, 0x0180),
+        'RWY': ('Runway Designation', Variation_372, 0x0140),
+        'CFL': ('Current Cleared Flight Level', Variation_169, 0x0120),
+        'CCP': ('Current Control Position', Variation_373, 0x0110),
+        'TOD': ('Time of Departure', Variation_380, 0x0108),
+        'AST': ('Aircraft Stand', Variation_166, 0x0104),
+        'STS': ('Stand Status', Variation_383, 0x0102),
     }
 
     @overload
@@ -23803,14 +23803,14 @@ class Variation_397(Compound):
         ('AAC', Variation_396),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'APC': (Variation_388, 0x80),
-        'APW': (Variation_390, 0x40),
-        'ATH': (Variation_391, 0x20),
-        'AVC': (Variation_393, 0x10),
-        'ARC': (Variation_394, 0x08),
-        'AAC': (Variation_396, 0x04),
+        'APC': ('Estimated Accuracy Of Track Position (Cartesian)', Variation_388, 0x80),
+        'APW': ('Estimated Accuracy Of Track Position (WGS84)', Variation_390, 0x40),
+        'ATH': ('Estimated Accuracy Of Track Height', Variation_391, 0x20),
+        'AVC': ('Estimated Accuracy Of Track Velocity (Cartesian)', Variation_393, 0x10),
+        'ARC': ('Estimated Accuracy Of Rate Of Climb / Descent', Variation_394, 0x08),
+        'AAC': ('Estimated Accuracy Of Acceleration (Cartesian)', Variation_396, 0x04),
     }
 
     @overload
@@ -24805,37 +24805,37 @@ class Variation_413(Compound):
         ('RE', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_311, 0x8000000000),
-        '000': (Variation_312, 0x4000000000),
-        '015': (Variation_0, 0x2000000000),
-        '140': (Variation_81, 0x1000000000),
-        '041': (Variation_313, 0x0800000000),
-        '042': (Variation_314, 0x0400000000),
-        '202': (Variation_316, 0x0200000000),
-        '210': (Variation_318, 0x0180000000),
-        '060': (Variation_319, 0x0140000000),
-        '245': (Variation_320, 0x0120000000),
-        '380': (Variation_337, 0x0110000000),
-        '161': (Variation_339, 0x0108000000),
-        '170': (Variation_356, 0x0104000000),
-        '290': (Variation_359, 0x0102000000),
-        '430': (Variation_360, 0x0101800000),
-        '090': (Variation_361, 0x0101400000),
-        '093': (Variation_364, 0x0101200000),
-        '092': (Variation_288, 0x0101100000),
-        '215': (Variation_365, 0x0101080000),
-        '270': (Variation_291, 0x0101040000),
-        '390': (Variation_384, 0x0101020000),
-        '300': (Variation_385, 0x0101018000),
-        '310': (Variation_387, 0x0101014000),
-        '500': (Variation_397, 0x0101012000),
-        '600': (Variation_400, 0x0101011000),
-        '605': (Variation_402, 0x0101010800),
-        '610': (Variation_412, 0x0101010400),
-        'SP': (Variation_62, 0x0101010200),
-        'RE': (Variation_62, 0x0101010180),
+        '010': ('Data Source Identifier', Variation_311, 0x8000000000),
+        '000': ('Message Type', Variation_312, 0x4000000000),
+        '015': ('Service Identification', Variation_0, 0x2000000000),
+        '140': ('Time of Track Information', Variation_81, 0x1000000000),
+        '041': ('Position in WGS-84 Coordinates', Variation_313, 0x0800000000),
+        '042': ('Calculated Position in Cartesian Co-ordinates', Variation_314, 0x0400000000),
+        '202': ('Calculated Track Velocity in Cartesian Coordinates', Variation_316, 0x0200000000),
+        '210': ('Calculated Acceleration', Variation_318, 0x0180000000),
+        '060': ('Mode-3/A Code in Octal Representation', Variation_319, 0x0140000000),
+        '245': ('Target Identification', Variation_320, 0x0120000000),
+        '380': ('Mode-S / ADS-B Related Data', Variation_337, 0x0110000000),
+        '161': ('Track Number', Variation_339, 0x0108000000),
+        '170': ('Track Status', Variation_356, 0x0104000000),
+        '290': ('System Track Update Ages', Variation_359, 0x0102000000),
+        '430': ('Phase of Flight', Variation_360, 0x0101800000),
+        '090': ('Measured Flight Level', Variation_361, 0x0101400000),
+        '093': ('Calculated Track Barometric Altitude', Variation_364, 0x0101200000),
+        '092': ('Calculated Track Geometric Altitude', Variation_288, 0x0101100000),
+        '215': ('Calculated Rate Of Climb/Descent', Variation_365, 0x0101080000),
+        '270': ('Target Size and Orientation', Variation_291, 0x0101040000),
+        '390': ('Flight Plan Related Data', Variation_384, 0x0101020000),
+        '300': ('Vehicle Fleet Identification', Variation_385, 0x0101018000),
+        '310': ('Pre-programmed Message', Variation_387, 0x0101014000),
+        '500': ('Estimated Accuracies', Variation_397, 0x0101012000),
+        '600': ('Alert Messages', Variation_400, 0x0101011000),
+        '605': ('Tracks in Alert', Variation_402, 0x0101010800),
+        '610': ('Holdbar Status', Variation_412, 0x0101010400),
+        'SP': ('Special Purpose Field', Variation_62, 0x0101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0101010180),
     }
 
     @overload
@@ -25845,14 +25845,14 @@ class Variation_416(Compound):
         ('AVTECH', Variation_336),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'MB': (Variation_322, 0x8000),
-        'ADR': (Variation_279, 0x4000),
-        'COMACAS': (Variation_415, 0x1000),
-        'ACT': (Variation_331, 0x0180),
-        'ECAT': (Variation_332, 0x0140),
-        'AVTECH': (Variation_336, 0x0110),
+        'MB': ('BDS', Variation_322, 0x8000),
+        'ADR': ('24 Bits Aircraft Address', Variation_279, 0x4000),
+        'COMACAS': ('Communications/ACAS Capability and Flight Status', Variation_415, 0x1000),
+        'ACT': ('Aircraft Derived Aircraft Type', Variation_331, 0x0180),
+        'ECAT': ('Emitter Category', Variation_332, 0x0140),
+        'AVTECH': ('Available Technologies', Variation_336, 0x0110),
     }
 
     @overload
@@ -26711,20 +26711,20 @@ class Variation_424(Compound):
         ('MUL', Variation_357),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'PSR': (Variation_357, 0x8000),
-        'SSR': (Variation_357, 0x4000),
-        'MDA': (Variation_357, 0x2000),
-        'MFL': (Variation_357, 0x1000),
-        'MDS': (Variation_357, 0x0800),
-        'ADS': (Variation_358, 0x0400),
-        'ADB': (Variation_357, 0x0200),
-        'MD1': (Variation_357, 0x0180),
-        'MD2': (Variation_357, 0x0140),
-        'LOP': (Variation_357, 0x0120),
-        'TRK': (Variation_357, 0x0110),
-        'MUL': (Variation_357, 0x0108),
+        'PSR': ('Age of the Last Primary Report Used to Update the Track', Variation_357, 0x8000),
+        'SSR': ('Age of the Last Secondary Report Used to Update the Track', Variation_357, 0x4000),
+        'MDA': ('Age of the Last Valid Mode A Report Used to Update the Track', Variation_357, 0x2000),
+        'MFL': ('Age of the Last Valid and Credible Mode C Used to Update the Track', Variation_357, 0x1000),
+        'MDS': ('Age of the Last Mode S Report Used to Update the Track', Variation_357, 0x0800),
+        'ADS': ('Age of the Last ADS Report Used to Update the Track', Variation_358, 0x0400),
+        'ADB': ('Age of the Last ADS-B Report Used to Update the Track', Variation_357, 0x0200),
+        'MD1': ('Age of the Last Valid Mode 1 Used to Update the Track', Variation_357, 0x0180),
+        'MD2': ('Age of the Last Valid Mode 2 Used to Update the Track', Variation_357, 0x0140),
+        'LOP': ('Age of the Last Magentic Loop Detection', Variation_357, 0x0120),
+        'TRK': ('Actual Track Age Since First Occurrence', Variation_357, 0x0110),
+        'MUL': ('Age of the Last Multilateration Detection', Variation_357, 0x0108),
     }
 
     @overload
@@ -27317,22 +27317,22 @@ class Variation_429(Compound):
         ('STS', Variation_383),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'FPPSID': (Variation_366, 0x8000),
-        'CSN': (Variation_149, 0x4000),
-        'IFPSFLIGHTID': (Variation_369, 0x2000),
-        'FLIGHTCAT': (Variation_428, 0x1000),
-        'TOA': (Variation_331, 0x0800),
-        'WTC': (Variation_371, 0x0400),
-        'ADEP': (Variation_331, 0x0200),
-        'ADES': (Variation_331, 0x0180),
-        'RWY': (Variation_372, 0x0140),
-        'CFL': (Variation_169, 0x0120),
-        'CCP': (Variation_373, 0x0110),
-        'TOD': (Variation_380, 0x0108),
-        'AST': (Variation_166, 0x0104),
-        'STS': (Variation_383, 0x0102),
+        'FPPSID': ('FPPS Identification Tag', Variation_366, 0x8000),
+        'CSN': ('Callsign', Variation_149, 0x4000),
+        'IFPSFLIGHTID': ('IFPS_FLIGHT_ID', Variation_369, 0x2000),
+        'FLIGHTCAT': ('Flight Category', Variation_428, 0x1000),
+        'TOA': ('Type of Aircraft', Variation_331, 0x0800),
+        'WTC': ('Wake Turbulence Category', Variation_371, 0x0400),
+        'ADEP': ('Departure Airport', Variation_331, 0x0200),
+        'ADES': ('Destination Airport', Variation_331, 0x0180),
+        'RWY': ('Runway Designation', Variation_372, 0x0140),
+        'CFL': ('Current Cleared Flight Level', Variation_169, 0x0120),
+        'CCP': ('Current Control Position', Variation_373, 0x0110),
+        'TOD': ('Time of Departure', Variation_380, 0x0108),
+        'AST': ('Aircraft Stand', Variation_166, 0x0104),
+        'STS': ('Stand Status', Variation_383, 0x0102),
     }
 
     @overload
@@ -27748,37 +27748,37 @@ class Variation_430(Compound):
         ('RE', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_311, 0x8000000000),
-        '000': (Variation_312, 0x4000000000),
-        '015': (Variation_0, 0x2000000000),
-        '140': (Variation_81, 0x1000000000),
-        '041': (Variation_313, 0x0800000000),
-        '042': (Variation_314, 0x0400000000),
-        '202': (Variation_316, 0x0200000000),
-        '210': (Variation_318, 0x0180000000),
-        '060': (Variation_319, 0x0140000000),
-        '245': (Variation_320, 0x0120000000),
-        '380': (Variation_416, 0x0110000000),
-        '161': (Variation_339, 0x0108000000),
-        '170': (Variation_423, 0x0104000000),
-        '290': (Variation_424, 0x0102000000),
-        '430': (Variation_360, 0x0101800000),
-        '090': (Variation_361, 0x0101400000),
-        '093': (Variation_426, 0x0101200000),
-        '092': (Variation_288, 0x0101100000),
-        '215': (Variation_365, 0x0101080000),
-        '270': (Variation_291, 0x0101040000),
-        '390': (Variation_429, 0x0101020000),
-        '300': (Variation_385, 0x0101018000),
-        '310': (Variation_387, 0x0101014000),
-        '500': (Variation_397, 0x0101012000),
-        '600': (Variation_400, 0x0101011000),
-        '605': (Variation_402, 0x0101010800),
-        '610': (Variation_412, 0x0101010400),
-        'SP': (Variation_62, 0x0101010200),
-        'RE': (Variation_62, 0x0101010180),
+        '010': ('Data Source Identifier', Variation_311, 0x8000000000),
+        '000': ('Message Type', Variation_312, 0x4000000000),
+        '015': ('Service Identification', Variation_0, 0x2000000000),
+        '140': ('Time of Track Information', Variation_81, 0x1000000000),
+        '041': ('Position in WGS-84 Coordinates', Variation_313, 0x0800000000),
+        '042': ('Calculated Position in Cartesian Co-ordinates', Variation_314, 0x0400000000),
+        '202': ('Calculated Track Velocity in Cartesian Coordinates', Variation_316, 0x0200000000),
+        '210': ('Calculated Acceleration', Variation_318, 0x0180000000),
+        '060': ('Mode-3/A Code in Octal Representation', Variation_319, 0x0140000000),
+        '245': ('Target Identification', Variation_320, 0x0120000000),
+        '380': ('Mode-S / ADS-B Related Data', Variation_416, 0x0110000000),
+        '161': ('Track Number', Variation_339, 0x0108000000),
+        '170': ('Track Status', Variation_423, 0x0104000000),
+        '290': ('System Track Update Ages', Variation_424, 0x0102000000),
+        '430': ('Phase of Flight', Variation_360, 0x0101800000),
+        '090': ('Measured Flight Level', Variation_361, 0x0101400000),
+        '093': ('Calculated Track Barometric Altitude', Variation_426, 0x0101200000),
+        '092': ('Calculated Track Geometric Altitude', Variation_288, 0x0101100000),
+        '215': ('Calculated Rate Of Climb/Descent', Variation_365, 0x0101080000),
+        '270': ('Target Size and Orientation', Variation_291, 0x0101040000),
+        '390': ('Flight Plan Related Data', Variation_429, 0x0101020000),
+        '300': ('Vehicle Fleet Identification', Variation_385, 0x0101018000),
+        '310': ('Pre-programmed Message', Variation_387, 0x0101014000),
+        '500': ('Estimated Accuracies', Variation_397, 0x0101012000),
+        '600': ('Alert Messages', Variation_400, 0x0101011000),
+        '605': ('Tracks in Alert', Variation_402, 0x0101010800),
+        '610': ('Holdbar Status', Variation_412, 0x0101010400),
+        'SP': ('Special Purpose Field', Variation_62, 0x0101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0101010180),
     }
 
     @overload
@@ -29269,12 +29269,12 @@ class Variation_449(Compound):
         ('ORT', Variation_14),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'LEN': (Variation_448, 0x80),
-        'WDT': (Variation_448, 0x40),
-        'HGT': (Variation_448, 0x20),
-        'ORT': (Variation_14, 0x10),
+        'LEN': ('Target Length', Variation_448, 0x80),
+        'WDT': ('Target Width', Variation_448, 0x40),
+        'HGT': ('Target Height', Variation_448, 0x20),
+        'ORT': ('Target Orientation', Variation_14, 0x10),
     }
 
     @overload
@@ -29954,11 +29954,11 @@ class Variation_460(Compound):
         ('HPP', Variation_459),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'P84': (Variation_455, 0x80),
-        'HPR': (Variation_457, 0x40),
-        'HPP': (Variation_459, 0x20),
+        'P84': ('Horizontal Position in WGS-84 Coordinates', Variation_455, 0x80),
+        'HPR': ('Horizontal Position Resolution', Variation_457, 0x40),
+        'HPP': ('Horizontal Position Precision', Variation_459, 0x20),
     }
 
     @overload
@@ -30410,16 +30410,16 @@ class Variation_468(Compound):
         ('COGHHA', Variation_467),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'GH': (Variation_461, 0x8000),
-        'RSGH': (Variation_462, 0x4000),
-        'SDGH': (Variation_462, 0x2000),
-        'CI6': (Variation_465, 0x1000),
-        'CI9': (Variation_466, 0x0800),
-        'COGHHP': (Variation_467, 0x0400),
-        'COGHHV': (Variation_467, 0x0200),
-        'COGHHA': (Variation_467, 0x0180),
+        'GH': ('Geometric Height (WGS-84)', Variation_461, 0x8000),
+        'RSGH': ('Geometric Height Resolution', Variation_462, 0x4000),
+        'SDGH': ('Geometric Height Precision', Variation_462, 0x2000),
+        'CI6': ('Confidence Interval for Geometric Height (67%)', Variation_465, 0x1000),
+        'CI9': ('Confidence Interval for Geometric Height (95%)', Variation_466, 0x0800),
+        'COGHHP': ('Correlation of Geometric Height and Horizontal Position', Variation_467, 0x0400),
+        'COGHHV': ('Correlation of Geometric Height and Horizontal Velocity', Variation_467, 0x0200),
+        'COGHHA': ('Correlation of Geometric Height and Horizontal Acceleration', Variation_467, 0x0180),
     }
 
     @overload
@@ -31125,12 +31125,12 @@ class Variation_476(Compound):
         ('COHVHP', Variation_475),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'HV': (Variation_471, 0x80),
-        'RSHV': (Variation_473, 0x40),
-        'SDHV': (Variation_474, 0x20),
-        'COHVHP': (Variation_475, 0x10),
+        'HV': ('Horizontal Velocity Vector', Variation_471, 0x80),
+        'RSHV': ('Horizontal Velocity Resolution', Variation_473, 0x40),
+        'SDHV': ('Horizontal Velocity Precision', Variation_474, 0x20),
+        'COHVHP': ('Correlation of Horizontal Velocity and Horizontal Position', Variation_475, 0x10),
     }
 
     @overload
@@ -31788,12 +31788,12 @@ class Variation_485(Compound):
         ('COHAHV', Variation_484),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'HA': (Variation_479, 0x80),
-        'SDHA': (Variation_482, 0x40),
-        'COHAHP': (Variation_483, 0x20),
-        'COHAHV': (Variation_484, 0x10),
+        'HA': ('Horizontal Acceleration Vector', Variation_479, 0x80),
+        'SDHA': ('Horizontal Acceleration Precision', Variation_482, 0x40),
+        'COHAHP': ('Correlation of Horizontal Acceleration and Horizontal Position', Variation_483, 0x20),
+        'COHAHV': ('Correlation of Horizontal Acceleration and Horizontal Velocity', Variation_484, 0x10),
     }
 
     @overload
@@ -32036,14 +32036,14 @@ class Variation_488(Compound):
         ('COVVHA', Variation_467),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'VV': (Variation_486, 0x80),
-        'RSVV': (Variation_472, 0x40),
-        'SDVV': (Variation_487, 0x20),
-        'COVVHP': (Variation_467, 0x10),
-        'COVVHV': (Variation_467, 0x08),
-        'COVVHA': (Variation_467, 0x04),
+        'VV': ('Vertical Velocity', Variation_486, 0x80),
+        'RSVV': ('Vertical Velocity Resolution', Variation_472, 0x40),
+        'SDVV': ('Vertical Velocity Precision', Variation_487, 0x20),
+        'COVVHP': ('Correlation of Vertical Velocity and Horizontal Position', Variation_467, 0x10),
+        'COVVHV': ('Correlation of Vertical Velocity and Horizontal Velocity', Variation_467, 0x08),
+        'COVVHA': ('Correlation of Vertical Velocity and Horizontal Acceleration', Variation_467, 0x04),
     }
 
     @overload
@@ -32374,13 +32374,13 @@ class Variation_492(Compound):
         ('COVAHA', Variation_467),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'VA': (Variation_489, 0x80),
-        'RSVA': (Variation_491, 0x40),
-        'COVAHP': (Variation_467, 0x20),
-        'COVAHV': (Variation_467, 0x10),
-        'COVAHA': (Variation_467, 0x08),
+        'VA': ('Vertical Acceleration', Variation_489, 0x80),
+        'RSVA': ('Vertical Acceleration Precision', Variation_491, 0x40),
+        'COVAHP': ('Correlation of Vertical Acceleration and Horizontal Position', Variation_467, 0x20),
+        'COVAHV': ('Correlation of Vertical Acceleration and Horizontal Velocity', Variation_467, 0x10),
+        'COVAHA': ('Correlation of Vertical Acceleration and Horizontal Acceleration', Variation_467, 0x08),
     }
 
     @overload
@@ -32902,16 +32902,16 @@ class Variation_503(Compound):
         ('SDRA', Variation_502),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'R': (Variation_495, 0x8000),
-        'RSR': (Variation_496, 0x4000),
-        'SDR': (Variation_496, 0x2000),
-        'RR': (Variation_497, 0x1000),
-        'RSRR': (Variation_498, 0x0800),
-        'SDRR': (Variation_499, 0x0400),
-        'RA': (Variation_500, 0x0200),
-        'SDRA': (Variation_502, 0x0180),
+        'R': ('Range', Variation_495, 0x8000),
+        'RSR': ('Range Resolution', Variation_496, 0x4000),
+        'SDR': ('Range Precision', Variation_496, 0x2000),
+        'RR': ('Range Rate', Variation_497, 0x1000),
+        'RSRR': ('Range Rate Resolution', Variation_498, 0x0800),
+        'SDRR': ('Range Rate Precision', Variation_499, 0x0400),
+        'RA': ('Range Acceleration', Variation_500, 0x0200),
+        'SDRA': ('Range Acceleration Precision', Variation_502, 0x0180),
     }
 
     @overload
@@ -33276,18 +33276,18 @@ class Variation_507(Compound):
         ('CODARA', Variation_456),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'DV': (Variation_486, 0x8000),
-        'SDDV': (Variation_504, 0x4000),
-        'DA': (Variation_500, 0x2000),
-        'SDDA': (Variation_506, 0x1000),
-        'CODVR': (Variation_456, 0x0800),
-        'CODVRR': (Variation_456, 0x0400),
-        'CODVRA': (Variation_456, 0x0200),
-        'CODAR': (Variation_456, 0x0180),
-        'CODARR': (Variation_456, 0x0140),
-        'CODARA': (Variation_456, 0x0120),
+        'DV': ('Doppler Velocity', Variation_486, 0x8000),
+        'SDDV': ('Precision of Doppler Velocity', Variation_504, 0x4000),
+        'DA': ('Doppler Acceleration', Variation_500, 0x2000),
+        'SDDA': ('Precision of Doppler Acceleration', Variation_506, 0x1000),
+        'CODVR': ('Correlation of Doppler Velocity and Range', Variation_456, 0x0800),
+        'CODVRR': ('Correlation of Doppler Velocity and Range Rate', Variation_456, 0x0400),
+        'CODVRA': ('Correlation of Doppler Velocity and Range Acceleration', Variation_456, 0x0200),
+        'CODAR': ('Correlation of Doppler Acceleration and Range', Variation_456, 0x0180),
+        'CODARR': ('Correlation of Doppler Acceleration and Range Rate', Variation_456, 0x0140),
+        'CODARA': ('Correlation of Doppler Acceleration and Range Acceleration', Variation_456, 0x0120),
     }
 
     @overload
@@ -33771,14 +33771,14 @@ class Variation_512(Compound):
         ('AZEX', Variation_511),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'AZ': (Variation_14, 0x80),
-        'RSAZ': (Variation_508, 0x40),
-        'SDASZ': (Variation_508, 0x20),
-        'AZR': (Variation_509, 0x10),
-        'SDAZR': (Variation_510, 0x08),
-        'AZEX': (Variation_511, 0x04),
+        'AZ': ('Azimuth', Variation_14, 0x80),
+        'RSAZ': ('Azimuth Resolution', Variation_508, 0x40),
+        'SDASZ': ('Standard Deviation of Azimuth', Variation_508, 0x20),
+        'AZR': ('Azimuth Rate', Variation_509, 0x10),
+        'SDAZR': ('Standard Deviation of Azimuth Rate', Variation_510, 0x08),
+        'AZEX': ('Azimuth Extent', Variation_511, 0x04),
     }
 
     @overload
@@ -34170,14 +34170,14 @@ class Variation_517(Compound):
         ('ELEX', Variation_516),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'EL': (Variation_509, 0x80),
-        'RSEL': (Variation_508, 0x40),
-        'SDEL': (Variation_508, 0x20),
-        'ER': (Variation_513, 0x10),
-        'SDER': (Variation_515, 0x08),
-        'ELEX': (Variation_516, 0x04),
+        'EL': ('Elevation', Variation_509, 0x80),
+        'RSEL': ('Elevation Resolution', Variation_508, 0x40),
+        'SDEL': ('Standard Deviation of Elevation', Variation_508, 0x20),
+        'ER': ('Elevation Rate', Variation_513, 0x10),
+        'SDER': ('Standard Deviation of Elevation Rate', Variation_515, 0x08),
+        'ELEX': ('Elevation Extent', Variation_516, 0x04),
     }
 
     @overload
@@ -34446,12 +34446,12 @@ class Variation_521(Compound):
         ('RPS', Variation_518),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'DPP': (Variation_518, 0x80),
-        'DPS': (Variation_518, 0x40),
-        'RPP': (Variation_520, 0x20),
-        'RPS': (Variation_518, 0x10),
+        'DPP': ('Direct Path - Power', Variation_518, 0x80),
+        'DPS': ('Direct Path - Signal to Noise Ratio (SNR)', Variation_518, 0x40),
+        'RPP': ('Reflected Path - Power', Variation_520, 0x20),
+        'RPS': ('Reflected Path - Signal to Noise Ratio (SNR)', Variation_518, 0x10),
     }
 
     @overload
@@ -34803,34 +34803,34 @@ class Variation_525(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000),
-        '000': (Variation_433, 0x40000000),
-        '015': (Variation_0, 0x20000000),
-        '020': (Variation_437, 0x10000000),
-        '030': (Variation_438, 0x08000000),
-        '145': (Variation_81, 0x04000000),
-        '161': (Variation_64, 0x02000000),
-        '170': (Variation_445, 0x01800000),
-        '050': (Variation_447, 0x01400000),
-        '270': (Variation_449, 0x01200000),
-        '300': (Variation_453, 0x01100000),
-        '400': (Variation_454, 0x01080000),
-        '600': (Variation_460, 0x01040000),
-        '601': (Variation_468, 0x01020000),
-        '602': (Variation_476, 0x01018000),
-        '603': (Variation_485, 0x01014000),
-        '604': (Variation_488, 0x01012000),
-        '605': (Variation_492, 0x01011000),
-        '480': (Variation_494, 0x01010800),
-        '625': (Variation_503, 0x01010400),
-        '626': (Variation_507, 0x01010200),
-        '627': (Variation_512, 0x01010180),
-        '628': (Variation_517, 0x01010140),
-        '630': (Variation_521, 0x01010120),
-        '631': (Variation_524, 0x01010110),
-        'SP': (Variation_62, 0x01010108),
+        '010': ('Data Source Identifier', Variation_1, 0x80000000),
+        '000': ('Message Type', Variation_433, 0x40000000),
+        '015': ('Service Identification', Variation_0, 0x20000000),
+        '020': ('Target Report Descriptor', Variation_437, 0x10000000),
+        '030': ('Warning/Error Conditions', Variation_438, 0x08000000),
+        '145': ('Time of Applicability', Variation_81, 0x04000000),
+        '161': ('Track/Plot Number', Variation_64, 0x02000000),
+        '170': ('Track/Plot Status', Variation_445, 0x01800000),
+        '050': ('Update Period', Variation_447, 0x01400000),
+        '270': ('Target Size & Orientation', Variation_449, 0x01200000),
+        '300': ('Object Classification', Variation_453, 0x01100000),
+        '400': ('Measurement Identifier', Variation_454, 0x01080000),
+        '600': ('Horizontal Position Information', Variation_460, 0x01040000),
+        '601': ('Geometric Height Information', Variation_468, 0x01020000),
+        '602': ('Horizontal Velocity Information', Variation_476, 0x01018000),
+        '603': ('Horizontal Acceleration Information', Variation_485, 0x01014000),
+        '604': ('Vertical Velocity Information', Variation_488, 0x01012000),
+        '605': ('Vertical Velocity Information', Variation_492, 0x01011000),
+        '480': ('Associations', Variation_494, 0x01010800),
+        '625': ('Range Information', Variation_503, 0x01010400),
+        '626': ('Doppler Information', Variation_507, 0x01010200),
+        '627': ('Azimuth Information', Variation_512, 0x01010180),
+        '628': ('Elevation Information', Variation_517, 0x01010140),
+        '630': ('Path Quality', Variation_521, 0x01010120),
+        '631': ('Contour (Azimuth, Elevation Angle, Range Extent)', Variation_524, 0x01010110),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010108),
     }
 
     @overload
@@ -36069,19 +36069,19 @@ class Variation_536(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '015': (Variation_0, 0x4000),
-        '000': (Variation_526, 0x2000),
-        '140': (Variation_81, 0x1000),
-        '200': (Variation_527, 0x0800),
-        '300': (Variation_529, 0x0400),
-        '400': (Variation_257, 0x0200),
-        '405': (Variation_302, 0x0180),
-        '410': (Variation_533, 0x0140),
-        '420': (Variation_535, 0x0120),
-        'SP': (Variation_62, 0x0110),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '015': ('Service Identification', Variation_0, 0x4000),
+        '000': ('Message Type', Variation_526, 0x2000),
+        '140': ('Time of Day', Variation_81, 0x1000),
+        '200': ('System Configuration Reporting Period', Variation_527, 0x0800),
+        '300': ('Pair Identification', Variation_529, 0x0400),
+        '400': ('Position of the System Reference Point', Variation_257, 0x0200),
+        '405': ('Height of System Reference Point', Variation_302, 0x0180),
+        '410': ('Transmitter Properties', Variation_533, 0x0140),
+        '420': ('Receiver Properties', Variation_535, 0x0120),
+        'SP': ('Special Purpose Field', Variation_62, 0x0110),
     }
 
     @overload
@@ -39091,43 +39091,43 @@ class Variation_594(Compound):
         ('013', Variation_0),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '036': (Variation_1, 0x8000000000),
-        '037': (Variation_1, 0x4000000000),
-        '000': (Variation_537, 0x2000000000),
-        '001': (Variation_540, 0x1000000000),
-        '005': (Variation_279, 0x0800000000),
-        '016': (Variation_541, 0x0400000000),
-        '017': (Variation_542, 0x0200000000),
-        '018': (Variation_545, 0x0180000000),
-        '019': (Variation_62, 0x0140000000),
-        '028': (Variation_546, 0x0120000000),
-        '030': (Variation_552, 0x0110000000),
-        '025': (Variation_541, 0x0108000000),
-        '027': (Variation_0, 0x0104000000),
-        '029': (Variation_282, 0x0102000000),
-        '002': (Variation_81, 0x0101800000),
-        '006': (Variation_553, 0x0101400000),
-        '007': (Variation_558, 0x0101200000),
-        '008': (Variation_565, 0x0101100000),
-        '009': (Variation_578, 0x0101080000),
-        '010': (Variation_580, 0x0101040000),
-        '011': (Variation_282, 0x0101020000),
-        '014': (Variation_582, 0x0101018000),
-        '015': (Variation_584, 0x0101014000),
-        '020': (Variation_541, 0x0101012000),
-        '021': (Variation_585, 0x0101011000),
-        '022': (Variation_586, 0x0101010800),
-        '023': (Variation_282, 0x0101010400),
-        '004': (Variation_587, 0x0101010200),
-        '031': (Variation_588, 0x0101010180),
-        '032': (Variation_589, 0x0101010140),
-        '033': (Variation_590, 0x0101010120),
-        '034': (Variation_67, 0x0101010110),
-        '035': (Variation_14, 0x0101010108),
-        '012': (Variation_593, 0x0101010104),
-        '013': (Variation_0, 0x0101010102),
+        '036': ('Data Source Identifier', Variation_1, 0x8000000000),
+        '037': ('Data Destination Identifier', Variation_1, 0x4000000000),
+        '000': ('Message Type', Variation_537, 0x2000000000),
+        '001': ('Result', Variation_540, 0x1000000000),
+        '005': ('Mode S Address', Variation_279, 0x0800000000),
+        '016': ('Packet Number', Variation_541, 0x0400000000),
+        '017': ('Packet Number List', Variation_542, 0x0200000000),
+        '018': ('Mode S Packet Properties', Variation_545, 0x0180000000),
+        '019': ('Mode S Packet', Variation_62, 0x0140000000),
+        '028': ('GICB Extraction Periodicity', Variation_546, 0x0120000000),
+        '030': ('GICB Properties', Variation_552, 0x0110000000),
+        '025': ('GICB Number', Variation_541, 0x0108000000),
+        '027': ('BDS Code', Variation_0, 0x0104000000),
+        '029': ('GICB Extracted', Variation_282, 0x0102000000),
+        '002': ('Time of Day', Variation_81, 0x0101800000),
+        '006': ('Mode S Address List', Variation_553, 0x0101400000),
+        '007': ('Aircraft Data Link Command', Variation_558, 0x0101200000),
+        '008': ('Aircraft Data Link Status', Variation_565, 0x0101100000),
+        '009': ('Aircraft Data Link Report Request', Variation_578, 0x0101080000),
+        '010': ('Transponder Communications Capability', Variation_580, 0x0101040000),
+        '011': ('Capability Report', Variation_282, 0x0101020000),
+        '014': ('Aircraft Position in Polar Co-ordinates', Variation_582, 0x0101018000),
+        '015': ('Aircraft Position in Cartesian Co-ordinates', Variation_584, 0x0101014000),
+        '020': ('Broadcast Number', Variation_541, 0x0101012000),
+        '021': ('Broadcast Properties', Variation_585, 0x0101011000),
+        '022': ('Broadcast Prefix', Variation_586, 0x0101010800),
+        '023': ('Uplink or Downlink Broadcast', Variation_282, 0x0101010400),
+        '004': ('II Code', Variation_587, 0x0101010200),
+        '031': ('Aircraft Identity', Variation_588, 0x0101010180),
+        '032': ('Aircraft Mode A', Variation_589, 0x0101010140),
+        '033': ('Aircraft Height', Variation_590, 0x0101010120),
+        '034': ('Aircraft Speed', Variation_67, 0x0101010110),
+        '035': ('Aircraft Heading', Variation_14, 0x0101010108),
+        '012': ('Aircraft Coverage Quality Factor', Variation_593, 0x0101010104),
+        '013': ('Aircraft CQF Calculation Method', Variation_0, 0x0101010102),
     }
 
     @overload
@@ -41180,20 +41180,20 @@ class Variation_620(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_595, 0x4000),
-        '140': (Variation_81, 0x2000),
-        '550': (Variation_598, 0x1000),
-        '551': (Variation_607, 0x0800),
-        '552': (Variation_614, 0x0400),
-        '553': (Variation_617, 0x0200),
-        '600': (Variation_619, 0x0180),
-        '610': (Variation_302, 0x0140),
-        '620': (Variation_304, 0x0120),
-        'RE': (Variation_62, 0x0104),
-        'SP': (Variation_62, 0x0102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Message Type', Variation_595, 0x4000),
+        '140': ('Time of Day', Variation_81, 0x2000),
+        '550': ('System Status', Variation_598, 0x1000),
+        '551': ('Tracking Processor Detailed Status', Variation_607, 0x0800),
+        '552': ('Remote Sensor Detailed Status', Variation_614, 0x0400),
+        '553': ('Reference Transponder Detailed Status', Variation_617, 0x0200),
+        '600': ('Position of the MLT System Reference Point', Variation_619, 0x0180),
+        '610': ('Height of the MLT System Reference Point', Variation_302, 0x0140),
+        '620': ('WGS-84 Undulation', Variation_304, 0x0120),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0102),
     }
 
     @overload
@@ -43796,11 +43796,11 @@ class Variation_656(Compound):
         ('SDH', Variation_157),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'DOP': (Variation_654, 0x80),
-        'SDP': (Variation_655, 0x40),
-        'SDH': (Variation_157, 0x20),
+        'DOP': ('DOP of Position', Variation_654, 0x80),
+        'SDP': ('Standard Deviation of Position', Variation_655, 0x40),
+        'SDH': ('Standard Deviation of Geometric Height (WGS 84)', Variation_157, 0x20),
     }
 
     @overload
@@ -45105,36 +45105,36 @@ class Variation_677(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000),
-        '020': (Variation_635, 0x40000000),
-        '140': (Variation_81, 0x20000000),
-        '041': (Variation_636, 0x10000000),
-        '042': (Variation_637, 0x08000000),
-        '161': (Variation_638, 0x04000000),
-        '170': (Variation_643, 0x02000000),
-        '070': (Variation_645, 0x01800000),
-        '202': (Variation_646, 0x01400000),
-        '090': (Variation_287, 0x01200000),
-        '100': (Variation_648, 0x01100000),
-        '220': (Variation_279, 0x01080000),
-        '245': (Variation_650, 0x01040000),
-        '110': (Variation_288, 0x01020000),
-        '105': (Variation_288, 0x01018000),
-        '210': (Variation_651, 0x01014000),
-        '300': (Variation_286, 0x01012000),
-        '310': (Variation_652, 0x01011000),
-        '500': (Variation_656, 0x01010800),
-        '400': (Variation_666, 0x01010400),
-        '250': (Variation_668, 0x01010200),
-        '230': (Variation_670, 0x01010180),
-        '260': (Variation_282, 0x01010140),
-        '030': (Variation_672, 0x01010120),
-        '055': (Variation_674, 0x01010110),
-        '050': (Variation_676, 0x01010108),
-        'RE': (Variation_62, 0x01010104),
-        'SP': (Variation_62, 0x01010102),
+        '010': ('Data Source Identifier', Variation_1, 0x80000000),
+        '020': ('Target Report Descriptor', Variation_635, 0x40000000),
+        '140': ('Time of Day', Variation_81, 0x20000000),
+        '041': ('Position In WGS-84 Coordinates', Variation_636, 0x10000000),
+        '042': ('Position in Cartesian Coordinates', Variation_637, 0x08000000),
+        '161': ('Track Number', Variation_638, 0x04000000),
+        '170': ('Track Status', Variation_643, 0x02000000),
+        '070': ('Mode-3/A Code in Octal Representation', Variation_645, 0x01800000),
+        '202': ('Calculated Track Velocity in Cartesian Coordinates', Variation_646, 0x01400000),
+        '090': ('Flight Level in Binary Representation', Variation_287, 0x01200000),
+        '100': ('Mode C Code', Variation_648, 0x01100000),
+        '220': ('Target Address', Variation_279, 0x01080000),
+        '245': ('Target Identification', Variation_650, 0x01040000),
+        '110': ('Measured Height (Local Cartesian Coordinates)', Variation_288, 0x01020000),
+        '105': ('Geometric Height (WGS-84)', Variation_288, 0x01018000),
+        '210': ('Calculated Acceleration', Variation_651, 0x01014000),
+        '300': ('Vehicle Fleet Identification', Variation_286, 0x01012000),
+        '310': ('Pre-programmed Message', Variation_652, 0x01011000),
+        '500': ('Position Accuracy', Variation_656, 0x01010800),
+        '400': ('Contributing Devices', Variation_666, 0x01010400),
+        '250': ('Mode S MB Data', Variation_668, 0x01010200),
+        '230': ('Communications/ACAS Capability and Flight Status', Variation_670, 0x01010180),
+        '260': ('ACAS Resolution Advisory Report', Variation_282, 0x01010140),
+        '030': ('Warning/Error Conditions', Variation_672, 0x01010120),
+        '055': ('Mode-1 Code in Octal Representation', Variation_674, 0x01010110),
+        '050': ('Mode-2 Code in Octal Representation', Variation_676, 0x01010108),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010102),
     }
 
     @overload
@@ -46110,36 +46110,36 @@ class Variation_680(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000),
-        '020': (Variation_635, 0x40000000),
-        '140': (Variation_81, 0x20000000),
-        '041': (Variation_636, 0x10000000),
-        '042': (Variation_637, 0x08000000),
-        '161': (Variation_638, 0x04000000),
-        '170': (Variation_679, 0x02000000),
-        '070': (Variation_645, 0x01800000),
-        '202': (Variation_646, 0x01400000),
-        '090': (Variation_287, 0x01200000),
-        '100': (Variation_648, 0x01100000),
-        '220': (Variation_279, 0x01080000),
-        '245': (Variation_650, 0x01040000),
-        '110': (Variation_288, 0x01020000),
-        '105': (Variation_288, 0x01018000),
-        '210': (Variation_651, 0x01014000),
-        '300': (Variation_286, 0x01012000),
-        '310': (Variation_652, 0x01011000),
-        '500': (Variation_656, 0x01010800),
-        '400': (Variation_666, 0x01010400),
-        '250': (Variation_668, 0x01010200),
-        '230': (Variation_670, 0x01010180),
-        '260': (Variation_282, 0x01010140),
-        '030': (Variation_672, 0x01010120),
-        '055': (Variation_674, 0x01010110),
-        '050': (Variation_676, 0x01010108),
-        'RE': (Variation_62, 0x01010104),
-        'SP': (Variation_62, 0x01010102),
+        '010': ('Data Source Identifier', Variation_1, 0x80000000),
+        '020': ('Target Report Descriptor', Variation_635, 0x40000000),
+        '140': ('Time of Day', Variation_81, 0x20000000),
+        '041': ('Position In WGS-84 Coordinates', Variation_636, 0x10000000),
+        '042': ('Position in Cartesian Coordinates', Variation_637, 0x08000000),
+        '161': ('Track Number', Variation_638, 0x04000000),
+        '170': ('Track Status', Variation_679, 0x02000000),
+        '070': ('Mode-3/A Code in Octal Representation', Variation_645, 0x01800000),
+        '202': ('Calculated Track Velocity in Cartesian Coordinates', Variation_646, 0x01400000),
+        '090': ('Flight Level in Binary Representation', Variation_287, 0x01200000),
+        '100': ('Mode C Code', Variation_648, 0x01100000),
+        '220': ('Target Address', Variation_279, 0x01080000),
+        '245': ('Target Identification', Variation_650, 0x01040000),
+        '110': ('Measured Height (Local Cartesian Coordinates)', Variation_288, 0x01020000),
+        '105': ('Geometric Height (WGS-84)', Variation_288, 0x01018000),
+        '210': ('Calculated Acceleration', Variation_651, 0x01014000),
+        '300': ('Vehicle Fleet Identification', Variation_286, 0x01012000),
+        '310': ('Pre-programmed Message', Variation_652, 0x01011000),
+        '500': ('Position Accuracy', Variation_656, 0x01010800),
+        '400': ('Contributing Devices', Variation_666, 0x01010400),
+        '250': ('BDS Register Data', Variation_668, 0x01010200),
+        '230': ('Communications/ACAS Capability and Flight Status', Variation_670, 0x01010180),
+        '260': ('ACAS Resolution Advisory Report', Variation_282, 0x01010140),
+        '030': ('Warning/Error Conditions', Variation_672, 0x01010120),
+        '055': ('Mode-1 Code in Octal Representation', Variation_674, 0x01010110),
+        '050': ('Mode-2 Code in Octal Representation', Variation_676, 0x01010108),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010102),
     }
 
     @overload
@@ -48381,12 +48381,12 @@ class Variation_718(Compound):
         ('TRB', Variation_0),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'WS': (Variation_707, 0x80),
-        'WD': (Variation_716, 0x40),
-        'TMP': (Variation_717, 0x20),
-        'TRB': (Variation_0, 0x10),
+        'WS': ('Wind Speed', Variation_707, 0x80),
+        'WD': ('Wind Direction', Variation_716, 0x40),
+        'TMP': ('Temperature', Variation_717, 0x20),
+        'TRB': ('Turbulence', Variation_0, 0x10),
     }
 
     @overload
@@ -49557,10 +49557,10 @@ class Variation_741(Compound):
         ('TID', Variation_740),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'TIS': (Variation_729, 0x80),
-        'TID': (Variation_740, 0x40),
+        'TIS': ('Trajectory Intent Status', Variation_729, 0x80),
+        'TID': ('Trajectory Intent Data', Variation_740, 0x40),
     }
 
     @overload
@@ -49705,36 +49705,36 @@ class Variation_742(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000000000),
-        '040': (Variation_690, 0x4000000000),
-        '030': (Variation_81, 0x2000000000),
-        '130': (Variation_692, 0x1000000000),
-        '080': (Variation_279, 0x0800000000),
-        '140': (Variation_288, 0x0400000000),
-        '090': (Variation_697, 0x0200000000),
-        '210': (Variation_703, 0x0180000000),
-        '230': (Variation_704, 0x0140000000),
-        '145': (Variation_361, 0x0120000000),
-        '150': (Variation_706, 0x0110000000),
-        '151': (Variation_707, 0x0108000000),
-        '152': (Variation_14, 0x0104000000),
-        '155': (Variation_365, 0x0102000000),
-        '157': (Variation_365, 0x0101800000),
-        '160': (Variation_709, 0x0101400000),
-        '165': (Variation_712, 0x0101200000),
-        '170': (Variation_201, 0x0101100000),
-        '095': (Variation_0, 0x0101080000),
-        '032': (Variation_713, 0x0101040000),
-        '200': (Variation_714, 0x0101020000),
-        '020': (Variation_715, 0x0101018000),
-        '220': (Variation_718, 0x0101014000),
-        '146': (Variation_722, 0x0101012000),
-        '148': (Variation_726, 0x0101011000),
-        '110': (Variation_741, 0x0101010800),
-        'RE': (Variation_62, 0x0101010104),
-        'SP': (Variation_62, 0x0101010102),
+        '010': ('Data Source Identification', Variation_1, 0x8000000000),
+        '040': ('Target Report Descriptor', Variation_690, 0x4000000000),
+        '030': ('Time of Day', Variation_81, 0x2000000000),
+        '130': ('Position in WGS-84 Co-ordinates', Variation_692, 0x1000000000),
+        '080': ('Target Address', Variation_279, 0x0800000000),
+        '140': ('Geometric Altitude', Variation_288, 0x0400000000),
+        '090': ('Figure of Merit', Variation_697, 0x0200000000),
+        '210': ('Link Technology Indicator', Variation_703, 0x0180000000),
+        '230': ('Roll Angle', Variation_704, 0x0140000000),
+        '145': ('Flight Level', Variation_361, 0x0120000000),
+        '150': ('Air Speed', Variation_706, 0x0110000000),
+        '151': ('True Airspeed', Variation_707, 0x0108000000),
+        '152': ('Magnetic Heading', Variation_14, 0x0104000000),
+        '155': ('Barometric Vertical Rate', Variation_365, 0x0102000000),
+        '157': ('Geometric Vertical Rate', Variation_365, 0x0101800000),
+        '160': ('Ground Vector', Variation_709, 0x0101400000),
+        '165': ('Rate Of Turn', Variation_712, 0x0101200000),
+        '170': ('Target Identification', Variation_201, 0x0101100000),
+        '095': ('Velocity Accuracy', Variation_0, 0x0101080000),
+        '032': ('Time of Day Accuracy', Variation_713, 0x0101040000),
+        '200': ('Target Status', Variation_714, 0x0101020000),
+        '020': ('Emitter Category', Variation_715, 0x0101018000),
+        '220': ('Met Information', Variation_718, 0x0101014000),
+        '146': ('Intermediate State Selected Altitude', Variation_722, 0x0101012000),
+        '148': ('Final State Selected Altitude', Variation_726, 0x0101011000),
+        '110': ('Trajectory Intent', Variation_741, 0x0101010800),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0101010102),
     }
 
     @overload
@@ -50477,36 +50477,36 @@ class Variation_743(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000000000),
-        '040': (Variation_690, 0x4000000000),
-        '030': (Variation_81, 0x2000000000),
-        '130': (Variation_636, 0x1000000000),
-        '080': (Variation_279, 0x0800000000),
-        '140': (Variation_288, 0x0400000000),
-        '090': (Variation_697, 0x0200000000),
-        '210': (Variation_703, 0x0180000000),
-        '230': (Variation_704, 0x0140000000),
-        '145': (Variation_361, 0x0120000000),
-        '150': (Variation_706, 0x0110000000),
-        '151': (Variation_707, 0x0108000000),
-        '152': (Variation_14, 0x0104000000),
-        '155': (Variation_365, 0x0102000000),
-        '157': (Variation_365, 0x0101800000),
-        '160': (Variation_709, 0x0101400000),
-        '165': (Variation_712, 0x0101200000),
-        '170': (Variation_201, 0x0101100000),
-        '095': (Variation_0, 0x0101080000),
-        '032': (Variation_713, 0x0101040000),
-        '200': (Variation_714, 0x0101020000),
-        '020': (Variation_715, 0x0101018000),
-        '220': (Variation_718, 0x0101014000),
-        '146': (Variation_722, 0x0101012000),
-        '148': (Variation_726, 0x0101011000),
-        '110': (Variation_741, 0x0101010800),
-        'RE': (Variation_62, 0x0101010104),
-        'SP': (Variation_62, 0x0101010102),
+        '010': ('Data Source Identification', Variation_1, 0x8000000000),
+        '040': ('Target Report Descriptor', Variation_690, 0x4000000000),
+        '030': ('Time of Day', Variation_81, 0x2000000000),
+        '130': ('Position in WGS-84 Co-ordinates', Variation_636, 0x1000000000),
+        '080': ('Target Address', Variation_279, 0x0800000000),
+        '140': ('Geometric Altitude', Variation_288, 0x0400000000),
+        '090': ('Figure of Merit', Variation_697, 0x0200000000),
+        '210': ('Link Technology Indicator', Variation_703, 0x0180000000),
+        '230': ('Roll Angle', Variation_704, 0x0140000000),
+        '145': ('Flight Level', Variation_361, 0x0120000000),
+        '150': ('Air Speed', Variation_706, 0x0110000000),
+        '151': ('True Airspeed', Variation_707, 0x0108000000),
+        '152': ('Magnetic Heading', Variation_14, 0x0104000000),
+        '155': ('Barometric Vertical Rate', Variation_365, 0x0102000000),
+        '157': ('Geometric Vertical Rate', Variation_365, 0x0101800000),
+        '160': ('Ground Vector', Variation_709, 0x0101400000),
+        '165': ('Rate Of Turn', Variation_712, 0x0101200000),
+        '170': ('Target Identification', Variation_201, 0x0101100000),
+        '095': ('Velocity Accuracy', Variation_0, 0x0101080000),
+        '032': ('Time of Day Accuracy', Variation_713, 0x0101040000),
+        '200': ('Target Status', Variation_714, 0x0101020000),
+        '020': ('Emitter Category', Variation_715, 0x0101018000),
+        '220': ('Met Information', Variation_718, 0x0101014000),
+        '146': ('Intermediate State Selected Altitude', Variation_722, 0x0101012000),
+        '148': ('Final State Selected Altitude', Variation_726, 0x0101011000),
+        '110': ('Trajectory Intent', Variation_741, 0x0101010800),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0101010102),
     }
 
     @overload
@@ -51399,38 +51399,38 @@ class Variation_746(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000000000),
-        '040': (Variation_690, 0x4000000000),
-        '030': (Variation_81, 0x2000000000),
-        '130': (Variation_636, 0x1000000000),
-        '080': (Variation_279, 0x0800000000),
-        '140': (Variation_288, 0x0400000000),
-        '090': (Variation_697, 0x0200000000),
-        '210': (Variation_703, 0x0180000000),
-        '230': (Variation_704, 0x0140000000),
-        '145': (Variation_361, 0x0120000000),
-        '150': (Variation_706, 0x0110000000),
-        '151': (Variation_707, 0x0108000000),
-        '152': (Variation_14, 0x0104000000),
-        '155': (Variation_365, 0x0102000000),
-        '157': (Variation_365, 0x0101800000),
-        '160': (Variation_709, 0x0101400000),
-        '165': (Variation_712, 0x0101200000),
-        '170': (Variation_201, 0x0101100000),
-        '095': (Variation_0, 0x0101080000),
-        '032': (Variation_713, 0x0101040000),
-        '200': (Variation_714, 0x0101020000),
-        '020': (Variation_715, 0x0101018000),
-        '220': (Variation_718, 0x0101014000),
-        '146': (Variation_722, 0x0101012000),
-        '148': (Variation_726, 0x0101011000),
-        '110': (Variation_741, 0x0101010800),
-        '070': (Variation_745, 0x0101010400),
-        '131': (Variation_0, 0x0101010200),
-        'RE': (Variation_62, 0x0101010104),
-        'SP': (Variation_62, 0x0101010102),
+        '010': ('Data Source Identification', Variation_1, 0x8000000000),
+        '040': ('Target Report Descriptor', Variation_690, 0x4000000000),
+        '030': ('Time of Day', Variation_81, 0x2000000000),
+        '130': ('Position in WGS-84 Co-ordinates', Variation_636, 0x1000000000),
+        '080': ('Target Address', Variation_279, 0x0800000000),
+        '140': ('Geometric Altitude', Variation_288, 0x0400000000),
+        '090': ('Figure of Merit', Variation_697, 0x0200000000),
+        '210': ('Link Technology Indicator', Variation_703, 0x0180000000),
+        '230': ('Roll Angle', Variation_704, 0x0140000000),
+        '145': ('Flight Level', Variation_361, 0x0120000000),
+        '150': ('Air Speed', Variation_706, 0x0110000000),
+        '151': ('True Airspeed', Variation_707, 0x0108000000),
+        '152': ('Magnetic Heading', Variation_14, 0x0104000000),
+        '155': ('Barometric Vertical Rate', Variation_365, 0x0102000000),
+        '157': ('Geometric Vertical Rate', Variation_365, 0x0101800000),
+        '160': ('Ground Vector', Variation_709, 0x0101400000),
+        '165': ('Rate Of Turn', Variation_712, 0x0101200000),
+        '170': ('Target Identification', Variation_201, 0x0101100000),
+        '095': ('Velocity Accuracy', Variation_0, 0x0101080000),
+        '032': ('Time of Day Accuracy', Variation_713, 0x0101040000),
+        '200': ('Target Status', Variation_714, 0x0101020000),
+        '020': ('Emitter Category', Variation_715, 0x0101018000),
+        '220': ('Met Information', Variation_718, 0x0101014000),
+        '146': ('Intermediate State Selected Altitude', Variation_722, 0x0101012000),
+        '148': ('Final State Selected Altitude', Variation_726, 0x0101011000),
+        '110': ('Trajectory Intent', Variation_741, 0x0101010800),
+        '070': ('Mode 3/A Code in Octal Representation', Variation_745, 0x0101010400),
+        '131': ('Signal Amplitude', Variation_0, 0x0101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0101010102),
     }
 
     @overload
@@ -54161,14 +54161,14 @@ class Variation_791(Compound):
         ('M2', Variation_790),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'SUM': (Variation_776, 0x80),
-        'PNO': (Variation_779, 0x40),
-        'EM1': (Variation_781, 0x20),
-        'XP': (Variation_788, 0x10),
-        'FOM': (Variation_789, 0x08),
-        'M2': (Variation_790, 0x04),
+        'SUM': ('Mode 5 Summary', Variation_776, 0x80),
+        'PNO': ('Mode 5 PIN / National Origin', Variation_779, 0x40),
+        'EM1': ('Extended Mode 1 Code in Octal Representation', Variation_781, 0x20),
+        'XP': ('X Pulse Presence', Variation_788, 0x10),
+        'FOM': ('Figure of Merit', Variation_789, 0x08),
+        'M2': ('Mode 2 Code in Octal Representation', Variation_790, 0x04),
     }
 
     @overload
@@ -54358,16 +54358,16 @@ class Variation_792(Compound):
         ('MES', Variation_791),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'BPS': (Variation_748, 0x80),
-        'SH': (Variation_752, 0x40),
-        'NAV': (Variation_757, 0x20),
-        'GAO': (Variation_0, 0x10),
-        'SGV': (Variation_764, 0x08),
-        'STA': (Variation_767, 0x04),
-        'TNH': (Variation_14, 0x02),
-        'MES': (Variation_791, 0x01),
+        'BPS': ('Barometric Pressure Setting', Variation_748, 0x80),
+        'SH': ('Selected Heading', Variation_752, 0x40),
+        'NAV': ('Navigation Mode', Variation_757, 0x20),
+        'GAO': ('GPS Antenna Offset', Variation_0, 0x10),
+        'SGV': ('Surface Ground Vector', Variation_764, 0x08),
+        'STA': ('Aircraft Status', Variation_767, 0x04),
+        'TNH': ('True North Heading', Variation_14, 0x02),
+        'MES': ('Military Extended Squitter', Variation_791, 0x01),
     }
 
     @overload
@@ -56661,16 +56661,16 @@ class Variation_826(Compound):
         ('MES', Variation_791),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'BPS': (Variation_748, 0x80),
-        'SH': (Variation_752, 0x40),
-        'NAV': (Variation_796, 0x20),
-        'GAO': (Variation_0, 0x10),
-        'SGV': (Variation_764, 0x08),
-        'STA': (Variation_825, 0x04),
-        'TNH': (Variation_14, 0x02),
-        'MES': (Variation_791, 0x01),
+        'BPS': ('Barometric Pressure Setting', Variation_748, 0x80),
+        'SH': ('Selected Heading', Variation_752, 0x40),
+        'NAV': ('Navigation Mode', Variation_796, 0x20),
+        'GAO': ('GPS Antenna Offset', Variation_0, 0x10),
+        'SGV': ('Surface Ground Vector', Variation_764, 0x08),
+        'STA': ('Aircraft Status', Variation_825, 0x04),
+        'TNH': ('True North Heading', Variation_14, 0x02),
+        'MES': ('Military Extended Squitter', Variation_791, 0x01),
     }
 
     @overload
@@ -60465,31 +60465,31 @@ class Variation_901(Compound):
         ('SCC', Variation_900),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'AOS': (Variation_900, 0x80000000),
-        'TRD': (Variation_900, 0x40000000),
-        'M3A': (Variation_900, 0x20000000),
-        'QI': (Variation_900, 0x10000000),
-        'TI1': (Variation_900, 0x08000000),
-        'MAM': (Variation_900, 0x04000000),
-        'GH': (Variation_900, 0x02000000),
-        'FL': (Variation_900, 0x01800000),
-        'ISA': (Variation_900, 0x01400000),
-        'FSA': (Variation_900, 0x01200000),
-        'AS': (Variation_900, 0x01100000),
-        'TAS': (Variation_900, 0x01080000),
-        'MH': (Variation_900, 0x01040000),
-        'BVR': (Variation_900, 0x01020000),
-        'GVR': (Variation_900, 0x01018000),
-        'GV': (Variation_900, 0x01014000),
-        'TAR': (Variation_900, 0x01012000),
-        'TI2': (Variation_900, 0x01011000),
-        'TS': (Variation_900, 0x01010800),
-        'MET': (Variation_900, 0x01010400),
-        'ROA': (Variation_900, 0x01010200),
-        'ARA': (Variation_900, 0x01010180),
-        'SCC': (Variation_900, 0x01010140),
+        'AOS': ('Aircraft Operational Status Age', Variation_900, 0x80000000),
+        'TRD': ('Target Report Descriptor Age', Variation_900, 0x40000000),
+        'M3A': ('Mode 3/A Age', Variation_900, 0x20000000),
+        'QI': ('Quality Indicators Age', Variation_900, 0x10000000),
+        'TI1': ('Trajectory Intent Age', Variation_900, 0x08000000),
+        'MAM': ('Message Amplitude Age', Variation_900, 0x04000000),
+        'GH': ('Geometric Height Age', Variation_900, 0x02000000),
+        'FL': ('Flight Level Age', Variation_900, 0x01800000),
+        'ISA': ('Intermediate State Selected Altitude Age', Variation_900, 0x01400000),
+        'FSA': ('Final State Selected Altitude Age', Variation_900, 0x01200000),
+        'AS': ('Air Speed Age', Variation_900, 0x01100000),
+        'TAS': ('True Air Speed Age', Variation_900, 0x01080000),
+        'MH': ('Magnetic Heading Age', Variation_900, 0x01040000),
+        'BVR': ('Barometric Vertical Rate Age', Variation_900, 0x01020000),
+        'GVR': ('Geometric Vertical Rate Age', Variation_900, 0x01018000),
+        'GV': ('Ground Vector Age', Variation_900, 0x01014000),
+        'TAR': ('Track Angle Rate Age', Variation_900, 0x01012000),
+        'TI2': ('Target Identification Age', Variation_900, 0x01011000),
+        'TS': ('Target Status Age', Variation_900, 0x01010800),
+        'MET': ('Met Information Age', Variation_900, 0x01010400),
+        'ROA': ('Roll Angle Age', Variation_900, 0x01010200),
+        'ARA': ('ACAS Resolution Advisory Age', Variation_900, 0x01010180),
+        'SCC': ('Surface Capabilities and Characteristics Age', Variation_900, 0x01010140),
     }
 
     @overload
@@ -61147,52 +61147,52 @@ class Variation_902(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000000000),
-        '040': (Variation_838, 0x40000000000000),
-        '161': (Variation_839, 0x20000000000000),
-        '015': (Variation_0, 0x10000000000000),
-        '071': (Variation_81, 0x08000000000000),
-        '130': (Variation_692, 0x04000000000000),
-        '131': (Variation_619, 0x02000000000000),
-        '072': (Variation_81, 0x01800000000000),
-        '150': (Variation_706, 0x01400000000000),
-        '151': (Variation_842, 0x01200000000000),
-        '080': (Variation_279, 0x01100000000000),
-        '073': (Variation_81, 0x01080000000000),
-        '074': (Variation_845, 0x01040000000000),
-        '075': (Variation_81, 0x01020000000000),
-        '076': (Variation_847, 0x01018000000000),
-        '140': (Variation_288, 0x01014000000000),
-        '090': (Variation_855, 0x01012000000000),
-        '210': (Variation_859, 0x01011000000000),
-        '070': (Variation_860, 0x01010800000000),
-        '230': (Variation_704, 0x01010400000000),
-        '145': (Variation_361, 0x01010200000000),
-        '152': (Variation_14, 0x01010180000000),
-        '200': (Variation_865, 0x01010140000000),
-        '155': (Variation_867, 0x01010120000000),
-        '157': (Variation_868, 0x01010110000000),
-        '160': (Variation_870, 0x01010108000000),
-        '165': (Variation_872, 0x01010104000000),
-        '077': (Variation_81, 0x01010102000000),
-        '170': (Variation_201, 0x01010101800000),
-        '020': (Variation_873, 0x01010101400000),
-        '220': (Variation_718, 0x01010101200000),
-        '146': (Variation_874, 0x01010101100000),
-        '148': (Variation_878, 0x01010101080000),
-        '110': (Variation_741, 0x01010101040000),
-        '016': (Variation_879, 0x01010101020000),
-        '008': (Variation_887, 0x01010101018000),
-        '271': (Variation_893, 0x01010101014000),
-        '132': (Variation_29, 0x01010101012000),
-        '250': (Variation_322, 0x01010101011000),
-        '260': (Variation_899, 0x01010101010800),
-        '400': (Variation_0, 0x01010101010400),
-        '295': (Variation_901, 0x01010101010200),
-        'RE': (Variation_62, 0x01010101010104),
-        'SP': (Variation_62, 0x01010101010102),
+        '010': ('Data Source Identification', Variation_1, 0x80000000000000),
+        '040': ('Target Report Descriptor', Variation_838, 0x40000000000000),
+        '161': ('Track Number', Variation_839, 0x20000000000000),
+        '015': ('Service Identification', Variation_0, 0x10000000000000),
+        '071': ('Time of Applicability for Position', Variation_81, 0x08000000000000),
+        '130': ('Position in WGS-84 Co-ordinates', Variation_692, 0x04000000000000),
+        '131': ('High-Resolution Position in WGS-84 Co-ordinates', Variation_619, 0x02000000000000),
+        '072': ('Time of Applicability for Velocity', Variation_81, 0x01800000000000),
+        '150': ('Air Speed', Variation_706, 0x01400000000000),
+        '151': ('True Airspeed', Variation_842, 0x01200000000000),
+        '080': ('Target Address', Variation_279, 0x01100000000000),
+        '073': ('Time of Message Reception for Position', Variation_81, 0x01080000000000),
+        '074': ('Time of Message Reception of Position-High Precision', Variation_845, 0x01040000000000),
+        '075': ('Time of Message Reception for Velocity', Variation_81, 0x01020000000000),
+        '076': ('Time of Message Reception of Velocity-High Precision', Variation_847, 0x01018000000000),
+        '140': ('Geometric Height', Variation_288, 0x01014000000000),
+        '090': ('Quality Indicators', Variation_855, 0x01012000000000),
+        '210': ('MOPS Version', Variation_859, 0x01011000000000),
+        '070': ('Mode 3/A Code in Octal Representation', Variation_860, 0x01010800000000),
+        '230': ('Roll Angle', Variation_704, 0x01010400000000),
+        '145': ('Flight Level', Variation_361, 0x01010200000000),
+        '152': ('Magnetic Heading', Variation_14, 0x01010180000000),
+        '200': ('Target Status', Variation_865, 0x01010140000000),
+        '155': ('Barometric Vertical Rate', Variation_867, 0x01010120000000),
+        '157': ('Geometric Vertical Rate', Variation_868, 0x01010110000000),
+        '160': ('Airborne Ground Vector', Variation_870, 0x01010108000000),
+        '165': ('Track Angle Rate', Variation_872, 0x01010104000000),
+        '077': ('Time of ASTERIX Report Transmission', Variation_81, 0x01010102000000),
+        '170': ('Target Identification', Variation_201, 0x01010101800000),
+        '020': ('Emitter Category', Variation_873, 0x01010101400000),
+        '220': ('Met Information', Variation_718, 0x01010101200000),
+        '146': ('Selected Altitude', Variation_874, 0x01010101100000),
+        '148': ('Final State Selected Altitude', Variation_878, 0x01010101080000),
+        '110': ('Trajectory Intent', Variation_741, 0x01010101040000),
+        '016': ('Service Management', Variation_879, 0x01010101020000),
+        '008': ('Aircraft Operational Status', Variation_887, 0x01010101018000),
+        '271': ('Surface Capabilities and Characteristics', Variation_893, 0x01010101014000),
+        '132': ('Message Amplitude', Variation_29, 0x01010101012000),
+        '250': ('Mode S MB Data', Variation_322, 0x01010101011000),
+        '260': ('ACAS Resolution Advisory Report', Variation_899, 0x01010101010800),
+        '400': ('Receiver ID', Variation_0, 0x01010101010400),
+        '295': ('Data Ages', Variation_901, 0x01010101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010101010102),
     }
 
     @overload
@@ -62698,52 +62698,52 @@ class Variation_906(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000000000),
-        '040': (Variation_838, 0x40000000000000),
-        '161': (Variation_839, 0x20000000000000),
-        '015': (Variation_0, 0x10000000000000),
-        '071': (Variation_81, 0x08000000000000),
-        '130': (Variation_692, 0x04000000000000),
-        '131': (Variation_619, 0x02000000000000),
-        '072': (Variation_81, 0x01800000000000),
-        '150': (Variation_706, 0x01400000000000),
-        '151': (Variation_842, 0x01200000000000),
-        '080': (Variation_279, 0x01100000000000),
-        '073': (Variation_81, 0x01080000000000),
-        '074': (Variation_845, 0x01040000000000),
-        '075': (Variation_81, 0x01020000000000),
-        '076': (Variation_847, 0x01018000000000),
-        '140': (Variation_288, 0x01014000000000),
-        '090': (Variation_855, 0x01012000000000),
-        '210': (Variation_859, 0x01011000000000),
-        '070': (Variation_860, 0x01010800000000),
-        '230': (Variation_704, 0x01010400000000),
-        '145': (Variation_361, 0x01010200000000),
-        '152': (Variation_14, 0x01010180000000),
-        '200': (Variation_904, 0x01010140000000),
-        '155': (Variation_867, 0x01010120000000),
-        '157': (Variation_868, 0x01010110000000),
-        '160': (Variation_870, 0x01010108000000),
-        '165': (Variation_872, 0x01010104000000),
-        '077': (Variation_81, 0x01010102000000),
-        '170': (Variation_201, 0x01010101800000),
-        '020': (Variation_873, 0x01010101400000),
-        '220': (Variation_718, 0x01010101200000),
-        '146': (Variation_874, 0x01010101100000),
-        '148': (Variation_878, 0x01010101080000),
-        '110': (Variation_741, 0x01010101040000),
-        '016': (Variation_879, 0x01010101020000),
-        '008': (Variation_887, 0x01010101018000),
-        '271': (Variation_905, 0x01010101014000),
-        '132': (Variation_29, 0x01010101012000),
-        '250': (Variation_322, 0x01010101011000),
-        '260': (Variation_899, 0x01010101010800),
-        '400': (Variation_0, 0x01010101010400),
-        '295': (Variation_901, 0x01010101010200),
-        'RE': (Variation_62, 0x01010101010104),
-        'SP': (Variation_62, 0x01010101010102),
+        '010': ('Data Source Identification', Variation_1, 0x80000000000000),
+        '040': ('Target Report Descriptor', Variation_838, 0x40000000000000),
+        '161': ('Track Number', Variation_839, 0x20000000000000),
+        '015': ('Service Identification', Variation_0, 0x10000000000000),
+        '071': ('Time of Applicability for Position', Variation_81, 0x08000000000000),
+        '130': ('Position in WGS-84 Co-ordinates', Variation_692, 0x04000000000000),
+        '131': ('High-Resolution Position in WGS-84 Co-ordinates', Variation_619, 0x02000000000000),
+        '072': ('Time of Applicability for Velocity', Variation_81, 0x01800000000000),
+        '150': ('Air Speed', Variation_706, 0x01400000000000),
+        '151': ('True Airspeed', Variation_842, 0x01200000000000),
+        '080': ('Target Address', Variation_279, 0x01100000000000),
+        '073': ('Time of Message Reception for Position', Variation_81, 0x01080000000000),
+        '074': ('Time of Message Reception of Position-High Precision', Variation_845, 0x01040000000000),
+        '075': ('Time of Message Reception for Velocity', Variation_81, 0x01020000000000),
+        '076': ('Time of Message Reception of Velocity-High Precision', Variation_847, 0x01018000000000),
+        '140': ('Geometric Height', Variation_288, 0x01014000000000),
+        '090': ('Quality Indicators', Variation_855, 0x01012000000000),
+        '210': ('MOPS Version', Variation_859, 0x01011000000000),
+        '070': ('Mode 3/A Code in Octal Representation', Variation_860, 0x01010800000000),
+        '230': ('Roll Angle', Variation_704, 0x01010400000000),
+        '145': ('Flight Level', Variation_361, 0x01010200000000),
+        '152': ('Magnetic Heading', Variation_14, 0x01010180000000),
+        '200': ('Target Status', Variation_904, 0x01010140000000),
+        '155': ('Barometric Vertical Rate', Variation_867, 0x01010120000000),
+        '157': ('Geometric Vertical Rate', Variation_868, 0x01010110000000),
+        '160': ('Airborne Ground Vector', Variation_870, 0x01010108000000),
+        '165': ('Track Angle Rate', Variation_872, 0x01010104000000),
+        '077': ('Time of ASTERIX Report Transmission', Variation_81, 0x01010102000000),
+        '170': ('Target Identification', Variation_201, 0x01010101800000),
+        '020': ('Emitter Category', Variation_873, 0x01010101400000),
+        '220': ('Met Information', Variation_718, 0x01010101200000),
+        '146': ('Selected Altitude', Variation_874, 0x01010101100000),
+        '148': ('Final State Selected Altitude', Variation_878, 0x01010101080000),
+        '110': ('Trajectory Intent', Variation_741, 0x01010101040000),
+        '016': ('Service Management', Variation_879, 0x01010101020000),
+        '008': ('Aircraft Operational Status', Variation_887, 0x01010101018000),
+        '271': ('Surface Capabilities and Characteristics', Variation_905, 0x01010101014000),
+        '132': ('Message Amplitude', Variation_29, 0x01010101012000),
+        '250': ('Mode S MB Data', Variation_322, 0x01010101011000),
+        '260': ('ACAS Resolution Advisory Report', Variation_899, 0x01010101010800),
+        '400': ('Receiver ID', Variation_0, 0x01010101010400),
+        '295': ('Data Ages', Variation_901, 0x01010101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010101010102),
     }
 
     @overload
@@ -64295,52 +64295,52 @@ class Variation_909(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000000000),
-        '040': (Variation_908, 0x40000000000000),
-        '161': (Variation_839, 0x20000000000000),
-        '015': (Variation_0, 0x10000000000000),
-        '071': (Variation_81, 0x08000000000000),
-        '130': (Variation_692, 0x04000000000000),
-        '131': (Variation_619, 0x02000000000000),
-        '072': (Variation_81, 0x01800000000000),
-        '150': (Variation_706, 0x01400000000000),
-        '151': (Variation_842, 0x01200000000000),
-        '080': (Variation_279, 0x01100000000000),
-        '073': (Variation_81, 0x01080000000000),
-        '074': (Variation_845, 0x01040000000000),
-        '075': (Variation_81, 0x01020000000000),
-        '076': (Variation_847, 0x01018000000000),
-        '140': (Variation_288, 0x01014000000000),
-        '090': (Variation_855, 0x01012000000000),
-        '210': (Variation_859, 0x01011000000000),
-        '070': (Variation_860, 0x01010800000000),
-        '230': (Variation_704, 0x01010400000000),
-        '145': (Variation_361, 0x01010200000000),
-        '152': (Variation_14, 0x01010180000000),
-        '200': (Variation_904, 0x01010140000000),
-        '155': (Variation_867, 0x01010120000000),
-        '157': (Variation_868, 0x01010110000000),
-        '160': (Variation_870, 0x01010108000000),
-        '165': (Variation_872, 0x01010104000000),
-        '077': (Variation_81, 0x01010102000000),
-        '170': (Variation_201, 0x01010101800000),
-        '020': (Variation_873, 0x01010101400000),
-        '220': (Variation_718, 0x01010101200000),
-        '146': (Variation_874, 0x01010101100000),
-        '148': (Variation_878, 0x01010101080000),
-        '110': (Variation_741, 0x01010101040000),
-        '016': (Variation_879, 0x01010101020000),
-        '008': (Variation_887, 0x01010101018000),
-        '271': (Variation_905, 0x01010101014000),
-        '132': (Variation_29, 0x01010101012000),
-        '250': (Variation_322, 0x01010101011000),
-        '260': (Variation_899, 0x01010101010800),
-        '400': (Variation_0, 0x01010101010400),
-        '295': (Variation_901, 0x01010101010200),
-        'RE': (Variation_62, 0x01010101010104),
-        'SP': (Variation_62, 0x01010101010102),
+        '010': ('Data Source Identification', Variation_1, 0x80000000000000),
+        '040': ('Target Report Descriptor', Variation_908, 0x40000000000000),
+        '161': ('Track Number', Variation_839, 0x20000000000000),
+        '015': ('Service Identification', Variation_0, 0x10000000000000),
+        '071': ('Time of Applicability for Position', Variation_81, 0x08000000000000),
+        '130': ('Position in WGS-84 Co-ordinates', Variation_692, 0x04000000000000),
+        '131': ('High-Resolution Position in WGS-84 Co-ordinates', Variation_619, 0x02000000000000),
+        '072': ('Time of Applicability for Velocity', Variation_81, 0x01800000000000),
+        '150': ('Air Speed', Variation_706, 0x01400000000000),
+        '151': ('True Airspeed', Variation_842, 0x01200000000000),
+        '080': ('Target Address', Variation_279, 0x01100000000000),
+        '073': ('Time of Message Reception for Position', Variation_81, 0x01080000000000),
+        '074': ('Time of Message Reception of Position-High Precision', Variation_845, 0x01040000000000),
+        '075': ('Time of Message Reception for Velocity', Variation_81, 0x01020000000000),
+        '076': ('Time of Message Reception of Velocity-High Precision', Variation_847, 0x01018000000000),
+        '140': ('Geometric Height', Variation_288, 0x01014000000000),
+        '090': ('Quality Indicators', Variation_855, 0x01012000000000),
+        '210': ('MOPS Version', Variation_859, 0x01011000000000),
+        '070': ('Mode 3/A Code in Octal Representation', Variation_860, 0x01010800000000),
+        '230': ('Roll Angle', Variation_704, 0x01010400000000),
+        '145': ('Flight Level', Variation_361, 0x01010200000000),
+        '152': ('Magnetic Heading', Variation_14, 0x01010180000000),
+        '200': ('Target Status', Variation_904, 0x01010140000000),
+        '155': ('Barometric Vertical Rate', Variation_867, 0x01010120000000),
+        '157': ('Geometric Vertical Rate', Variation_868, 0x01010110000000),
+        '160': ('Airborne Ground Vector', Variation_870, 0x01010108000000),
+        '165': ('Track Angle Rate', Variation_872, 0x01010104000000),
+        '077': ('Time of ASTERIX Report Transmission', Variation_81, 0x01010102000000),
+        '170': ('Target Identification', Variation_201, 0x01010101800000),
+        '020': ('Emitter Category', Variation_873, 0x01010101400000),
+        '220': ('Met Information', Variation_718, 0x01010101200000),
+        '146': ('Selected Altitude', Variation_874, 0x01010101100000),
+        '148': ('Final State Selected Altitude', Variation_878, 0x01010101080000),
+        '110': ('Trajectory Intent', Variation_741, 0x01010101040000),
+        '016': ('Service Management', Variation_879, 0x01010101020000),
+        '008': ('Aircraft Operational Status', Variation_887, 0x01010101018000),
+        '271': ('Surface Capabilities and Characteristics', Variation_905, 0x01010101014000),
+        '132': ('Message Amplitude', Variation_29, 0x01010101012000),
+        '250': ('Mode S MB Data', Variation_322, 0x01010101011000),
+        '260': ('ACAS Resolution Advisory Report', Variation_899, 0x01010101010800),
+        '400': ('Receiver ID', Variation_0, 0x01010101010400),
+        '295': ('Data Ages', Variation_901, 0x01010101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010101010102),
     }
 
     @overload
@@ -65609,52 +65609,52 @@ class Variation_912(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000000000),
-        '040': (Variation_908, 0x40000000000000),
-        '161': (Variation_839, 0x20000000000000),
-        '015': (Variation_0, 0x10000000000000),
-        '071': (Variation_81, 0x08000000000000),
-        '130': (Variation_692, 0x04000000000000),
-        '131': (Variation_619, 0x02000000000000),
-        '072': (Variation_81, 0x01800000000000),
-        '150': (Variation_706, 0x01400000000000),
-        '151': (Variation_842, 0x01200000000000),
-        '080': (Variation_279, 0x01100000000000),
-        '073': (Variation_81, 0x01080000000000),
-        '074': (Variation_845, 0x01040000000000),
-        '075': (Variation_81, 0x01020000000000),
-        '076': (Variation_847, 0x01018000000000),
-        '140': (Variation_288, 0x01014000000000),
-        '090': (Variation_855, 0x01012000000000),
-        '210': (Variation_911, 0x01011000000000),
-        '070': (Variation_860, 0x01010800000000),
-        '230': (Variation_704, 0x01010400000000),
-        '145': (Variation_361, 0x01010200000000),
-        '152': (Variation_14, 0x01010180000000),
-        '200': (Variation_904, 0x01010140000000),
-        '155': (Variation_867, 0x01010120000000),
-        '157': (Variation_868, 0x01010110000000),
-        '160': (Variation_870, 0x01010108000000),
-        '165': (Variation_872, 0x01010104000000),
-        '077': (Variation_81, 0x01010102000000),
-        '170': (Variation_201, 0x01010101800000),
-        '020': (Variation_873, 0x01010101400000),
-        '220': (Variation_718, 0x01010101200000),
-        '146': (Variation_874, 0x01010101100000),
-        '148': (Variation_878, 0x01010101080000),
-        '110': (Variation_741, 0x01010101040000),
-        '016': (Variation_879, 0x01010101020000),
-        '008': (Variation_887, 0x01010101018000),
-        '271': (Variation_905, 0x01010101014000),
-        '132': (Variation_29, 0x01010101012000),
-        '250': (Variation_322, 0x01010101011000),
-        '260': (Variation_899, 0x01010101010800),
-        '400': (Variation_0, 0x01010101010400),
-        '295': (Variation_901, 0x01010101010200),
-        'RE': (Variation_62, 0x01010101010104),
-        'SP': (Variation_62, 0x01010101010102),
+        '010': ('Data Source Identification', Variation_1, 0x80000000000000),
+        '040': ('Target Report Descriptor', Variation_908, 0x40000000000000),
+        '161': ('Track Number', Variation_839, 0x20000000000000),
+        '015': ('Service Identification', Variation_0, 0x10000000000000),
+        '071': ('Time of Applicability for Position', Variation_81, 0x08000000000000),
+        '130': ('Position in WGS-84 Co-ordinates', Variation_692, 0x04000000000000),
+        '131': ('High-Resolution Position in WGS-84 Co-ordinates', Variation_619, 0x02000000000000),
+        '072': ('Time of Applicability for Velocity', Variation_81, 0x01800000000000),
+        '150': ('Air Speed', Variation_706, 0x01400000000000),
+        '151': ('True Airspeed', Variation_842, 0x01200000000000),
+        '080': ('Target Address', Variation_279, 0x01100000000000),
+        '073': ('Time of Message Reception for Position', Variation_81, 0x01080000000000),
+        '074': ('Time of Message Reception of Position-High Precision', Variation_845, 0x01040000000000),
+        '075': ('Time of Message Reception for Velocity', Variation_81, 0x01020000000000),
+        '076': ('Time of Message Reception of Velocity-High Precision', Variation_847, 0x01018000000000),
+        '140': ('Geometric Height', Variation_288, 0x01014000000000),
+        '090': ('Quality Indicators', Variation_855, 0x01012000000000),
+        '210': ('MOPS Version', Variation_911, 0x01011000000000),
+        '070': ('Mode 3/A Code in Octal Representation', Variation_860, 0x01010800000000),
+        '230': ('Roll Angle', Variation_704, 0x01010400000000),
+        '145': ('Flight Level', Variation_361, 0x01010200000000),
+        '152': ('Magnetic Heading', Variation_14, 0x01010180000000),
+        '200': ('Target Status', Variation_904, 0x01010140000000),
+        '155': ('Barometric Vertical Rate', Variation_867, 0x01010120000000),
+        '157': ('Geometric Vertical Rate', Variation_868, 0x01010110000000),
+        '160': ('Airborne Ground Vector', Variation_870, 0x01010108000000),
+        '165': ('Track Angle Rate', Variation_872, 0x01010104000000),
+        '077': ('Time of ASTERIX Report Transmission', Variation_81, 0x01010102000000),
+        '170': ('Target Identification', Variation_201, 0x01010101800000),
+        '020': ('Emitter Category', Variation_873, 0x01010101400000),
+        '220': ('Met Information', Variation_718, 0x01010101200000),
+        '146': ('Selected Altitude', Variation_874, 0x01010101100000),
+        '148': ('Final State Selected Altitude', Variation_878, 0x01010101080000),
+        '110': ('Trajectory Intent', Variation_741, 0x01010101040000),
+        '016': ('Service Management', Variation_879, 0x01010101020000),
+        '008': ('Aircraft Operational Status', Variation_887, 0x01010101018000),
+        '271': ('Surface Capabilities and Characteristics', Variation_905, 0x01010101014000),
+        '132': ('Message Amplitude', Variation_29, 0x01010101012000),
+        '250': ('Mode S MB Data', Variation_322, 0x01010101011000),
+        '260': ('ACAS Resolution Advisory Report', Variation_899, 0x01010101010800),
+        '400': ('Receiver ID', Variation_0, 0x01010101010400),
+        '295': ('Data Ages', Variation_901, 0x01010101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010101010102),
     }
 
     @overload
@@ -67319,31 +67319,31 @@ class Variation_916(Compound):
         ('SCC', Variation_900),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'AOS': (Variation_900, 0x80000000),
-        'TRD': (Variation_900, 0x40000000),
-        'M3A': (Variation_900, 0x20000000),
-        'QI': (Variation_900, 0x10000000),
-        'TI1': (Variation_900, 0x08000000),
-        'MAM': (Variation_900, 0x04000000),
-        'GH': (Variation_900, 0x02000000),
-        'FL': (Variation_900, 0x01800000),
-        'SAL': (Variation_900, 0x01400000),
-        'FSA': (Variation_900, 0x01200000),
-        'AS': (Variation_900, 0x01100000),
-        'TAS': (Variation_900, 0x01080000),
-        'MH': (Variation_900, 0x01040000),
-        'BVR': (Variation_900, 0x01020000),
-        'GVR': (Variation_900, 0x01018000),
-        'GV': (Variation_900, 0x01014000),
-        'TAR': (Variation_900, 0x01012000),
-        'TI2': (Variation_900, 0x01011000),
-        'TS': (Variation_900, 0x01010800),
-        'MET': (Variation_900, 0x01010400),
-        'ROA': (Variation_900, 0x01010200),
-        'ARA': (Variation_900, 0x01010180),
-        'SCC': (Variation_900, 0x01010140),
+        'AOS': ('Aircraft Operational Status Age', Variation_900, 0x80000000),
+        'TRD': ('Target Report Descriptor Age', Variation_900, 0x40000000),
+        'M3A': ('Mode 3/A Age', Variation_900, 0x20000000),
+        'QI': ('Quality Indicators Age', Variation_900, 0x10000000),
+        'TI1': ('Trajectory Intent Age', Variation_900, 0x08000000),
+        'MAM': ('Message Amplitude Age', Variation_900, 0x04000000),
+        'GH': ('Geometric Height Age', Variation_900, 0x02000000),
+        'FL': ('Flight Level Age', Variation_900, 0x01800000),
+        'SAL': ('Selected Altitude Age', Variation_900, 0x01400000),
+        'FSA': ('Final State Selected Altitude Age', Variation_900, 0x01200000),
+        'AS': ('Air Speed Age', Variation_900, 0x01100000),
+        'TAS': ('True Air Speed Age', Variation_900, 0x01080000),
+        'MH': ('Magnetic Heading Age', Variation_900, 0x01040000),
+        'BVR': ('Barometric Vertical Rate Age', Variation_900, 0x01020000),
+        'GVR': ('Geometric Vertical Rate Age', Variation_900, 0x01018000),
+        'GV': ('Ground Vector Age', Variation_900, 0x01014000),
+        'TAR': ('Track Angle Rate Age', Variation_900, 0x01012000),
+        'TI2': ('Target Identification Age', Variation_900, 0x01011000),
+        'TS': ('Target Status Age', Variation_900, 0x01010800),
+        'MET': ('Met Information Age', Variation_900, 0x01010400),
+        'ROA': ('Roll Angle Age', Variation_900, 0x01010200),
+        'ARA': ('ACAS Resolution Advisory Age', Variation_900, 0x01010180),
+        'SCC': ('Surface Capabilities and Characteristics Age', Variation_900, 0x01010140),
     }
 
     @overload
@@ -68001,52 +68001,52 @@ class Variation_917(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000000000),
-        '040': (Variation_915, 0x40000000000000),
-        '161': (Variation_839, 0x20000000000000),
-        '015': (Variation_0, 0x10000000000000),
-        '071': (Variation_81, 0x08000000000000),
-        '130': (Variation_692, 0x04000000000000),
-        '131': (Variation_619, 0x02000000000000),
-        '072': (Variation_81, 0x01800000000000),
-        '150': (Variation_706, 0x01400000000000),
-        '151': (Variation_842, 0x01200000000000),
-        '080': (Variation_279, 0x01100000000000),
-        '073': (Variation_81, 0x01080000000000),
-        '074': (Variation_845, 0x01040000000000),
-        '075': (Variation_81, 0x01020000000000),
-        '076': (Variation_847, 0x01018000000000),
-        '140': (Variation_288, 0x01014000000000),
-        '090': (Variation_855, 0x01012000000000),
-        '210': (Variation_911, 0x01011000000000),
-        '070': (Variation_860, 0x01010800000000),
-        '230': (Variation_704, 0x01010400000000),
-        '145': (Variation_361, 0x01010200000000),
-        '152': (Variation_14, 0x01010180000000),
-        '200': (Variation_904, 0x01010140000000),
-        '155': (Variation_867, 0x01010120000000),
-        '157': (Variation_868, 0x01010110000000),
-        '160': (Variation_870, 0x01010108000000),
-        '165': (Variation_872, 0x01010104000000),
-        '077': (Variation_81, 0x01010102000000),
-        '170': (Variation_201, 0x01010101800000),
-        '020': (Variation_873, 0x01010101400000),
-        '220': (Variation_718, 0x01010101200000),
-        '146': (Variation_874, 0x01010101100000),
-        '148': (Variation_878, 0x01010101080000),
-        '110': (Variation_741, 0x01010101040000),
-        '016': (Variation_879, 0x01010101020000),
-        '008': (Variation_887, 0x01010101018000),
-        '271': (Variation_905, 0x01010101014000),
-        '132': (Variation_29, 0x01010101012000),
-        '250': (Variation_322, 0x01010101011000),
-        '260': (Variation_899, 0x01010101010800),
-        '400': (Variation_0, 0x01010101010400),
-        '295': (Variation_916, 0x01010101010200),
-        'RE': (Variation_62, 0x01010101010104),
-        'SP': (Variation_62, 0x01010101010102),
+        '010': ('Data Source Identification', Variation_1, 0x80000000000000),
+        '040': ('Target Report Descriptor', Variation_915, 0x40000000000000),
+        '161': ('Track Number', Variation_839, 0x20000000000000),
+        '015': ('Service Identification', Variation_0, 0x10000000000000),
+        '071': ('Time of Applicability for Position', Variation_81, 0x08000000000000),
+        '130': ('Position in WGS-84 Co-ordinates', Variation_692, 0x04000000000000),
+        '131': ('High-Resolution Position in WGS-84 Co-ordinates', Variation_619, 0x02000000000000),
+        '072': ('Time of Applicability for Velocity', Variation_81, 0x01800000000000),
+        '150': ('Air Speed', Variation_706, 0x01400000000000),
+        '151': ('True Airspeed', Variation_842, 0x01200000000000),
+        '080': ('Target Address', Variation_279, 0x01100000000000),
+        '073': ('Time of Message Reception for Position', Variation_81, 0x01080000000000),
+        '074': ('Time of Message Reception of Position-High Precision', Variation_845, 0x01040000000000),
+        '075': ('Time of Message Reception for Velocity', Variation_81, 0x01020000000000),
+        '076': ('Time of Message Reception of Velocity-High Precision', Variation_847, 0x01018000000000),
+        '140': ('Geometric Height', Variation_288, 0x01014000000000),
+        '090': ('Quality Indicators', Variation_855, 0x01012000000000),
+        '210': ('MOPS Version', Variation_911, 0x01011000000000),
+        '070': ('Mode 3/A Code in Octal Representation', Variation_860, 0x01010800000000),
+        '230': ('Roll Angle', Variation_704, 0x01010400000000),
+        '145': ('Flight Level', Variation_361, 0x01010200000000),
+        '152': ('Magnetic Heading', Variation_14, 0x01010180000000),
+        '200': ('Target Status', Variation_904, 0x01010140000000),
+        '155': ('Barometric Vertical Rate', Variation_867, 0x01010120000000),
+        '157': ('Geometric Vertical Rate', Variation_868, 0x01010110000000),
+        '160': ('Airborne Ground Vector', Variation_870, 0x01010108000000),
+        '165': ('Track Angle Rate', Variation_872, 0x01010104000000),
+        '077': ('Time of ASTERIX Report Transmission', Variation_81, 0x01010102000000),
+        '170': ('Target Identification', Variation_201, 0x01010101800000),
+        '020': ('Emitter Category', Variation_873, 0x01010101400000),
+        '220': ('Met Information', Variation_718, 0x01010101200000),
+        '146': ('Selected Altitude', Variation_874, 0x01010101100000),
+        '148': ('Final State Selected Altitude', Variation_878, 0x01010101080000),
+        '110': ('Trajectory Intent', Variation_741, 0x01010101040000),
+        '016': ('Service Management', Variation_879, 0x01010101020000),
+        '008': ('Aircraft Operational Status', Variation_887, 0x01010101018000),
+        '271': ('Surface Capabilities and Characteristics', Variation_905, 0x01010101014000),
+        '132': ('Message Amplitude', Variation_29, 0x01010101012000),
+        '250': ('Mode S MB Data', Variation_322, 0x01010101011000),
+        '260': ('ACAS Resolution Advisory Report', Variation_899, 0x01010101010800),
+        '400': ('Receiver ID', Variation_0, 0x01010101010400),
+        '295': ('Data Ages', Variation_916, 0x01010101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010101010102),
     }
 
     @overload
@@ -70117,19 +70117,19 @@ class Variation_939(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_918, 0x4000),
-        '015': (Variation_920, 0x2000),
-        '070': (Variation_81, 0x1000),
-        '100': (Variation_929, 0x0800),
-        '101': (Variation_931, 0x0400),
-        '200': (Variation_932, 0x0200),
-        '110': (Variation_934, 0x0180),
-        '120': (Variation_938, 0x0140),
-        'RE': (Variation_62, 0x0104),
-        'SP': (Variation_62, 0x0102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Report Type', Variation_918, 0x4000),
+        '015': ('Service Type and Identification', Variation_920, 0x2000),
+        '070': ('Time of Day', Variation_81, 0x1000),
+        '100': ('Ground Station Status', Variation_929, 0x0800),
+        '101': ('Service Configuration', Variation_931, 0x0400),
+        '200': ('Operational Range', Variation_932, 0x0200),
+        '110': ('Service Status', Variation_934, 0x0180),
+        '120': ('Service Statistics', Variation_938, 0x0140),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0102),
     }
 
     @overload
@@ -71875,21 +71875,21 @@ class Variation_958(Compound):
         ('610', Variation_302),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_940, 0x4000),
-        '200': (Variation_279, 0x2000),
-        '015': (Variation_0, 0x1000),
-        '020': (Variation_201, 0x0800),
-        '070': (Variation_81, 0x0400),
-        '100': (Variation_945, 0x0200),
-        '105': (Variation_947, 0x0180),
-        '120': (Variation_951, 0x0140),
-        '140': (Variation_955, 0x0120),
-        'SP': (Variation_62, 0x0110),
-        '600': (Variation_957, 0x0108),
-        '610': (Variation_302, 0x0104),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Report Type', Variation_940, 0x4000),
+        '200': ('Message Identification', Variation_279, 0x2000),
+        '015': ('Service Identification', Variation_0, 0x1000),
+        '020': ('Service Designator', Variation_201, 0x0800),
+        '070': ('Time of Day', Variation_81, 0x0400),
+        '100': ('System and Service Status', Variation_945, 0x0200),
+        '105': ('System and Service Error Codes', Variation_947, 0x0180),
+        '120': ('Component Status', Variation_951, 0x0140),
+        '140': ('Service Statistics', Variation_955, 0x0120),
+        'SP': ('Special Purpose Field', Variation_62, 0x0110),
+        '600': ('Position of the System Reference Point', Variation_957, 0x0108),
+        '610': ('Height of the System Reference Point', Variation_302, 0x0104),
     }
 
     @overload
@@ -73684,16 +73684,16 @@ class Variation_986(Compound):
         ('STAR', Variation_149),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'IFI': (Variation_973, 0x8000),
-        'RVP': (Variation_976, 0x4000),
-        'RDS': (Variation_978, 0x2000),
-        'TOD': (Variation_982, 0x1000),
-        'AST': (Variation_166, 0x0800),
-        'STS': (Variation_985, 0x0400),
-        'SID': (Variation_149, 0x0200),
-        'STAR': (Variation_149, 0x0180),
+        'IFI': ('IFPS FLIGHT ID', Variation_973, 0x8000),
+        'RVP': ('RVSM & Flight Priority', Variation_976, 0x4000),
+        'RDS': ('Runway Designation', Variation_978, 0x2000),
+        'TOD': ('Time of Departure / Arrival', Variation_982, 0x1000),
+        'AST': ('Aircraft Stand', Variation_166, 0x0800),
+        'STS': ('Stand Status', Variation_985, 0x0400),
+        'SID': ('Standard Instrument Departure', Variation_149, 0x0200),
+        'STAR': ('Standard Instrument Arrival', Variation_149, 0x0180),
     }
 
     @overload
@@ -73954,28 +73954,28 @@ class Variation_987(Compound):
         ('RE', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x800000),
-        '015': (Variation_64, 0x400000),
-        '018': (Variation_1, 0x200000),
-        '035': (Variation_961, 0x100000),
-        '020': (Variation_81, 0x080000),
-        '040': (Variation_64, 0x040000),
-        '050': (Variation_962, 0x020000),
-        '060': (Variation_963, 0x018000),
-        '400': (Variation_149, 0x014000),
-        '410': (Variation_64, 0x012000),
-        '420': (Variation_966, 0x011000),
-        '440': (Variation_331, 0x010800),
-        '450': (Variation_331, 0x010400),
-        '480': (Variation_169, 0x010200),
-        '490': (Variation_967, 0x010180),
-        '430': (Variation_331, 0x010140),
-        '435': (Variation_371, 0x010120),
-        '460': (Variation_971, 0x010110),
-        '500': (Variation_986, 0x010108),
-        'RE': (Variation_62, 0x010102),
+        '010': ('Server Identification Tag', Variation_1, 0x800000),
+        '015': ('User Number', Variation_64, 0x400000),
+        '018': ('Data Source Identification Tag', Variation_1, 0x200000),
+        '035': ('Type of Message', Variation_961, 0x100000),
+        '020': ('Time of ASTERIX Report Generation', Variation_81, 0x080000),
+        '040': ('Track Number', Variation_64, 0x040000),
+        '050': ('Composed Track Number', Variation_962, 0x020000),
+        '060': ('Track Mode 3/A', Variation_963, 0x018000),
+        '400': ('Callsign', Variation_149, 0x014000),
+        '410': ('Plan Number', Variation_64, 0x012000),
+        '420': ('Flight Category', Variation_966, 0x011000),
+        '440': ('Departure Aerodrome', Variation_331, 0x010800),
+        '450': ('Destination Aerodrome', Variation_331, 0x010400),
+        '480': ('Current Cleared Flight Level', Variation_169, 0x010200),
+        '490': ('Current Control Position', Variation_967, 0x010180),
+        '430': ('Type of Aircraft', Variation_331, 0x010140),
+        '435': ('Wake Turbulence Category', Variation_371, 0x010120),
+        '460': ('Allocated SSR Codes', Variation_971, 0x010110),
+        '500': ('Supplementary Flight Data', Variation_986, 0x010108),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x010102),
     }
 
     @overload
@@ -75543,12 +75543,12 @@ class Variation_1010(Compound):
         ('MDS', Variation_1009),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'COM': (Variation_996, 0x80),
-        'PSR': (Variation_1001, 0x10),
-        'SSR': (Variation_1003, 0x08),
-        'MDS': (Variation_1009, 0x04),
+        'COM': ('Common Part', Variation_996, 0x80),
+        'PSR': ('Specific Status Information for a PSR Sensor', Variation_1001, 0x10),
+        'SSR': ('Specific Status Information for a SSR Sensor', Variation_1003, 0x08),
+        'MDS': ('Specific Status Information for a Mode S Sensor', Variation_1009, 0x04),
     }
 
     @overload
@@ -76150,12 +76150,12 @@ class Variation_1021(Compound):
         ('MDS', Variation_1020),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'COM': (Variation_1013, 0x80),
-        'PSR': (Variation_1016, 0x10),
-        'SSR': (Variation_1018, 0x08),
-        'MDS': (Variation_1020, 0x04),
+        'COM': ('Common Part', Variation_1013, 0x80),
+        'PSR': ('Specific Processing Mode Information for a PSR Sensor', Variation_1016, 0x10),
+        'SSR': ('Specific Processing Mode Information for a SSR Sensor', Variation_1018, 0x08),
+        'MDS': ('Specific Processing Mode Information for a Mode S Sensor', Variation_1020, 0x04),
     }
 
     @overload
@@ -76793,22 +76793,22 @@ class Variation_1029(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_988, 0x4000),
-        '030': (Variation_81, 0x2000),
-        '020': (Variation_80, 0x1000),
-        '041': (Variation_25, 0x0800),
-        '050': (Variation_1010, 0x0400),
-        '060': (Variation_1021, 0x0200),
-        '070': (Variation_1024, 0x0180),
-        '100': (Variation_1025, 0x0140),
-        '110': (Variation_1026, 0x0120),
-        '120': (Variation_1027, 0x0110),
-        '090': (Variation_1028, 0x0108),
-        'RE': (Variation_62, 0x0104),
-        'SP': (Variation_62, 0x0102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Message Type', Variation_988, 0x4000),
+        '030': ('Time of Day', Variation_81, 0x2000),
+        '020': ('Sector Number', Variation_80, 0x1000),
+        '041': ('Antenna Rotation Speed', Variation_25, 0x0800),
+        '050': ('System Configuration and Status', Variation_1010, 0x0400),
+        '060': ('System Processing Mode', Variation_1021, 0x0200),
+        '070': ('Message Count Values', Variation_1024, 0x0180),
+        '100': ('Generic Polar Window', Variation_1025, 0x0140),
+        '110': ('Data Filter', Variation_1026, 0x0120),
+        '120': ('3D-Position Of Data Source', Variation_1027, 0x0110),
+        '090': ('Collimation Error', Variation_1028, 0x0108),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0102),
     }
 
     @overload
@@ -77366,22 +77366,22 @@ class Variation_1034(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_1030, 0x4000),
-        '030': (Variation_81, 0x2000),
-        '020': (Variation_80, 0x1000),
-        '041': (Variation_25, 0x0800),
-        '050': (Variation_1010, 0x0400),
-        '060': (Variation_1021, 0x0200),
-        '070': (Variation_1033, 0x0180),
-        '100': (Variation_1025, 0x0140),
-        '110': (Variation_1026, 0x0120),
-        '120': (Variation_1027, 0x0110),
-        '090': (Variation_1028, 0x0108),
-        'RE': (Variation_62, 0x0104),
-        'SP': (Variation_62, 0x0102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Message Type', Variation_1030, 0x4000),
+        '030': ('Time of Day', Variation_81, 0x2000),
+        '020': ('Sector Number', Variation_80, 0x1000),
+        '041': ('Antenna Rotation Speed', Variation_25, 0x0800),
+        '050': ('System Configuration and Status', Variation_1010, 0x0400),
+        '060': ('System Processing Mode', Variation_1021, 0x0200),
+        '070': ('Message Count Values', Variation_1033, 0x0180),
+        '100': ('Generic Polar Window', Variation_1025, 0x0140),
+        '110': ('Data Filter', Variation_1026, 0x0120),
+        '120': ('3D-Position Of Data Source', Variation_1027, 0x0110),
+        '090': ('Collimation Error', Variation_1028, 0x0108),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0102),
     }
 
     @overload
@@ -77794,22 +77794,22 @@ class Variation_1036(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_1035, 0x4000),
-        '030': (Variation_81, 0x2000),
-        '020': (Variation_80, 0x1000),
-        '041': (Variation_25, 0x0800),
-        '050': (Variation_1010, 0x0400),
-        '060': (Variation_1021, 0x0200),
-        '070': (Variation_1033, 0x0180),
-        '100': (Variation_1025, 0x0140),
-        '110': (Variation_1026, 0x0120),
-        '120': (Variation_1027, 0x0110),
-        '090': (Variation_1028, 0x0108),
-        'RE': (Variation_62, 0x0104),
-        'SP': (Variation_62, 0x0102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Message Type', Variation_1035, 0x4000),
+        '030': ('Time of Day', Variation_81, 0x2000),
+        '020': ('Sector Number', Variation_80, 0x1000),
+        '041': ('Antenna Rotation Speed', Variation_25, 0x0800),
+        '050': ('System Configuration and Status', Variation_1010, 0x0400),
+        '060': ('System Processing Mode', Variation_1021, 0x0200),
+        '070': ('Message Count Values', Variation_1033, 0x0180),
+        '100': ('Generic Polar Window', Variation_1025, 0x0140),
+        '110': ('Data Filter', Variation_1026, 0x0120),
+        '120': ('3D-Position Of Data Source', Variation_1027, 0x0110),
+        '090': ('Collimation Error', Variation_1028, 0x0108),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0102),
     }
 
     @overload
@@ -79158,15 +79158,15 @@ class Variation_1052(Compound):
         ('XP', Variation_1051),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'SUM': (Variation_1039, 0x80),
-        'PMN': (Variation_1041, 0x40),
-        'POS': (Variation_1042, 0x20),
-        'GA': (Variation_1045, 0x10),
-        'EM1': (Variation_1048, 0x08),
-        'TOS': (Variation_1049, 0x04),
-        'XP': (Variation_1051, 0x02),
+        'SUM': ('Mode 5 Summary', Variation_1039, 0x80),
+        'PMN': ('PIN/ National Origin/Mission Code', Variation_1041, 0x40),
+        'POS': ('Mode 5 Reported Position', Variation_1042, 0x20),
+        'GA': ('Mode 5 GNSS-derived Altitude', Variation_1045, 0x10),
+        'EM1': ('Extended Mode 1 Code in Octal Representation', Variation_1048, 0x08),
+        'TOS': ('Time Offset for POS and GA', Variation_1049, 0x04),
+        'XP': ('X Pulse Presence', Variation_1051, 0x02),
     }
 
     @overload
@@ -79549,16 +79549,16 @@ class Variation_1056(Compound):
         ('FOM', Variation_1055),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'SUM': (Variation_1039, 0x8000),
-        'PMN': (Variation_1054, 0x4000),
-        'POS': (Variation_1042, 0x2000),
-        'GA': (Variation_1045, 0x1000),
-        'EM1': (Variation_1048, 0x0800),
-        'TOS': (Variation_1049, 0x0400),
-        'XP': (Variation_1051, 0x0200),
-        'FOM': (Variation_1055, 0x0180),
+        'SUM': ('Mode 5 Summary', Variation_1039, 0x8000),
+        'PMN': ('PIN/ National Origin/Mission Code', Variation_1054, 0x4000),
+        'POS': ('Mode 5 Reported Position', Variation_1042, 0x2000),
+        'GA': ('Mode 5 GNSS-derived Altitude', Variation_1045, 0x1000),
+        'EM1': ('Extended Mode 1 Code in Octal Representation', Variation_1048, 0x0800),
+        'TOS': ('Time Offset for POS and GA', Variation_1049, 0x0400),
+        'XP': ('X Pulse Presence', Variation_1051, 0x0200),
+        'FOM': ('Figure of Merit', Variation_1055, 0x0180),
     }
 
     @overload
@@ -79890,12 +79890,12 @@ class Variation_1060(Compound):
         ('AR', Variation_581),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'SCO': (Variation_0, 0x80),
-        'SRC': (Variation_1059, 0x40),
-        'RW': (Variation_581, 0x20),
-        'AR': (Variation_581, 0x10),
+        'SCO': ('Score', Variation_0, 0x80),
+        'SRC': ('Signal/Clutter Ratio', Variation_1059, 0x40),
+        'RW': ('Range Width', Variation_581, 0x20),
+        'AR': ('Ambiguous Range', Variation_581, 0x10),
     }
 
     @overload
@@ -81731,19 +81731,19 @@ class Variation_1092(Compound):
         ('IR', Variation_1091),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'PTL': (Variation_1067, 0x8000),
-        'ATL': (Variation_1068, 0x4000),
-        'TRN': (Variation_1069, 0x2000),
-        'NPP': (Variation_1070, 0x1000),
-        'DLK': (Variation_1075, 0x0800),
-        'LCK': (Variation_1078, 0x0400),
-        'TC': (Variation_1080, 0x0200),
-        'TLC': (Variation_1083, 0x0180),
-        'ASI': (Variation_1087, 0x0140),
-        'TES': (Variation_1088, 0x0120),
-        'IR': (Variation_1091, 0x0110),
+        'PTL': ('Plot/Track Link', Variation_1067, 0x8000),
+        'ATL': ('ADS-B/Track Link', Variation_1068, 0x4000),
+        'TRN': ('Turn State', Variation_1069, 0x2000),
+        'NPP': ('Next Predicted Position', Variation_1070, 0x1000),
+        'DLK': ('Data Link Characteristics', Variation_1075, 0x0800),
+        'LCK': ('Lockout Characteristics', Variation_1078, 0x0400),
+        'TC': ('Transition Code', Variation_1080, 0x0200),
+        'TLC': ('Track Life Cycle', Variation_1083, 0x0180),
+        'ASI': ('Adjacent Sensor Information', Variation_1087, 0x0140),
+        'TES': ('Track Extrapolation Source', Variation_1088, 0x0120),
+        'IR': ('Identity Requested', Variation_1091, 0x0110),
     }
 
     @overload
@@ -82383,12 +82383,12 @@ class Variation_1097(Compound):
         ('DATE', Variation_1096),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'PNB': (Variation_64, 0x80),
-        'RPL': (Variation_1095, 0x40),
-        'SNB': (Variation_0, 0x20),
-        'DATE': (Variation_1096, 0x10),
+        'PNB': ('Plot Number', Variation_64, 0x80),
+        'RPL': ('Replies/Plot Link', Variation_1095, 0x40),
+        'SNB': ('Scan Number', Variation_0, 0x20),
+        'DATE': ('Common and Plot Characteristics Date', Variation_1096, 0x10),
     }
 
     @overload
@@ -82530,15 +82530,15 @@ class Variation_1098(Compound):
         ('CPC', Variation_1097),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'MD5': (Variation_1052, 0x80),
-        'M5N': (Variation_1056, 0x40),
-        'M4E': (Variation_1058, 0x20),
-        'RPC': (Variation_1060, 0x10),
-        'ERR': (Variation_1061, 0x08),
-        'RTC': (Variation_1092, 0x04),
-        'CPC': (Variation_1097, 0x02),
+        'MD5': ('Mode 5 Reports', Variation_1052, 0x80),
+        'M5N': ('Mode 5 Reports, New Format', Variation_1056, 0x40),
+        'M4E': ('Extended Mode 4 Report', Variation_1058, 0x20),
+        'RPC': ('Radar Plot Characteristics', Variation_1060, 0x10),
+        'ERR': ('Extended Range Report', Variation_1061, 0x08),
+        'RTC': ('Radar Track Characteristics', Variation_1092, 0x04),
+        'CPC': ('Common and Plot Characteristics', Variation_1097, 0x02),
     }
 
     @overload
@@ -83578,15 +83578,15 @@ class Variation_1116(Compound):
         ('APD', Variation_91),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'SRL': (Variation_1114, 0x80),
-        'SRR': (Variation_0, 0x40),
-        'SAM': (Variation_29, 0x20),
-        'PRL': (Variation_1114, 0x10),
-        'PAM': (Variation_29, 0x08),
-        'RPD': (Variation_1115, 0x04),
-        'APD': (Variation_91, 0x02),
+        'SRL': ('SSR Plot Runlength', Variation_1114, 0x80),
+        'SRR': ('Number of Received Replies for (M)SSR', Variation_0, 0x40),
+        'SAM': ('Amplitude of (M)SSR Reply', Variation_29, 0x20),
+        'PRL': ('Primary Plot Runlength', Variation_1114, 0x10),
+        'PAM': ('Amplitude of Primary Plot', Variation_29, 0x08),
+        'RPD': ('Difference in Range Between PSR and SSR Plot', Variation_1115, 0x04),
+        'APD': ('Difference in Azimuth Between PSR and SSR Plot', Variation_91, 0x02),
     }
 
     @overload
@@ -85066,10 +85066,10 @@ class Variation_1143(Compound):
         ('RDS', Variation_1142),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'CAL': (Variation_1138, 0x80),
-        'RDS': (Variation_1142, 0x40),
+        'CAL': ('Calculated Doppler Speed', Variation_1138, 0x80),
+        'RDS': ('Raw Doppler Speed', Variation_1142, 0x40),
     }
 
     @overload
@@ -85878,36 +85878,36 @@ class Variation_1155(Compound):
         ('RE', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000),
-        '140': (Variation_81, 0x40000000),
-        '020': (Variation_1110, 0x20000000),
-        '040': (Variation_582, 0x10000000),
-        '070': (Variation_1111, 0x08000000),
-        '090': (Variation_1113, 0x04000000),
-        '130': (Variation_1116, 0x02000000),
-        '220': (Variation_279, 0x01800000),
-        '240': (Variation_201, 0x01400000),
-        '250': (Variation_1118, 0x01200000),
-        '161': (Variation_638, 0x01100000),
-        '042': (Variation_1119, 0x01080000),
-        '200': (Variation_68, 0x01040000),
-        '170': (Variation_1128, 0x01020000),
-        '210': (Variation_1132, 0x01018000),
-        '030': (Variation_1134, 0x01014000),
-        '080': (Variation_42, 0x01012000),
-        '100': (Variation_55, 0x01011000),
-        '110': (Variation_1135, 0x01010800),
-        '120': (Variation_1143, 0x01010400),
-        '230': (Variation_1147, 0x01010200),
-        '260': (Variation_282, 0x01010180),
-        '055': (Variation_1149, 0x01010140),
-        '050': (Variation_27, 0x01010120),
-        '065': (Variation_1154, 0x01010110),
-        '060': (Variation_42, 0x01010108),
-        'SP': (Variation_62, 0x01010104),
-        'RE': (Variation_62, 0x01010102),
+        '010': ('Data Source Identifier', Variation_1, 0x80000000),
+        '140': ('Time of Day', Variation_81, 0x40000000),
+        '020': ('Target Report Descriptor', Variation_1110, 0x20000000),
+        '040': ('Measured Position in Polar Co-ordinates', Variation_582, 0x10000000),
+        '070': ('Mode-3/A Code in Octal Representation', Variation_1111, 0x08000000),
+        '090': ('Flight Level in Binary Representation', Variation_1113, 0x04000000),
+        '130': ('Radar Plot Characteristics', Variation_1116, 0x02000000),
+        '220': ('Aircraft Address', Variation_279, 0x01800000),
+        '240': ('Aircraft Identification', Variation_201, 0x01400000),
+        '250': ('Mode S MB Data', Variation_1118, 0x01200000),
+        '161': ('Track Number', Variation_638, 0x01100000),
+        '042': ('Calculated Position in Cartesian Co-ordinates', Variation_1119, 0x01080000),
+        '200': ('Calculated Track Velocity in Polar Co-ordinates', Variation_68, 0x01040000),
+        '170': ('Track Status', Variation_1128, 0x01020000),
+        '210': ('Track Quality', Variation_1132, 0x01018000),
+        '030': ('Warning/Error Conditions and Target Classification', Variation_1134, 0x01014000),
+        '080': ('Mode-3/A Code Confidence Indicator', Variation_42, 0x01012000),
+        '100': ('Mode-C Code and Code Confidence Indicator', Variation_55, 0x01011000),
+        '110': ('Height Measured by a 3D Radar', Variation_1135, 0x01010800),
+        '120': ('Radial Doppler Speed', Variation_1143, 0x01010400),
+        '230': ('Communications/ACAS Capability and Flight Status', Variation_1147, 0x01010200),
+        '260': ('ACAS Resolution Advisory Report', Variation_282, 0x01010180),
+        '055': ('Mode-1 Code in Octal Representation', Variation_1149, 0x01010140),
+        '050': ('Mode-2 Code in Octal Representation', Variation_27, 0x01010120),
+        '065': ('Mode-1 Code Confidence Indicator', Variation_1154, 0x01010110),
+        '060': ('Mode-2 Code Confidence Indicator', Variation_42, 0x01010108),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010104),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010102),
     }
 
     @overload
@@ -86755,36 +86755,36 @@ class Variation_1158(Compound):
         ('RE', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000),
-        '140': (Variation_81, 0x40000000),
-        '020': (Variation_1110, 0x20000000),
-        '040': (Variation_582, 0x10000000),
-        '070': (Variation_1111, 0x08000000),
-        '090': (Variation_1113, 0x04000000),
-        '130': (Variation_1116, 0x02000000),
-        '220': (Variation_279, 0x01800000),
-        '240': (Variation_201, 0x01400000),
-        '250': (Variation_1118, 0x01200000),
-        '161': (Variation_638, 0x01100000),
-        '042': (Variation_1119, 0x01080000),
-        '200': (Variation_68, 0x01040000),
-        '170': (Variation_1128, 0x01020000),
-        '210': (Variation_1132, 0x01018000),
-        '030': (Variation_1157, 0x01014000),
-        '080': (Variation_42, 0x01012000),
-        '100': (Variation_55, 0x01011000),
-        '110': (Variation_1135, 0x01010800),
-        '120': (Variation_1143, 0x01010400),
-        '230': (Variation_1147, 0x01010200),
-        '260': (Variation_282, 0x01010180),
-        '055': (Variation_1149, 0x01010140),
-        '050': (Variation_27, 0x01010120),
-        '065': (Variation_1154, 0x01010110),
-        '060': (Variation_42, 0x01010108),
-        'SP': (Variation_62, 0x01010104),
-        'RE': (Variation_62, 0x01010102),
+        '010': ('Data Source Identifier', Variation_1, 0x80000000),
+        '140': ('Time of Day', Variation_81, 0x40000000),
+        '020': ('Target Report Descriptor', Variation_1110, 0x20000000),
+        '040': ('Measured Position in Polar Co-ordinates', Variation_582, 0x10000000),
+        '070': ('Mode-3/A Code in Octal Representation', Variation_1111, 0x08000000),
+        '090': ('Flight Level in Binary Representation', Variation_1113, 0x04000000),
+        '130': ('Radar Plot Characteristics', Variation_1116, 0x02000000),
+        '220': ('Aircraft Address', Variation_279, 0x01800000),
+        '240': ('Aircraft Identification', Variation_201, 0x01400000),
+        '250': ('Mode S MB Data', Variation_1118, 0x01200000),
+        '161': ('Track Number', Variation_638, 0x01100000),
+        '042': ('Calculated Position in Cartesian Co-ordinates', Variation_1119, 0x01080000),
+        '200': ('Calculated Track Velocity in Polar Co-ordinates', Variation_68, 0x01040000),
+        '170': ('Track Status', Variation_1128, 0x01020000),
+        '210': ('Track Quality', Variation_1132, 0x01018000),
+        '030': ('Warning/Error Conditions and Target Classification', Variation_1157, 0x01014000),
+        '080': ('Mode-3/A Code Confidence Indicator', Variation_42, 0x01012000),
+        '100': ('Mode-C Code and Code Confidence Indicator', Variation_55, 0x01011000),
+        '110': ('Height Measured by a 3D Radar', Variation_1135, 0x01010800),
+        '120': ('Radial Doppler Speed', Variation_1143, 0x01010400),
+        '230': ('Communications/ACAS Capability and Flight Status', Variation_1147, 0x01010200),
+        '260': ('ACAS Resolution Advisory Report', Variation_282, 0x01010180),
+        '055': ('Mode-1 Code in Octal Representation', Variation_1149, 0x01010140),
+        '050': ('Mode-2 Code in Octal Representation', Variation_27, 0x01010120),
+        '065': ('Mode-1 Code Confidence Indicator', Variation_1154, 0x01010110),
+        '060': ('Mode-2 Code Confidence Indicator', Variation_42, 0x01010108),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010104),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010102),
     }
 
     @overload
@@ -87520,36 +87520,36 @@ class Variation_1159(Compound):
         ('RE', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000),
-        '140': (Variation_81, 0x40000000),
-        '020': (Variation_1110, 0x20000000),
-        '040': (Variation_582, 0x10000000),
-        '070': (Variation_1111, 0x08000000),
-        '090': (Variation_1113, 0x04000000),
-        '130': (Variation_1116, 0x02000000),
-        '220': (Variation_279, 0x01800000),
-        '240': (Variation_201, 0x01400000),
-        '250': (Variation_1118, 0x01200000),
-        '161': (Variation_638, 0x01100000),
-        '042': (Variation_1119, 0x01080000),
-        '200': (Variation_68, 0x01040000),
-        '170': (Variation_1128, 0x01020000),
-        '210': (Variation_1132, 0x01018000),
-        '030': (Variation_1157, 0x01014000),
-        '080': (Variation_42, 0x01012000),
-        '100': (Variation_55, 0x01011000),
-        '110': (Variation_1135, 0x01010800),
-        '120': (Variation_1143, 0x01010400),
-        '230': (Variation_1147, 0x01010200),
-        '260': (Variation_282, 0x01010180),
-        '055': (Variation_1149, 0x01010140),
-        '050': (Variation_27, 0x01010120),
-        '065': (Variation_1154, 0x01010110),
-        '060': (Variation_42, 0x01010108),
-        'SP': (Variation_62, 0x01010104),
-        'RE': (Variation_62, 0x01010102),
+        '010': ('Data Source Identifier', Variation_1, 0x80000000),
+        '140': ('Time of Day', Variation_81, 0x40000000),
+        '020': ('Target Report Descriptor', Variation_1110, 0x20000000),
+        '040': ('Measured Position in Polar Co-ordinates', Variation_582, 0x10000000),
+        '070': ('Mode-3/A Code in Octal Representation', Variation_1111, 0x08000000),
+        '090': ('Flight Level in Binary Representation', Variation_1113, 0x04000000),
+        '130': ('Radar Plot Characteristics', Variation_1116, 0x02000000),
+        '220': ('Aircraft Address', Variation_279, 0x01800000),
+        '240': ('Aircraft Identification', Variation_201, 0x01400000),
+        '250': ('BDS Register Data', Variation_1118, 0x01200000),
+        '161': ('Track Number', Variation_638, 0x01100000),
+        '042': ('Calculated Position in Cartesian Co-ordinates', Variation_1119, 0x01080000),
+        '200': ('Calculated Track Velocity in Polar Co-ordinates', Variation_68, 0x01040000),
+        '170': ('Track Status', Variation_1128, 0x01020000),
+        '210': ('Track Quality', Variation_1132, 0x01018000),
+        '030': ('Warning/Error Conditions and Target Classification', Variation_1157, 0x01014000),
+        '080': ('Mode-3/A Code Confidence Indicator', Variation_42, 0x01012000),
+        '100': ('Mode-C Code and Code Confidence Indicator', Variation_55, 0x01011000),
+        '110': ('Height Measured by a 3D Radar', Variation_1135, 0x01010800),
+        '120': ('Radial Doppler Speed', Variation_1143, 0x01010400),
+        '230': ('Communications/ACAS Capability and Flight Status', Variation_1147, 0x01010200),
+        '260': ('ACAS Resolution Advisory Report', Variation_282, 0x01010180),
+        '055': ('Mode-1 Code in Octal Representation', Variation_1149, 0x01010140),
+        '050': ('Mode-2 Code in Octal Representation', Variation_27, 0x01010120),
+        '065': ('Mode-1 Code Confidence Indicator', Variation_1154, 0x01010110),
+        '060': ('Mode-2 Code Confidence Indicator', Variation_42, 0x01010108),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010104),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010102),
     }
 
     @overload
@@ -89133,36 +89133,36 @@ class Variation_1172(Compound):
         ('RE', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80000000),
-        '140': (Variation_81, 0x40000000),
-        '020': (Variation_1169, 0x20000000),
-        '040': (Variation_582, 0x10000000),
-        '070': (Variation_1111, 0x08000000),
-        '090': (Variation_1113, 0x04000000),
-        '130': (Variation_1116, 0x02000000),
-        '220': (Variation_279, 0x01800000),
-        '240': (Variation_201, 0x01400000),
-        '250': (Variation_1118, 0x01200000),
-        '161': (Variation_638, 0x01100000),
-        '042': (Variation_1119, 0x01080000),
-        '200': (Variation_68, 0x01040000),
-        '170': (Variation_1128, 0x01020000),
-        '210': (Variation_1132, 0x01018000),
-        '030': (Variation_1171, 0x01014000),
-        '080': (Variation_42, 0x01012000),
-        '100': (Variation_55, 0x01011000),
-        '110': (Variation_1135, 0x01010800),
-        '120': (Variation_1143, 0x01010400),
-        '230': (Variation_1147, 0x01010200),
-        '260': (Variation_282, 0x01010180),
-        '055': (Variation_1149, 0x01010140),
-        '050': (Variation_27, 0x01010120),
-        '065': (Variation_1154, 0x01010110),
-        '060': (Variation_42, 0x01010108),
-        'SP': (Variation_62, 0x01010104),
-        'RE': (Variation_62, 0x01010102),
+        '010': ('Data Source Identifier', Variation_1, 0x80000000),
+        '140': ('Time of Day', Variation_81, 0x40000000),
+        '020': ('Target Report Descriptor', Variation_1169, 0x20000000),
+        '040': ('Measured Position in Polar Co-ordinates', Variation_582, 0x10000000),
+        '070': ('Mode-3/A Code in Octal Representation', Variation_1111, 0x08000000),
+        '090': ('Flight Level in Binary Representation', Variation_1113, 0x04000000),
+        '130': ('Radar Plot Characteristics', Variation_1116, 0x02000000),
+        '220': ('Aircraft Address', Variation_279, 0x01800000),
+        '240': ('Aircraft Identification', Variation_201, 0x01400000),
+        '250': ('BDS Register Data', Variation_1118, 0x01200000),
+        '161': ('Track Number', Variation_638, 0x01100000),
+        '042': ('Calculated Position in Cartesian Co-ordinates', Variation_1119, 0x01080000),
+        '200': ('Calculated Track Velocity in Polar Co-ordinates', Variation_68, 0x01040000),
+        '170': ('Track Status', Variation_1128, 0x01020000),
+        '210': ('Track Quality', Variation_1132, 0x01018000),
+        '030': ('Warning/Error Conditions and Target Classification', Variation_1171, 0x01014000),
+        '080': ('Mode-3/A Code Confidence Indicator', Variation_42, 0x01012000),
+        '100': ('Mode-C Code and Code Confidence Indicator', Variation_55, 0x01011000),
+        '110': ('Height Measured by a 3D Radar', Variation_1135, 0x01010800),
+        '120': ('Radial Doppler Speed', Variation_1143, 0x01010400),
+        '230': ('Communications/ACAS Capability and Flight Status', Variation_1147, 0x01010200),
+        '260': ('ACAS Resolution Advisory Report', Variation_282, 0x01010180),
+        '055': ('Mode-1 Code in Octal Representation', Variation_1149, 0x01010140),
+        '050': ('Mode-2 Code in Octal Representation', Variation_27, 0x01010120),
+        '065': ('Mode-1 Code Confidence Indicator', Variation_1154, 0x01010110),
+        '060': ('Mode-2 Code Confidence Indicator', Variation_42, 0x01010108),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010104),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x01010102),
     }
 
     @overload
@@ -90240,12 +90240,12 @@ class Variation_1180(Compound):
         ('STS', Variation_1179),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'CST': (Variation_1175, 0x80),
-        'CSN': (Variation_1177, 0x40),
-        'TVS': (Variation_646, 0x20),
-        'STS': (Variation_1179, 0x10),
+        'CST': ('Contributing Sensors With Local Tracknumbers', Variation_1175, 0x80),
+        'CSN': ('Contributing Sensors No Local Tracknumbers', Variation_1177, 0x40),
+        'TVS': ('Calculated Track Velocity Relative to System Reference Point', Variation_646, 0x20),
+        'STS': ('Supplementary Track Status', Variation_1179, 0x10),
     }
 
     @overload
@@ -92817,36 +92817,36 @@ class Variation_1218(Compound):
         ('BPS', Variation_1217),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'ADR': (Variation_279, 0x80000000),
-        'ID': (Variation_201, 0x40000000),
-        'MHG': (Variation_14, 0x20000000),
-        'IAS': (Variation_1188, 0x10000000),
-        'TAS': (Variation_707, 0x08000000),
-        'SAL': (Variation_1191, 0x04000000),
-        'FSS': (Variation_1192, 0x02000000),
-        'TIS': (Variation_1195, 0x01800000),
-        'TID': (Variation_1197, 0x01400000),
-        'COM': (Variation_1199, 0x01200000),
-        'SAB': (Variation_1205, 0x01100000),
-        'ACS': (Variation_282, 0x01080000),
-        'BVR': (Variation_365, 0x01040000),
-        'GVR': (Variation_365, 0x01020000),
-        'RAN': (Variation_704, 0x01018000),
-        'TAR': (Variation_1206, 0x01014000),
-        'TAN': (Variation_14, 0x01012000),
-        'GS': (Variation_708, 0x01011000),
-        'VUN': (Variation_0, 0x01010800),
-        'MET': (Variation_1211, 0x01010400),
-        'EMC': (Variation_1212, 0x01010200),
-        'POS': (Variation_1213, 0x01010180),
-        'GAL': (Variation_288, 0x01010140),
-        'PUN': (Variation_1214, 0x01010120),
-        'MB': (Variation_322, 0x01010110),
-        'IAR': (Variation_707, 0x01010108),
-        'MAC': (Variation_1215, 0x01010104),
-        'BPS': (Variation_1217, 0x01010102),
+        'ADR': ('Target Address', Variation_279, 0x80000000),
+        'ID': ('Target Identification', Variation_201, 0x40000000),
+        'MHG': ('Magnetic Heading', Variation_14, 0x20000000),
+        'IAS': ('Indicated Airspeed/Mach No', Variation_1188, 0x10000000),
+        'TAS': ('True Airspeed', Variation_707, 0x08000000),
+        'SAL': ('Selected Altitude', Variation_1191, 0x04000000),
+        'FSS': ('Final State Selected Altitude', Variation_1192, 0x02000000),
+        'TIS': ('Trajectory Intent Status', Variation_1195, 0x01800000),
+        'TID': ('Trajectory Intent Data', Variation_1197, 0x01400000),
+        'COM': ('Communications/ACAS Capability and Flight Status', Variation_1199, 0x01200000),
+        'SAB': ('Status Reported by ADS-B', Variation_1205, 0x01100000),
+        'ACS': ('ACAS Resolution Advisory Report', Variation_282, 0x01080000),
+        'BVR': ('Barometric Vertical Rate', Variation_365, 0x01040000),
+        'GVR': ('Geometric Vertical Rate', Variation_365, 0x01020000),
+        'RAN': ('Roll Angle', Variation_704, 0x01018000),
+        'TAR': ('Track Angle Rate', Variation_1206, 0x01014000),
+        'TAN': ('Track Angle', Variation_14, 0x01012000),
+        'GS': ('Ground Speed', Variation_708, 0x01011000),
+        'VUN': ('Velocity Uncertainty', Variation_0, 0x01010800),
+        'MET': ('Meteorological Data', Variation_1211, 0x01010400),
+        'EMC': ('Emitter Category', Variation_1212, 0x01010200),
+        'POS': ('Position', Variation_1213, 0x01010180),
+        'GAL': ('Geometric Altitude', Variation_288, 0x01010140),
+        'PUN': ('Position Uncertainty', Variation_1214, 0x01010120),
+        'MB': ('MODE S MB DATA', Variation_322, 0x01010110),
+        'IAR': ('Indicated Airspeed', Variation_707, 0x01010108),
+        'MAC': ('Mach Number', Variation_1215, 0x01010104),
+        'BPS': ('Barometric Pressure Setting (derived from Mode S BDS 4,0)', Variation_1217, 0x01010102),
     }
 
     @overload
@@ -94788,18 +94788,18 @@ class Variation_1241(Compound):
         ('MLT', Variation_357),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'TRK': (Variation_357, 0x8000),
-        'PSR': (Variation_357, 0x4000),
-        'SSR': (Variation_357, 0x2000),
-        'MDS': (Variation_357, 0x1000),
-        'ADS': (Variation_358, 0x0800),
-        'ES': (Variation_357, 0x0400),
-        'VDL': (Variation_357, 0x0200),
-        'UAT': (Variation_357, 0x0180),
-        'LOP': (Variation_357, 0x0140),
-        'MLT': (Variation_357, 0x0120),
+        'TRK': ('Track Age', Variation_357, 0x8000),
+        'PSR': ('PSR Age', Variation_357, 0x4000),
+        'SSR': ('SSR Age', Variation_357, 0x2000),
+        'MDS': ('Mode S Age', Variation_357, 0x1000),
+        'ADS': ('ADS-C Age', Variation_358, 0x0800),
+        'ES': ('ADS-B Extended Squitter Age', Variation_357, 0x0400),
+        'VDL': ('ADS-B VDL Mode 4 Age', Variation_357, 0x0200),
+        'UAT': ('ADS-B UAT Age', Variation_357, 0x0180),
+        'LOP': ('Loop Age', Variation_357, 0x0140),
+        'MLT': ('Multilateration Age', Variation_357, 0x0120),
     }
 
     @overload
@@ -95347,39 +95347,39 @@ class Variation_1247(Compound):
         ('BPS', Variation_357),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'MFL': (Variation_357, 0x8000000000),
-        'MD1': (Variation_357, 0x4000000000),
-        'MD2': (Variation_357, 0x2000000000),
-        'MDA': (Variation_357, 0x1000000000),
-        'MD4': (Variation_357, 0x0800000000),
-        'MD5': (Variation_357, 0x0400000000),
-        'MHG': (Variation_357, 0x0200000000),
-        'IAS': (Variation_357, 0x0180000000),
-        'TAS': (Variation_357, 0x0140000000),
-        'SAL': (Variation_357, 0x0120000000),
-        'FSS': (Variation_357, 0x0110000000),
-        'TID': (Variation_357, 0x0108000000),
-        'COM': (Variation_357, 0x0104000000),
-        'SAB': (Variation_357, 0x0102000000),
-        'ACS': (Variation_357, 0x0101800000),
-        'BVR': (Variation_357, 0x0101400000),
-        'GVR': (Variation_357, 0x0101200000),
-        'RAN': (Variation_357, 0x0101100000),
-        'TAR': (Variation_357, 0x0101080000),
-        'TAN': (Variation_357, 0x0101040000),
-        'GSP': (Variation_357, 0x0101020000),
-        'VUN': (Variation_357, 0x0101018000),
-        'MET': (Variation_357, 0x0101014000),
-        'EMC': (Variation_357, 0x0101012000),
-        'POS': (Variation_357, 0x0101011000),
-        'GAL': (Variation_357, 0x0101010800),
-        'PUN': (Variation_357, 0x0101010400),
-        'MB': (Variation_357, 0x0101010200),
-        'IAR': (Variation_357, 0x0101010180),
-        'MAC': (Variation_357, 0x0101010140),
-        'BPS': (Variation_357, 0x0101010120),
+        'MFL': ('Measured Flight Level Age', Variation_357, 0x8000000000),
+        'MD1': ('Mode 1 Age', Variation_357, 0x4000000000),
+        'MD2': ('Mode 2 Age', Variation_357, 0x2000000000),
+        'MDA': ('Mode 3/A Age', Variation_357, 0x1000000000),
+        'MD4': ('Mode 4 Age', Variation_357, 0x0800000000),
+        'MD5': ('Mode 5 Age', Variation_357, 0x0400000000),
+        'MHG': ('Magnetic Heading Age', Variation_357, 0x0200000000),
+        'IAS': ('Indicated Airspeed / Mach Nb Age', Variation_357, 0x0180000000),
+        'TAS': ('True Airspeed Age', Variation_357, 0x0140000000),
+        'SAL': ('Selected Altitude Age', Variation_357, 0x0120000000),
+        'FSS': ('Final State Selected Altitude Age', Variation_357, 0x0110000000),
+        'TID': ('Trajectory Intent Age', Variation_357, 0x0108000000),
+        'COM': ('Communication/ACAS Capability and Flight Status Age', Variation_357, 0x0104000000),
+        'SAB': ('Status Reported by ADS-B Age', Variation_357, 0x0102000000),
+        'ACS': ('ACAS Resolution Advisory Report Age', Variation_357, 0x0101800000),
+        'BVR': ('Barometric Vertical Rate Age', Variation_357, 0x0101400000),
+        'GVR': ('Geometrical Vertical Rate Age', Variation_357, 0x0101200000),
+        'RAN': ('Roll Angle Age', Variation_357, 0x0101100000),
+        'TAR': ('Track Angle Rate Age', Variation_357, 0x0101080000),
+        'TAN': ('Track Angle Age', Variation_357, 0x0101040000),
+        'GSP': ('Ground Speed Age', Variation_357, 0x0101020000),
+        'VUN': ('Velocity Uncertainty Age', Variation_357, 0x0101018000),
+        'MET': ('Meteorological Data Age', Variation_357, 0x0101014000),
+        'EMC': ('Emitter Category Age', Variation_357, 0x0101012000),
+        'POS': ('Position Age', Variation_357, 0x0101011000),
+        'GAL': ('Geometric Altitude Age', Variation_357, 0x0101010800),
+        'PUN': ('Position Uncertainty Age', Variation_357, 0x0101010400),
+        'MB': ('Mode S MB Data Age', Variation_357, 0x0101010200),
+        'IAR': ('Indicated Airspeed Data Age', Variation_357, 0x0101010180),
+        'MAC': ('Mach Number Data Age', Variation_357, 0x0101010140),
+        'BPS': ('Barometric Pressure Setting Data Age', Variation_357, 0x0101010120),
     }
 
     @overload
@@ -96754,26 +96754,26 @@ class Variation_1255(Compound):
         ('PEC', Variation_149),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'TAG': (Variation_1, 0x800000),
-        'CS': (Variation_149, 0x400000),
-        'IFI': (Variation_1249, 0x200000),
-        'FCT': (Variation_1250, 0x100000),
-        'TAC': (Variation_331, 0x080000),
-        'WTC': (Variation_977, 0x040000),
-        'DEP': (Variation_331, 0x020000),
-        'DST': (Variation_331, 0x018000),
-        'RDS': (Variation_978, 0x014000),
-        'CFL': (Variation_169, 0x012000),
-        'CTL': (Variation_373, 0x011000),
-        'TOD': (Variation_1252, 0x010800),
-        'AST': (Variation_166, 0x010400),
-        'STS': (Variation_985, 0x010200),
-        'STD': (Variation_149, 0x010180),
-        'STA': (Variation_149, 0x010140),
-        'PEM': (Variation_1254, 0x010120),
-        'PEC': (Variation_149, 0x010110),
+        'TAG': ('FPPS Identification Tag', Variation_1, 0x800000),
+        'CS': ('Callsign', Variation_149, 0x400000),
+        'IFI': ('IFPS_FLIGHT_ID', Variation_1249, 0x200000),
+        'FCT': ('Flight Category', Variation_1250, 0x100000),
+        'TAC': ('Type of Aircraft', Variation_331, 0x080000),
+        'WTC': ('Wake Turbulence Category', Variation_977, 0x040000),
+        'DEP': ('Departure Airport', Variation_331, 0x020000),
+        'DST': ('Destination Airport', Variation_331, 0x018000),
+        'RDS': ('Runway Designation', Variation_978, 0x014000),
+        'CFL': ('Current Cleared Flight Level', Variation_169, 0x012000),
+        'CTL': ('Current Control Position', Variation_373, 0x011000),
+        'TOD': ('Time of Departure / Arrival', Variation_1252, 0x010800),
+        'AST': ('Aircraft Stand', Variation_166, 0x010400),
+        'STS': ('Stand Status', Variation_985, 0x010200),
+        'STD': ('Standard Instrument Departure', Variation_149, 0x010180),
+        'STA': ('Standard Instrument Arrival', Variation_149, 0x010140),
+        'PEM': ('Pre-Emergency Mode 3/A', Variation_1254, 0x010120),
+        'PEC': ('Pre-Emergency Callsign', Variation_149, 0x010110),
     }
 
     @overload
@@ -97983,15 +97983,15 @@ class Variation_1268(Compound):
         ('XP', Variation_1267),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'SUM': (Variation_1262, 0x80),
-        'PMN': (Variation_1263, 0x40),
-        'POS': (Variation_692, 0x20),
-        'GA': (Variation_1264, 0x10),
-        'EM1': (Variation_1265, 0x08),
-        'TOS': (Variation_1266, 0x04),
-        'XP': (Variation_1267, 0x02),
+        'SUM': ('Mode 5 Summary', Variation_1262, 0x80),
+        'PMN': ('Mode 5 PIN/ National Origin/Mission Code', Variation_1263, 0x40),
+        'POS': ('Mode 5 Reported Position', Variation_692, 0x20),
+        'GA': ('Mode 5 GNSS-derived Altitude', Variation_1264, 0x10),
+        'EM1': ('Extended Mode 1 Code in Octal Representation', Variation_1265, 0x08),
+        'TOS': ('Time Offset for POS and GA', Variation_1266, 0x04),
+        'XP': ('X Pulse Presence', Variation_1267, 0x02),
     }
 
     @overload
@@ -98846,16 +98846,16 @@ class Variation_1281(Compound):
         ('ARC', Variation_1280),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'APC': (Variation_1271, 0x8000),
-        'COV': (Variation_391, 0x4000),
-        'APW': (Variation_1273, 0x2000),
-        'AGA': (Variation_1274, 0x1000),
-        'ABA': (Variation_1275, 0x0800),
-        'ATV': (Variation_1277, 0x0400),
-        'AA': (Variation_1279, 0x0200),
-        'ARC': (Variation_1280, 0x0180),
+        'APC': ('Estimated Accuracy Of Track Position (Cartesian)', Variation_1271, 0x8000),
+        'COV': ('XY Covariance Component', Variation_391, 0x4000),
+        'APW': ('Estimated Accuracy Of Track Position (WGS-84)', Variation_1273, 0x2000),
+        'AGA': ('Estimated Accuracy Of Calculated Track Geometric Altitude', Variation_1274, 0x1000),
+        'ABA': ('Estimated Accuracy Of Calculated Track Barometric Altitude', Variation_1275, 0x0800),
+        'ATV': ('Estimated Accuracy Of Track Velocity (Cartesian)', Variation_1277, 0x0400),
+        'AA': ('Estimated Accuracy Of Acceleration (Cartesian)', Variation_1279, 0x0200),
+        'ARC': ('Estimated Accuracy Of Rate Of Climb/Descent', Variation_1280, 0x0180),
     }
 
     @overload
@@ -99617,14 +99617,14 @@ class Variation_1290(Compound):
         ('TYP', Variation_1289),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'SID': (Variation_1, 0x80),
-        'POS': (Variation_1282, 0x40),
-        'HEIGHT': (Variation_198, 0x20),
-        'MDC': (Variation_1283, 0x10),
-        'MDA': (Variation_1285, 0x08),
-        'TYP': (Variation_1289, 0x04),
+        'SID': ('Sensor Identification', Variation_1, 0x80),
+        'POS': ('Measured Position', Variation_1282, 0x40),
+        'HEIGHT': ('Measured 3-D Height', Variation_198, 0x20),
+        'MDC': ('', Variation_1283, 0x10),
+        'MDA': ('', Variation_1285, 0x08),
+        'TYP': ('', Variation_1289, 0x04),
     }
 
     @overload
@@ -99862,37 +99862,37 @@ class Variation_1291(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000000000),
-        '015': (Variation_0, 0x2000000000),
-        '070': (Variation_81, 0x1000000000),
-        '105': (Variation_636, 0x0800000000),
-        '100': (Variation_1181, 0x0400000000),
-        '185': (Variation_1182, 0x0200000000),
-        '210': (Variation_651, 0x0180000000),
-        '060': (Variation_1184, 0x0140000000),
-        '245': (Variation_1186, 0x0120000000),
-        '380': (Variation_1218, 0x0110000000),
-        '040': (Variation_64, 0x0108000000),
-        '080': (Variation_1240, 0x0104000000),
-        '290': (Variation_1241, 0x0102000000),
-        '200': (Variation_1246, 0x0101800000),
-        '295': (Variation_1247, 0x0101400000),
-        '136': (Variation_361, 0x0101200000),
-        '130': (Variation_288, 0x0101100000),
-        '135': (Variation_1248, 0x0101080000),
-        '220': (Variation_365, 0x0101040000),
-        '390': (Variation_1255, 0x0101020000),
-        '270': (Variation_291, 0x0101018000),
-        '300': (Variation_286, 0x0101014000),
-        '110': (Variation_1268, 0x0101012000),
-        '120': (Variation_1269, 0x0101011000),
-        '510': (Variation_1270, 0x0101010800),
-        '500': (Variation_1281, 0x0101010400),
-        '340': (Variation_1290, 0x0101010200),
-        'RE': (Variation_62, 0x0101010104),
-        'SP': (Variation_62, 0x0101010102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000000000),
+        '015': ('Service Identification', Variation_0, 0x2000000000),
+        '070': ('Time Of Track Information', Variation_81, 0x1000000000),
+        '105': ('Calculated Position In WGS-84 Co-ordinates', Variation_636, 0x0800000000),
+        '100': ('Calculated Track Position (Cartesian)', Variation_1181, 0x0400000000),
+        '185': ('Calculated Track Velocity (Cartesian)', Variation_1182, 0x0200000000),
+        '210': ('Calculated Acceleration (Cartesian)', Variation_651, 0x0180000000),
+        '060': ('Track Mode 3/A Code', Variation_1184, 0x0140000000),
+        '245': ('Target Identification', Variation_1186, 0x0120000000),
+        '380': ('Aircraft Derived Data', Variation_1218, 0x0110000000),
+        '040': ('Track Number', Variation_64, 0x0108000000),
+        '080': ('Track Status', Variation_1240, 0x0104000000),
+        '290': ('System Track Update Ages', Variation_1241, 0x0102000000),
+        '200': ('Mode of Movement', Variation_1246, 0x0101800000),
+        '295': ('Track Data Ages', Variation_1247, 0x0101400000),
+        '136': ('Measured Flight Level', Variation_361, 0x0101200000),
+        '130': ('Calculated Track Geometric Altitude', Variation_288, 0x0101100000),
+        '135': ('Calculated Track Barometric Altitude', Variation_1248, 0x0101080000),
+        '220': ('Calculated Rate of Climb/Descent', Variation_365, 0x0101040000),
+        '390': ('Flight Plan Related Data', Variation_1255, 0x0101020000),
+        '270': ('Target Size and Orientation', Variation_291, 0x0101018000),
+        '300': ('Vehicle Fleet Identification', Variation_286, 0x0101014000),
+        '110': ('Mode 5 Data Reports and Extended Mode 1 Code', Variation_1268, 0x0101012000),
+        '120': ('Track Mode 2 Code', Variation_1269, 0x0101011000),
+        '510': ('Composed Track Number', Variation_1270, 0x0101010800),
+        '500': ('Estimated Accuracies', Variation_1281, 0x0101010400),
+        '340': ('Measured Information', Variation_1290, 0x0101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0101010102),
     }
 
     @overload
@@ -100871,36 +100871,36 @@ class Variation_1294(Compound):
         ('BPS', Variation_1217),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'ADR': (Variation_279, 0x80000000),
-        'ID': (Variation_201, 0x40000000),
-        'MHG': (Variation_14, 0x20000000),
-        'IAS': (Variation_1188, 0x10000000),
-        'TAS': (Variation_707, 0x08000000),
-        'SAL': (Variation_1191, 0x04000000),
-        'FSS': (Variation_1192, 0x02000000),
-        'TIS': (Variation_1195, 0x01800000),
-        'TID': (Variation_1197, 0x01400000),
-        'COM': (Variation_1293, 0x01200000),
-        'SAB': (Variation_1205, 0x01100000),
-        'ACS': (Variation_282, 0x01080000),
-        'BVR': (Variation_365, 0x01040000),
-        'GVR': (Variation_365, 0x01020000),
-        'RAN': (Variation_704, 0x01018000),
-        'TAR': (Variation_1206, 0x01014000),
-        'TAN': (Variation_14, 0x01012000),
-        'GS': (Variation_708, 0x01011000),
-        'VUN': (Variation_0, 0x01010800),
-        'MET': (Variation_1211, 0x01010400),
-        'EMC': (Variation_1212, 0x01010200),
-        'POS': (Variation_1213, 0x01010180),
-        'GAL': (Variation_288, 0x01010140),
-        'PUN': (Variation_1214, 0x01010120),
-        'MB': (Variation_322, 0x01010110),
-        'IAR': (Variation_707, 0x01010108),
-        'MAC': (Variation_1215, 0x01010104),
-        'BPS': (Variation_1217, 0x01010102),
+        'ADR': ('Target Address', Variation_279, 0x80000000),
+        'ID': ('Target Identification', Variation_201, 0x40000000),
+        'MHG': ('Magnetic Heading', Variation_14, 0x20000000),
+        'IAS': ('Indicated Airspeed/Mach No', Variation_1188, 0x10000000),
+        'TAS': ('True Airspeed', Variation_707, 0x08000000),
+        'SAL': ('Selected Altitude', Variation_1191, 0x04000000),
+        'FSS': ('Final State Selected Altitude', Variation_1192, 0x02000000),
+        'TIS': ('Trajectory Intent Status', Variation_1195, 0x01800000),
+        'TID': ('Trajectory Intent Data', Variation_1197, 0x01400000),
+        'COM': ('Communications/ACAS Capability and Flight Status', Variation_1293, 0x01200000),
+        'SAB': ('Status Reported by ADS-B', Variation_1205, 0x01100000),
+        'ACS': ('ACAS Resolution Advisory Report', Variation_282, 0x01080000),
+        'BVR': ('Barometric Vertical Rate', Variation_365, 0x01040000),
+        'GVR': ('Geometric Vertical Rate', Variation_365, 0x01020000),
+        'RAN': ('Roll Angle', Variation_704, 0x01018000),
+        'TAR': ('Track Angle Rate', Variation_1206, 0x01014000),
+        'TAN': ('Track Angle', Variation_14, 0x01012000),
+        'GS': ('Ground Speed', Variation_708, 0x01011000),
+        'VUN': ('Velocity Uncertainty', Variation_0, 0x01010800),
+        'MET': ('Meteorological Data', Variation_1211, 0x01010400),
+        'EMC': ('Emitter Category', Variation_1212, 0x01010200),
+        'POS': ('Position', Variation_1213, 0x01010180),
+        'GAL': ('Geometric Altitude', Variation_288, 0x01010140),
+        'PUN': ('Position Uncertainty', Variation_1214, 0x01010120),
+        'MB': ('MODE S MB DATA', Variation_322, 0x01010110),
+        'IAR': ('Indicated Airspeed', Variation_707, 0x01010108),
+        'MAC': ('Mach Number', Variation_1215, 0x01010104),
+        'BPS': ('Barometric Pressure Setting (derived from Mode S BDS 4,0)', Variation_1217, 0x01010102),
     }
 
     @overload
@@ -102526,37 +102526,37 @@ class Variation_1299(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000000000),
-        '015': (Variation_0, 0x2000000000),
-        '070': (Variation_81, 0x1000000000),
-        '105': (Variation_636, 0x0800000000),
-        '100': (Variation_1181, 0x0400000000),
-        '185': (Variation_1182, 0x0200000000),
-        '210': (Variation_651, 0x0180000000),
-        '060': (Variation_1184, 0x0140000000),
-        '245': (Variation_1186, 0x0120000000),
-        '380': (Variation_1294, 0x0110000000),
-        '040': (Variation_64, 0x0108000000),
-        '080': (Variation_1298, 0x0104000000),
-        '290': (Variation_1241, 0x0102000000),
-        '200': (Variation_1246, 0x0101800000),
-        '295': (Variation_1247, 0x0101400000),
-        '136': (Variation_361, 0x0101200000),
-        '130': (Variation_288, 0x0101100000),
-        '135': (Variation_1248, 0x0101080000),
-        '220': (Variation_365, 0x0101040000),
-        '390': (Variation_1255, 0x0101020000),
-        '270': (Variation_291, 0x0101018000),
-        '300': (Variation_286, 0x0101014000),
-        '110': (Variation_1268, 0x0101012000),
-        '120': (Variation_1269, 0x0101011000),
-        '510': (Variation_1270, 0x0101010800),
-        '500': (Variation_1281, 0x0101010400),
-        '340': (Variation_1290, 0x0101010200),
-        'RE': (Variation_62, 0x0101010104),
-        'SP': (Variation_62, 0x0101010102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000000000),
+        '015': ('Service Identification', Variation_0, 0x2000000000),
+        '070': ('Time Of Track Information', Variation_81, 0x1000000000),
+        '105': ('Calculated Position In WGS-84 Co-ordinates', Variation_636, 0x0800000000),
+        '100': ('Calculated Track Position (Cartesian)', Variation_1181, 0x0400000000),
+        '185': ('Calculated Track Velocity (Cartesian)', Variation_1182, 0x0200000000),
+        '210': ('Calculated Acceleration (Cartesian)', Variation_651, 0x0180000000),
+        '060': ('Track Mode 3/A Code', Variation_1184, 0x0140000000),
+        '245': ('Target Identification', Variation_1186, 0x0120000000),
+        '380': ('Aircraft Derived Data', Variation_1294, 0x0110000000),
+        '040': ('Track Number', Variation_64, 0x0108000000),
+        '080': ('Track Status', Variation_1298, 0x0104000000),
+        '290': ('System Track Update Ages', Variation_1241, 0x0102000000),
+        '200': ('Mode of Movement', Variation_1246, 0x0101800000),
+        '295': ('Track Data Ages', Variation_1247, 0x0101400000),
+        '136': ('Measured Flight Level', Variation_361, 0x0101200000),
+        '130': ('Calculated Track Geometric Altitude', Variation_288, 0x0101100000),
+        '135': ('Calculated Track Barometric Altitude', Variation_1248, 0x0101080000),
+        '220': ('Calculated Rate of Climb/Descent', Variation_365, 0x0101040000),
+        '390': ('Flight Plan Related Data', Variation_1255, 0x0101020000),
+        '270': ('Target Size and Orientation', Variation_291, 0x0101018000),
+        '300': ('Vehicle Fleet Identification', Variation_286, 0x0101014000),
+        '110': ('Mode 5 Data Reports and Extended Mode 1 Code', Variation_1268, 0x0101012000),
+        '120': ('Track Mode 2 Code', Variation_1269, 0x0101011000),
+        '510': ('Composed Track Number', Variation_1270, 0x0101010800),
+        '500': ('Estimated Accuracies', Variation_1281, 0x0101010400),
+        '340': ('Measured Information', Variation_1290, 0x0101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0101010102),
     }
 
     @overload
@@ -103315,36 +103315,36 @@ class Variation_1300(Compound):
         ('BPS', Variation_1217),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'ADR': (Variation_279, 0x80000000),
-        'ID': (Variation_201, 0x40000000),
-        'MHG': (Variation_14, 0x20000000),
-        'IAS': (Variation_1188, 0x10000000),
-        'TAS': (Variation_707, 0x08000000),
-        'SAL': (Variation_1191, 0x04000000),
-        'FSS': (Variation_1192, 0x02000000),
-        'TIS': (Variation_1195, 0x01800000),
-        'TID': (Variation_1197, 0x01400000),
-        'COM': (Variation_1293, 0x01200000),
-        'SAB': (Variation_1205, 0x01100000),
-        'ACS': (Variation_282, 0x01080000),
-        'BVR': (Variation_365, 0x01040000),
-        'GVR': (Variation_365, 0x01020000),
-        'RAN': (Variation_704, 0x01018000),
-        'TAR': (Variation_1206, 0x01014000),
-        'TAN': (Variation_14, 0x01012000),
-        'GS': (Variation_708, 0x01011000),
-        'VUN': (Variation_0, 0x01010800),
-        'MET': (Variation_1211, 0x01010400),
-        'EMC': (Variation_1212, 0x01010200),
-        'POS': (Variation_1213, 0x01010180),
-        'GAL': (Variation_288, 0x01010140),
-        'PUN': (Variation_1214, 0x01010120),
-        'MB': (Variation_322, 0x01010110),
-        'IAR': (Variation_707, 0x01010108),
-        'MAC': (Variation_1215, 0x01010104),
-        'BPS': (Variation_1217, 0x01010102),
+        'ADR': ('Target Address', Variation_279, 0x80000000),
+        'ID': ('Target Identification', Variation_201, 0x40000000),
+        'MHG': ('Magnetic Heading', Variation_14, 0x20000000),
+        'IAS': ('Indicated Airspeed/Mach No', Variation_1188, 0x10000000),
+        'TAS': ('True Airspeed', Variation_707, 0x08000000),
+        'SAL': ('Selected Altitude', Variation_1191, 0x04000000),
+        'FSS': ('Final State Selected Altitude', Variation_1192, 0x02000000),
+        'TIS': ('Trajectory Intent Status', Variation_1195, 0x01800000),
+        'TID': ('Trajectory Intent Data', Variation_1197, 0x01400000),
+        'COM': ('Communications/ACAS Capability and Flight Status', Variation_1293, 0x01200000),
+        'SAB': ('Status Reported by ADS-B', Variation_1205, 0x01100000),
+        'ACS': ('ACAS Resolution Advisory Report', Variation_282, 0x01080000),
+        'BVR': ('Barometric Vertical Rate', Variation_365, 0x01040000),
+        'GVR': ('Geometric Vertical Rate', Variation_365, 0x01020000),
+        'RAN': ('Roll Angle', Variation_704, 0x01018000),
+        'TAR': ('Track Angle Rate', Variation_1206, 0x01014000),
+        'TAN': ('Track Angle', Variation_14, 0x01012000),
+        'GS': ('Ground Speed', Variation_708, 0x01011000),
+        'VUN': ('Velocity Uncertainty', Variation_0, 0x01010800),
+        'MET': ('Meteorological Data', Variation_1211, 0x01010400),
+        'EMC': ('Emitter Category', Variation_1212, 0x01010200),
+        'POS': ('Position', Variation_1213, 0x01010180),
+        'GAL': ('Geometric Altitude', Variation_288, 0x01010140),
+        'PUN': ('Position Uncertainty', Variation_1214, 0x01010120),
+        'MB': ('MODE S MB DATA', Variation_322, 0x01010110),
+        'IAR': ('Indicated Airspeed', Variation_707, 0x01010108),
+        'MAC': ('Mach Number', Variation_1215, 0x01010104),
+        'BPS': ('Barometric Pressure Setting', Variation_1217, 0x01010102),
     }
 
     @overload
@@ -104036,14 +104036,14 @@ class Variation_1301(Compound):
         ('TYP', Variation_1289),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        'SID': (Variation_1, 0x80),
-        'POS': (Variation_1282, 0x40),
-        'HEIGHT': (Variation_155, 0x20),
-        'MDC': (Variation_1283, 0x10),
-        'MDA': (Variation_1285, 0x08),
-        'TYP': (Variation_1289, 0x04),
+        'SID': ('Sensor Identification', Variation_1, 0x80),
+        'POS': ('Measured Position', Variation_1282, 0x40),
+        'HEIGHT': ('Measured 3-D Height', Variation_155, 0x20),
+        'MDC': ('', Variation_1283, 0x10),
+        'MDA': ('', Variation_1285, 0x08),
+        'TYP': ('', Variation_1289, 0x04),
     }
 
     @overload
@@ -104281,37 +104281,37 @@ class Variation_1302(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000000000),
-        '015': (Variation_0, 0x2000000000),
-        '070': (Variation_81, 0x1000000000),
-        '105': (Variation_636, 0x0800000000),
-        '100': (Variation_1181, 0x0400000000),
-        '185': (Variation_1182, 0x0200000000),
-        '210': (Variation_651, 0x0180000000),
-        '060': (Variation_1184, 0x0140000000),
-        '245': (Variation_1186, 0x0120000000),
-        '380': (Variation_1300, 0x0110000000),
-        '040': (Variation_64, 0x0108000000),
-        '080': (Variation_1298, 0x0104000000),
-        '290': (Variation_1241, 0x0102000000),
-        '200': (Variation_1246, 0x0101800000),
-        '295': (Variation_1247, 0x0101400000),
-        '136': (Variation_361, 0x0101200000),
-        '130': (Variation_288, 0x0101100000),
-        '135': (Variation_1248, 0x0101080000),
-        '220': (Variation_365, 0x0101040000),
-        '390': (Variation_1255, 0x0101020000),
-        '270': (Variation_291, 0x0101018000),
-        '300': (Variation_286, 0x0101014000),
-        '110': (Variation_1268, 0x0101012000),
-        '120': (Variation_1269, 0x0101011000),
-        '510': (Variation_1270, 0x0101010800),
-        '500': (Variation_1281, 0x0101010400),
-        '340': (Variation_1301, 0x0101010200),
-        'RE': (Variation_62, 0x0101010104),
-        'SP': (Variation_62, 0x0101010102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000000000),
+        '015': ('Service Identification', Variation_0, 0x2000000000),
+        '070': ('Time Of Track Information', Variation_81, 0x1000000000),
+        '105': ('Calculated Position In WGS-84 Co-ordinates', Variation_636, 0x0800000000),
+        '100': ('Calculated Track Position (Cartesian)', Variation_1181, 0x0400000000),
+        '185': ('Calculated Track Velocity (Cartesian)', Variation_1182, 0x0200000000),
+        '210': ('Calculated Acceleration (Cartesian)', Variation_651, 0x0180000000),
+        '060': ('Track Mode 3/A Code', Variation_1184, 0x0140000000),
+        '245': ('Target Identification', Variation_1186, 0x0120000000),
+        '380': ('Aircraft Derived Data', Variation_1300, 0x0110000000),
+        '040': ('Track Number', Variation_64, 0x0108000000),
+        '080': ('Track Status', Variation_1298, 0x0104000000),
+        '290': ('System Track Update Ages', Variation_1241, 0x0102000000),
+        '200': ('Mode of Movement', Variation_1246, 0x0101800000),
+        '295': ('Track Data Ages', Variation_1247, 0x0101400000),
+        '136': ('Measured Flight Level', Variation_361, 0x0101200000),
+        '130': ('Calculated Track Geometric Altitude', Variation_288, 0x0101100000),
+        '135': ('Calculated Track Barometric Altitude', Variation_1248, 0x0101080000),
+        '220': ('Calculated Rate of Climb/Descent', Variation_365, 0x0101040000),
+        '390': ('Flight Plan Related Data', Variation_1255, 0x0101020000),
+        '270': ('Target Size and Orientation', Variation_291, 0x0101018000),
+        '300': ('Vehicle Fleet Identification', Variation_286, 0x0101014000),
+        '110': ('Mode 5 Data Reports and Extended Mode 1 Code', Variation_1268, 0x0101012000),
+        '120': ('Track Mode 2 Code', Variation_1269, 0x0101011000),
+        '510': ('Composed Track Number', Variation_1270, 0x0101010800),
+        '500': ('Estimated Accuracies', Variation_1281, 0x0101010400),
+        '340': ('Measured Information', Variation_1301, 0x0101010200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0101010104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0101010102),
     }
 
     @overload
@@ -105777,21 +105777,21 @@ class Variation_1318(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '015': (Variation_0, 0x4000),
-        '030': (Variation_81, 0x2000),
-        '050': (Variation_1, 0x1000),
-        '060': (Variation_1312, 0x0800),
-        '070': (Variation_1313, 0x0400),
-        '080': (Variation_1315, 0x0200),
-        '081': (Variation_1316, 0x0180),
-        '090': (Variation_1317, 0x0140),
-        '091': (Variation_1316, 0x0120),
-        '092': (Variation_1316, 0x0110),
-        'RE': (Variation_62, 0x0104),
-        'SP': (Variation_62, 0x0102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '015': ('Service Identification', Variation_0, 0x4000),
+        '030': ('Time of Message', Variation_81, 0x2000),
+        '050': ('Sensor Identifier', Variation_1, 0x1000),
+        '060': ('Sensor Configuration and Status', Variation_1312, 0x0800),
+        '070': ('Time Stamping Bias', Variation_1313, 0x0400),
+        '080': ('SSR / Mode S Range Gain and Bias', Variation_1315, 0x0200),
+        '081': ('SSR Mode S Azimuth Bias', Variation_1316, 0x0180),
+        '090': ('PSR Range Gain and Bias', Variation_1317, 0x0140),
+        '091': ('PSR Azimuth Bias', Variation_1316, 0x0120),
+        '092': ('PSR Elevation Bias', Variation_1316, 0x0110),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0102),
     }
 
     @overload
@@ -106448,17 +106448,17 @@ class Variation_1326(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_1319, 0x4000),
-        '015': (Variation_0, 0x2000),
-        '030': (Variation_81, 0x1000),
-        '020': (Variation_0, 0x0800),
-        '040': (Variation_1324, 0x0400),
-        '050': (Variation_1325, 0x0200),
-        'RE': (Variation_62, 0x0104),
-        'SP': (Variation_62, 0x0102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Message Type', Variation_1319, 0x4000),
+        '015': ('Service Identification', Variation_0, 0x2000),
+        '030': ('Time of Message', Variation_81, 0x1000),
+        '020': ('Batch Number', Variation_0, 0x0800),
+        '040': ('SDPS Configuration and Status', Variation_1324, 0x0400),
+        '050': ('Service Status Report', Variation_1325, 0x0200),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0102),
     }
 
     @overload
@@ -107359,22 +107359,22 @@ class Variation_1341(Compound):
         ('SP', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x8000),
-        '000': (Variation_1327, 0x4000),
-        '020': (Variation_541, 0x2000),
-        '030': (Variation_1328, 0x1000),
-        '040': (Variation_1330, 0x0800),
-        '041': (Variation_1332, 0x0400),
-        '048': (Variation_1335, 0x0200),
-        '049': (Variation_1336, 0x0180),
-        '050': (Variation_542, 0x0140),
-        '051': (Variation_1338, 0x0120),
-        '052': (Variation_1340, 0x0110),
-        '140': (Variation_81, 0x0108),
-        'RE': (Variation_62, 0x0104),
-        'SP': (Variation_62, 0x0102),
+        '010': ('Data Source Identifier', Variation_1, 0x8000),
+        '000': ('Message Type', Variation_1327, 0x4000),
+        '020': ('Video Record Header', Variation_541, 0x2000),
+        '030': ('Video Summary', Variation_1328, 0x1000),
+        '040': ('Video Header Nano', Variation_1330, 0x0800),
+        '041': ('Video Header Femto', Variation_1332, 0x0400),
+        '048': ('Video Cells Resolution & Data Compression Indicator', Variation_1335, 0x0200),
+        '049': ('Video Octets & Video Cells Counters', Variation_1336, 0x0180),
+        '050': ('Video Block Low Data Volume', Variation_542, 0x0140),
+        '051': ('Video Block Medium Data Volume', Variation_1338, 0x0120),
+        '052': ('Video Block High Data Volume', Variation_1340, 0x0110),
+        '140': ('Time of Day', Variation_81, 0x0108),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x0104),
+        'SP': ('Special Purpose Field', Variation_62, 0x0102),
     }
 
     @overload
@@ -107873,14 +107873,14 @@ class Variation_1344(Compound):
         ('RE', Variation_62),
     ]
 
-    # name: (cls, fspec)
+    # name: (title, cls, fspec)
     subitems_dict = {
-        '010': (Variation_1, 0x80),
-        '015': (Variation_0, 0x40),
-        '140': (Variation_81, 0x20),
-        '550': (Variation_1343, 0x10),
-        'SP': (Variation_62, 0x04),
-        'RE': (Variation_62, 0x02),
+        '010': ('Data Source Identifier', Variation_1, 0x80),
+        '015': ('Service Identification', Variation_0, 0x40),
+        '140': ('Time of Day', Variation_81, 0x20),
+        '550': ('Category Version Number Report', Variation_1343, 0x10),
+        'SP': ('Special Purpose Field', Variation_62, 0x04),
+        'RE': ('Reserved Expansion Field', Variation_62, 0x02),
     }
 
     @overload
@@ -109410,6 +109410,6 @@ manifest = {
     },
 }
 
-VERSION = '20230507.7908'
+VERSION = '20230508.47724'
 
-REFERENCE = 'bfa7e0af2a21a3b11af462a8cdd5db15a383f2cc'
+REFERENCE = '7b26d3950b997624e5bf521c099a3988499d1415'
