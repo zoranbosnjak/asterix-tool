@@ -25,7 +25,7 @@ from scapy.all import rdpcap, IP, UDP
 import asterix as ast
 from asterix import *
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 def output(*args):
     """Like 'print', but handle broken pipe exception and flush."""
@@ -134,7 +134,12 @@ class FmtVcr(Fmt):
                 if o['channel'] != self.channel:
                     continue
             t_mono = o['tMono']/(1000*1000*1000)
-            t_utc = datetime.datetime.strptime(o['tUtc'], self.__class__.time_format)
+            # datetime does not support nanoseconds, round to microseconds
+            t_utc = o['tUtc'].split('.')
+            subseconds = float('0.' + t_utc[-1][:-1])
+            microseconds = round(subseconds*1000*1000)
+            t_utc = ''.join(t_utc[:-1]) + '.{:06d}Z'.format(microseconds)
+            t_utc = datetime.datetime.strptime(t_utc, self.__class__.time_format)
             t_utc = t_utc.replace(tzinfo=datetime.timezone.utc)
             data = o['value']['data']
             yield (t_mono, t_utc, data)
