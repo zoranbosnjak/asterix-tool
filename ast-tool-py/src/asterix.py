@@ -108043,1040 +108043,6 @@ class Variation_1344(Compound):
     def modify_item(self, name : Any, f : Any) -> Any:
         return self._modify_item(name, f)
 
-class CAT_247_1_2(Basic):
-    cat = 247
-    variation = Variation_1344
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1344_Arg) -> Variation_1344:
-        return Variation_1344(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1344, List[Variation_1344]]) -> Datablock[Variation_1344]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1344]:
-        return cls._parse(val) # type: ignore
-
-class CAT_247_1_3(Basic):
-    cat = 247
-    variation = Variation_1344
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1344_Arg) -> Variation_1344:
-        return Variation_1344(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1344, List[Variation_1344]]) -> Datablock[Variation_1344]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1344]:
-        return cls._parse(val) # type: ignore
-
-class CAT_034_1_27(Basic):
-    cat = 34
-    variation = Variation_1029
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1029_Arg) -> Variation_1029:
-        return Variation_1029(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1029, List[Variation_1029]]) -> Datablock[Variation_1029]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1029]:
-        return cls._parse(val) # type: ignore
-
-class CAT_034_1_28(Basic):
-    cat = 34
-    variation = Variation_1034
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1034_Arg) -> Variation_1034:
-        return Variation_1034(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1034, List[Variation_1034]]) -> Datablock[Variation_1034]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1034]:
-        return cls._parse(val) # type: ignore
-
-class CAT_034_1_29(Basic):
-    cat = 34
-    variation = Variation_1036
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1036_Arg) -> Variation_1036:
-        return Variation_1036(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1036, List[Variation_1036]]) -> Datablock[Variation_1036]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1036]:
-        return cls._parse(val) # type: ignore
-
-class CAT_002_1_0(Basic):
-    cat = 2
-    variation = Variation_94
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_94_Arg) -> Variation_94:
-        return Variation_94(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_94, List[Variation_94]]) -> Datablock[Variation_94]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_94]:
-        return cls._parse(val) # type: ignore
-
-class CAT_002_1_1(Basic):
-    cat = 2
-    variation = Variation_94
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_94_Arg) -> Variation_94:
-        return Variation_94(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_94, List[Variation_94]]) -> Datablock[Variation_94]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_94]:
-        return cls._parse(val) # type: ignore
-
-class CAT_008_1_2(Basic):
-    cat = 8
-    variation = Variation_230
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_230_Arg) -> Variation_230:
-        return Variation_230(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_230, List[Variation_230]]) -> Datablock[Variation_230]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_230]:
-        return cls._parse(val) # type: ignore
-
-class CAT_008_1_3(Basic):
-    cat = 8
-    variation = Variation_230
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_230_Arg) -> Variation_230:
-        return Variation_230(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_230, List[Variation_230]]) -> Datablock[Variation_230]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_230]:
-        return cls._parse(val) # type: ignore
-
-class CAT_065_1_4(Basic):
-    cat = 65
-    variation = Variation_1326
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1326_Arg) -> Variation_1326:
-        return Variation_1326(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1326, List[Variation_1326]]) -> Datablock[Variation_1326]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1326]:
-        return cls._parse(val) # type: ignore
-
-class CAT_065_1_5(Basic):
-    cat = 65
-    variation = Variation_1326
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1326_Arg) -> Variation_1326:
-        return Variation_1326(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1326, List[Variation_1326]]) -> Datablock[Variation_1326]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1326]:
-        return cls._parse(val) # type: ignore
-
-class CAT_019_1_3(Basic):
-    cat = 19
-    variation = Variation_620
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_620_Arg) -> Variation_620:
-        return Variation_620(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_620, List[Variation_620]]) -> Datablock[Variation_620]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_620]:
-        return cls._parse(val) # type: ignore
-
-class CAT_240_1_3(Basic):
-    cat = 240
-    variation = Variation_1341
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1341_Arg) -> Variation_1341:
-        return Variation_1341(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1341, List[Variation_1341]]) -> Datablock[Variation_1341]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1341]:
-        return cls._parse(val) # type: ignore
-
-class CAT_009_2_1(Basic):
-    cat = 9
-    variation = Variation_242
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_242_Arg) -> Variation_242:
-        return Variation_242(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_242, List[Variation_242]]) -> Datablock[Variation_242]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_242]:
-        return cls._parse(val) # type: ignore
-
-class CAT_023_1_2(Basic):
-    cat = 23
-    variation = Variation_939
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_939_Arg) -> Variation_939:
-        return Variation_939(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_939, List[Variation_939]]) -> Datablock[Variation_939]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_939]:
-        return cls._parse(val) # type: ignore
-
-class CAT_023_1_3(Basic):
-    cat = 23
-    variation = Variation_939
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_939_Arg) -> Variation_939:
-        return Variation_939(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_939, List[Variation_939]]) -> Datablock[Variation_939]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_939]:
-        return cls._parse(val) # type: ignore
-
-class CAT_025_1_5(Basic):
-    cat = 25
-    variation = Variation_958
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_958_Arg) -> Variation_958:
-        return Variation_958(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_958, List[Variation_958]]) -> Datablock[Variation_958]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_958]:
-        return cls._parse(val) # type: ignore
-
-class CAT_016_1_0(Basic):
-    cat = 16
-    variation = Variation_536
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_536_Arg) -> Variation_536:
-        return Variation_536(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_536, List[Variation_536]]) -> Datablock[Variation_536]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_536]:
-        return cls._parse(val) # type: ignore
-
-class CAT_063_1_6(Basic):
-    cat = 63
-    variation = Variation_1318
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1318_Arg) -> Variation_1318:
-        return Variation_1318(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1318, List[Variation_1318]]) -> Datablock[Variation_1318]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1318]:
-        return cls._parse(val) # type: ignore
-
-class CAT_004_1_12(Basic):
-    cat = 4
-    variation = Variation_207
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_207_Arg) -> Variation_207:
-        return Variation_207(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_207, List[Variation_207]]) -> Datablock[Variation_207]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_207]:
-        return cls._parse(val) # type: ignore
-
-class CAT_032_1_1(Basic):
-    cat = 32
-    variation = Variation_987
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_987_Arg) -> Variation_987:
-        return Variation_987(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_987, List[Variation_987]]) -> Datablock[Variation_987]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_987]:
-        return cls._parse(val) # type: ignore
-
-class CAT_010_1_1(Basic):
-    cat = 10
-    variation = Variation_310
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_310_Arg) -> Variation_310:
-        return Variation_310(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_310, List[Variation_310]]) -> Datablock[Variation_310]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_310]:
-        return cls._parse(val) # type: ignore
-
-class CAT_015_1_0(Basic):
-    cat = 15
-    variation = Variation_525
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_525_Arg) -> Variation_525:
-        return Variation_525(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_525, List[Variation_525]]) -> Datablock[Variation_525]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_525]:
-        return cls._parse(val) # type: ignore
-
-class CAT_015_1_1(Basic):
-    cat = 15
-    variation = Variation_525
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_525_Arg) -> Variation_525:
-        return Variation_525(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_525, List[Variation_525]]) -> Datablock[Variation_525]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_525]:
-        return cls._parse(val) # type: ignore
-
-class CAT_020_1_10(Basic):
-    cat = 20
-    variation = Variation_680
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_680_Arg) -> Variation_680:
-        return Variation_680(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_680, List[Variation_680]]) -> Datablock[Variation_680]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_680]:
-        return cls._parse(val) # type: ignore
-
-class CAT_020_1_9(Basic):
-    cat = 20
-    variation = Variation_677
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_677_Arg) -> Variation_677:
-        return Variation_677(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_677, List[Variation_677]]) -> Datablock[Variation_677]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_677]:
-        return cls._parse(val) # type: ignore
-
-class CAT_048_1_29(Basic):
-    cat = 48
-    variation = Variation_1159
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1159_Arg) -> Variation_1159:
-        return Variation_1159(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1159, List[Variation_1159]]) -> Datablock[Variation_1159]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1159]:
-        return cls._parse(val) # type: ignore
-
-class CAT_048_1_30(Basic):
-    cat = 48
-    variation = Variation_1159
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1159_Arg) -> Variation_1159:
-        return Variation_1159(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1159, List[Variation_1159]]) -> Datablock[Variation_1159]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1159]:
-        return cls._parse(val) # type: ignore
-
-class CAT_048_1_27(Basic):
-    cat = 48
-    variation = Variation_1155
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1155_Arg) -> Variation_1155:
-        return Variation_1155(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1155, List[Variation_1155]]) -> Datablock[Variation_1155]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1155]:
-        return cls._parse(val) # type: ignore
-
-class CAT_048_1_28(Basic):
-    cat = 48
-    variation = Variation_1158
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1158_Arg) -> Variation_1158:
-        return Variation_1158(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1158, List[Variation_1158]]) -> Datablock[Variation_1158]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1158]:
-        return cls._parse(val) # type: ignore
-
-class CAT_048_1_31(Basic):
-    cat = 48
-    variation = Variation_1172
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1172_Arg) -> Variation_1172:
-        return Variation_1172(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1172, List[Variation_1172]]) -> Datablock[Variation_1172]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1172]:
-        return cls._parse(val) # type: ignore
-
-class CAT_021_0_23(Basic):
-    cat = 21
-    variation = Variation_742
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_742_Arg) -> Variation_742:
-        return Variation_742(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_742, List[Variation_742]]) -> Datablock[Variation_742]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_742]:
-        return cls._parse(val) # type: ignore
-
-class CAT_021_0_24(Basic):
-    cat = 21
-    variation = Variation_743
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_743_Arg) -> Variation_743:
-        return Variation_743(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_743, List[Variation_743]]) -> Datablock[Variation_743]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_743]:
-        return cls._parse(val) # type: ignore
-
-class CAT_021_0_25(Basic):
-    cat = 21
-    variation = Variation_743
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_743_Arg) -> Variation_743:
-        return Variation_743(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_743, List[Variation_743]]) -> Datablock[Variation_743]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_743]:
-        return cls._parse(val) # type: ignore
-
-class CAT_021_0_26(Basic):
-    cat = 21
-    variation = Variation_746
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_746_Arg) -> Variation_746:
-        return Variation_746(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_746, List[Variation_746]]) -> Datablock[Variation_746]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_746]:
-        return cls._parse(val) # type: ignore
-
-class CAT_062_1_17(Basic):
-    cat = 62
-    variation = Variation_1291
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1291_Arg) -> Variation_1291:
-        return Variation_1291(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1291, List[Variation_1291]]) -> Datablock[Variation_1291]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1291]:
-        return cls._parse(val) # type: ignore
-
-class CAT_062_1_19(Basic):
-    cat = 62
-    variation = Variation_1302
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1302_Arg) -> Variation_1302:
-        return Variation_1302(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1302, List[Variation_1302]]) -> Datablock[Variation_1302]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1302]:
-        return cls._parse(val) # type: ignore
-
-class CAT_062_1_18(Basic):
-    cat = 62
-    variation = Variation_1299
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_1299_Arg) -> Variation_1299:
-        return Variation_1299(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_1299, List[Variation_1299]]) -> Datablock[Variation_1299]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1299]:
-        return cls._parse(val) # type: ignore
-
-class CAT_011_1_2(Basic):
-    cat = 11
-    variation = Variation_413
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_413_Arg) -> Variation_413:
-        return Variation_413(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_413, List[Variation_413]]) -> Datablock[Variation_413]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_413]:
-        return cls._parse(val) # type: ignore
-
-class CAT_011_1_3(Basic):
-    cat = 11
-    variation = Variation_430
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_430_Arg) -> Variation_430:
-        return Variation_430(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_430, List[Variation_430]]) -> Datablock[Variation_430]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_430]:
-        return cls._parse(val) # type: ignore
-
-class CAT_018_1_7(Basic):
-    cat = 18
-    variation = Variation_594
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_594_Arg) -> Variation_594:
-        return Variation_594(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_594, List[Variation_594]]) -> Datablock[Variation_594]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_594]:
-        return cls._parse(val) # type: ignore
-
-class CAT_021_2_5(Basic):
-    cat = 21
-    variation = Variation_912
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_912_Arg) -> Variation_912:
-        return Variation_912(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_912, List[Variation_912]]) -> Datablock[Variation_912]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_912]:
-        return cls._parse(val) # type: ignore
-
-class CAT_021_2_3(Basic):
-    cat = 21
-    variation = Variation_909
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_909_Arg) -> Variation_909:
-        return Variation_909(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_909, List[Variation_909]]) -> Datablock[Variation_909]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_909]:
-        return cls._parse(val) # type: ignore
-
-class CAT_021_2_4(Basic):
-    cat = 21
-    variation = Variation_909
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_909_Arg) -> Variation_909:
-        return Variation_909(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_909, List[Variation_909]]) -> Datablock[Variation_909]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_909]:
-        return cls._parse(val) # type: ignore
-
-class CAT_021_2_6(Basic):
-    cat = 21
-    variation = Variation_917
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_917_Arg) -> Variation_917:
-        return Variation_917(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_917, List[Variation_917]]) -> Datablock[Variation_917]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_917]:
-        return cls._parse(val) # type: ignore
-
-class CAT_021_2_1(Basic):
-    cat = 21
-    variation = Variation_902
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_902_Arg) -> Variation_902:
-        return Variation_902(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_902, List[Variation_902]]) -> Datablock[Variation_902]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_902]:
-        return cls._parse(val) # type: ignore
-
-class CAT_021_2_2(Basic):
-    cat = 21
-    variation = Variation_906
-
-    spec = variation.spec
-
-    parse_bits = variation.parse_bits
-
-    unparse_bits = variation.unparse_bits
-
-    @classmethod
-    def make_record(cls, val : Variation_906_Arg) -> Variation_906:
-        return Variation_906(val)
-
-    @classmethod
-    def make_datablock(cls, val : Union[Variation_906, List[Variation_906]]) -> Datablock[Variation_906]:
-        return Datablock(cls.cat, val)
-
-    @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_906]:
-        return cls._parse(val) # type: ignore
-
 class CAT_001_1_2(Basic):
     cat = 1
 
@@ -109209,9 +108175,9 @@ class CAT_001_1_4(Basic):
     def is_valid(cls, arg : Union[Variation_63, Variation_78]) -> bool:
         return cls._is_valid(arg)
 
-class REF_021_1_5(Expansion):
-    cat = 21
-    variation = Variation_826
+class CAT_002_1_0(Basic):
+    cat = 2
+    variation = Variation_94
 
     spec = variation.spec
 
@@ -109220,16 +108186,1028 @@ class REF_021_1_5(Expansion):
     unparse_bits = variation.unparse_bits
 
     @classmethod
-    def make_extended(cls, val : Variation_826_Arg) -> Variation_826:
-        return Variation_826(val)
+    def make_record(cls, val : Variation_94_Arg) -> Variation_94:
+        return Variation_94(val)
 
     @classmethod
-    def parse(cls, val : bytes) -> Variation_826:
-        s = Bits.from_bytes(val)
-        (rec, s2) = Variation_826.parse_bits(s)
-        if len(s2) != 0:
-            raise AsterixError('unable to parse expansion')
-        return rec # type: ignore
+    def make_datablock(cls, val : Union[Variation_94, List[Variation_94]]) -> Datablock[Variation_94]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_94]:
+        return cls._parse(val) # type: ignore
+
+class CAT_002_1_1(Basic):
+    cat = 2
+    variation = Variation_94
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_94_Arg) -> Variation_94:
+        return Variation_94(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_94, List[Variation_94]]) -> Datablock[Variation_94]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_94]:
+        return cls._parse(val) # type: ignore
+
+class CAT_004_1_12(Basic):
+    cat = 4
+    variation = Variation_207
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_207_Arg) -> Variation_207:
+        return Variation_207(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_207, List[Variation_207]]) -> Datablock[Variation_207]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_207]:
+        return cls._parse(val) # type: ignore
+
+class CAT_008_1_2(Basic):
+    cat = 8
+    variation = Variation_230
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_230_Arg) -> Variation_230:
+        return Variation_230(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_230, List[Variation_230]]) -> Datablock[Variation_230]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_230]:
+        return cls._parse(val) # type: ignore
+
+class CAT_008_1_3(Basic):
+    cat = 8
+    variation = Variation_230
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_230_Arg) -> Variation_230:
+        return Variation_230(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_230, List[Variation_230]]) -> Datablock[Variation_230]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_230]:
+        return cls._parse(val) # type: ignore
+
+class CAT_009_2_1(Basic):
+    cat = 9
+    variation = Variation_242
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_242_Arg) -> Variation_242:
+        return Variation_242(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_242, List[Variation_242]]) -> Datablock[Variation_242]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_242]:
+        return cls._parse(val) # type: ignore
+
+class CAT_010_1_1(Basic):
+    cat = 10
+    variation = Variation_310
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_310_Arg) -> Variation_310:
+        return Variation_310(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_310, List[Variation_310]]) -> Datablock[Variation_310]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_310]:
+        return cls._parse(val) # type: ignore
+
+class CAT_011_1_2(Basic):
+    cat = 11
+    variation = Variation_413
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_413_Arg) -> Variation_413:
+        return Variation_413(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_413, List[Variation_413]]) -> Datablock[Variation_413]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_413]:
+        return cls._parse(val) # type: ignore
+
+class CAT_011_1_3(Basic):
+    cat = 11
+    variation = Variation_430
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_430_Arg) -> Variation_430:
+        return Variation_430(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_430, List[Variation_430]]) -> Datablock[Variation_430]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_430]:
+        return cls._parse(val) # type: ignore
+
+class CAT_015_1_0(Basic):
+    cat = 15
+    variation = Variation_525
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_525_Arg) -> Variation_525:
+        return Variation_525(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_525, List[Variation_525]]) -> Datablock[Variation_525]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_525]:
+        return cls._parse(val) # type: ignore
+
+class CAT_015_1_1(Basic):
+    cat = 15
+    variation = Variation_525
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_525_Arg) -> Variation_525:
+        return Variation_525(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_525, List[Variation_525]]) -> Datablock[Variation_525]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_525]:
+        return cls._parse(val) # type: ignore
+
+class CAT_016_1_0(Basic):
+    cat = 16
+    variation = Variation_536
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_536_Arg) -> Variation_536:
+        return Variation_536(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_536, List[Variation_536]]) -> Datablock[Variation_536]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_536]:
+        return cls._parse(val) # type: ignore
+
+class CAT_018_1_7(Basic):
+    cat = 18
+    variation = Variation_594
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_594_Arg) -> Variation_594:
+        return Variation_594(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_594, List[Variation_594]]) -> Datablock[Variation_594]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_594]:
+        return cls._parse(val) # type: ignore
+
+class CAT_019_1_3(Basic):
+    cat = 19
+    variation = Variation_620
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_620_Arg) -> Variation_620:
+        return Variation_620(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_620, List[Variation_620]]) -> Datablock[Variation_620]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_620]:
+        return cls._parse(val) # type: ignore
+
+class CAT_020_1_9(Basic):
+    cat = 20
+    variation = Variation_677
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_677_Arg) -> Variation_677:
+        return Variation_677(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_677, List[Variation_677]]) -> Datablock[Variation_677]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_677]:
+        return cls._parse(val) # type: ignore
+
+class CAT_020_1_10(Basic):
+    cat = 20
+    variation = Variation_680
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_680_Arg) -> Variation_680:
+        return Variation_680(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_680, List[Variation_680]]) -> Datablock[Variation_680]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_680]:
+        return cls._parse(val) # type: ignore
+
+class CAT_021_0_23(Basic):
+    cat = 21
+    variation = Variation_742
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_742_Arg) -> Variation_742:
+        return Variation_742(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_742, List[Variation_742]]) -> Datablock[Variation_742]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_742]:
+        return cls._parse(val) # type: ignore
+
+class CAT_021_0_24(Basic):
+    cat = 21
+    variation = Variation_743
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_743_Arg) -> Variation_743:
+        return Variation_743(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_743, List[Variation_743]]) -> Datablock[Variation_743]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_743]:
+        return cls._parse(val) # type: ignore
+
+class CAT_021_0_25(Basic):
+    cat = 21
+    variation = Variation_743
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_743_Arg) -> Variation_743:
+        return Variation_743(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_743, List[Variation_743]]) -> Datablock[Variation_743]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_743]:
+        return cls._parse(val) # type: ignore
+
+class CAT_021_0_26(Basic):
+    cat = 21
+    variation = Variation_746
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_746_Arg) -> Variation_746:
+        return Variation_746(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_746, List[Variation_746]]) -> Datablock[Variation_746]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_746]:
+        return cls._parse(val) # type: ignore
+
+class CAT_021_2_1(Basic):
+    cat = 21
+    variation = Variation_902
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_902_Arg) -> Variation_902:
+        return Variation_902(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_902, List[Variation_902]]) -> Datablock[Variation_902]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_902]:
+        return cls._parse(val) # type: ignore
+
+class CAT_021_2_2(Basic):
+    cat = 21
+    variation = Variation_906
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_906_Arg) -> Variation_906:
+        return Variation_906(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_906, List[Variation_906]]) -> Datablock[Variation_906]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_906]:
+        return cls._parse(val) # type: ignore
+
+class CAT_021_2_3(Basic):
+    cat = 21
+    variation = Variation_909
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_909_Arg) -> Variation_909:
+        return Variation_909(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_909, List[Variation_909]]) -> Datablock[Variation_909]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_909]:
+        return cls._parse(val) # type: ignore
+
+class CAT_021_2_4(Basic):
+    cat = 21
+    variation = Variation_909
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_909_Arg) -> Variation_909:
+        return Variation_909(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_909, List[Variation_909]]) -> Datablock[Variation_909]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_909]:
+        return cls._parse(val) # type: ignore
+
+class CAT_021_2_5(Basic):
+    cat = 21
+    variation = Variation_912
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_912_Arg) -> Variation_912:
+        return Variation_912(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_912, List[Variation_912]]) -> Datablock[Variation_912]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_912]:
+        return cls._parse(val) # type: ignore
+
+class CAT_021_2_6(Basic):
+    cat = 21
+    variation = Variation_917
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_917_Arg) -> Variation_917:
+        return Variation_917(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_917, List[Variation_917]]) -> Datablock[Variation_917]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_917]:
+        return cls._parse(val) # type: ignore
+
+class CAT_023_1_2(Basic):
+    cat = 23
+    variation = Variation_939
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_939_Arg) -> Variation_939:
+        return Variation_939(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_939, List[Variation_939]]) -> Datablock[Variation_939]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_939]:
+        return cls._parse(val) # type: ignore
+
+class CAT_023_1_3(Basic):
+    cat = 23
+    variation = Variation_939
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_939_Arg) -> Variation_939:
+        return Variation_939(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_939, List[Variation_939]]) -> Datablock[Variation_939]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_939]:
+        return cls._parse(val) # type: ignore
+
+class CAT_025_1_5(Basic):
+    cat = 25
+    variation = Variation_958
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_958_Arg) -> Variation_958:
+        return Variation_958(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_958, List[Variation_958]]) -> Datablock[Variation_958]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_958]:
+        return cls._parse(val) # type: ignore
+
+class CAT_032_1_1(Basic):
+    cat = 32
+    variation = Variation_987
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_987_Arg) -> Variation_987:
+        return Variation_987(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_987, List[Variation_987]]) -> Datablock[Variation_987]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_987]:
+        return cls._parse(val) # type: ignore
+
+class CAT_034_1_27(Basic):
+    cat = 34
+    variation = Variation_1029
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1029_Arg) -> Variation_1029:
+        return Variation_1029(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1029, List[Variation_1029]]) -> Datablock[Variation_1029]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1029]:
+        return cls._parse(val) # type: ignore
+
+class CAT_034_1_28(Basic):
+    cat = 34
+    variation = Variation_1034
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1034_Arg) -> Variation_1034:
+        return Variation_1034(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1034, List[Variation_1034]]) -> Datablock[Variation_1034]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1034]:
+        return cls._parse(val) # type: ignore
+
+class CAT_034_1_29(Basic):
+    cat = 34
+    variation = Variation_1036
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1036_Arg) -> Variation_1036:
+        return Variation_1036(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1036, List[Variation_1036]]) -> Datablock[Variation_1036]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1036]:
+        return cls._parse(val) # type: ignore
+
+class CAT_048_1_27(Basic):
+    cat = 48
+    variation = Variation_1155
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1155_Arg) -> Variation_1155:
+        return Variation_1155(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1155, List[Variation_1155]]) -> Datablock[Variation_1155]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1155]:
+        return cls._parse(val) # type: ignore
+
+class CAT_048_1_28(Basic):
+    cat = 48
+    variation = Variation_1158
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1158_Arg) -> Variation_1158:
+        return Variation_1158(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1158, List[Variation_1158]]) -> Datablock[Variation_1158]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1158]:
+        return cls._parse(val) # type: ignore
+
+class CAT_048_1_29(Basic):
+    cat = 48
+    variation = Variation_1159
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1159_Arg) -> Variation_1159:
+        return Variation_1159(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1159, List[Variation_1159]]) -> Datablock[Variation_1159]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1159]:
+        return cls._parse(val) # type: ignore
+
+class CAT_048_1_30(Basic):
+    cat = 48
+    variation = Variation_1159
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1159_Arg) -> Variation_1159:
+        return Variation_1159(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1159, List[Variation_1159]]) -> Datablock[Variation_1159]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1159]:
+        return cls._parse(val) # type: ignore
+
+class CAT_048_1_31(Basic):
+    cat = 48
+    variation = Variation_1172
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1172_Arg) -> Variation_1172:
+        return Variation_1172(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1172, List[Variation_1172]]) -> Datablock[Variation_1172]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1172]:
+        return cls._parse(val) # type: ignore
+
+class CAT_062_1_17(Basic):
+    cat = 62
+    variation = Variation_1291
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1291_Arg) -> Variation_1291:
+        return Variation_1291(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1291, List[Variation_1291]]) -> Datablock[Variation_1291]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1291]:
+        return cls._parse(val) # type: ignore
+
+class CAT_062_1_18(Basic):
+    cat = 62
+    variation = Variation_1299
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1299_Arg) -> Variation_1299:
+        return Variation_1299(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1299, List[Variation_1299]]) -> Datablock[Variation_1299]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1299]:
+        return cls._parse(val) # type: ignore
+
+class CAT_062_1_19(Basic):
+    cat = 62
+    variation = Variation_1302
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1302_Arg) -> Variation_1302:
+        return Variation_1302(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1302, List[Variation_1302]]) -> Datablock[Variation_1302]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1302]:
+        return cls._parse(val) # type: ignore
+
+class CAT_063_1_6(Basic):
+    cat = 63
+    variation = Variation_1318
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1318_Arg) -> Variation_1318:
+        return Variation_1318(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1318, List[Variation_1318]]) -> Datablock[Variation_1318]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1318]:
+        return cls._parse(val) # type: ignore
+
+class CAT_065_1_4(Basic):
+    cat = 65
+    variation = Variation_1326
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1326_Arg) -> Variation_1326:
+        return Variation_1326(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1326, List[Variation_1326]]) -> Datablock[Variation_1326]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1326]:
+        return cls._parse(val) # type: ignore
+
+class CAT_065_1_5(Basic):
+    cat = 65
+    variation = Variation_1326
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1326_Arg) -> Variation_1326:
+        return Variation_1326(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1326, List[Variation_1326]]) -> Datablock[Variation_1326]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1326]:
+        return cls._parse(val) # type: ignore
+
+class CAT_240_1_3(Basic):
+    cat = 240
+    variation = Variation_1341
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1341_Arg) -> Variation_1341:
+        return Variation_1341(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1341, List[Variation_1341]]) -> Datablock[Variation_1341]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1341]:
+        return cls._parse(val) # type: ignore
+
+class CAT_247_1_2(Basic):
+    cat = 247
+    variation = Variation_1344
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1344_Arg) -> Variation_1344:
+        return Variation_1344(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1344, List[Variation_1344]]) -> Datablock[Variation_1344]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1344]:
+        return cls._parse(val) # type: ignore
+
+class CAT_247_1_3(Basic):
+    cat = 247
+    variation = Variation_1344
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1344_Arg) -> Variation_1344:
+        return Variation_1344(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1344, List[Variation_1344]]) -> Datablock[Variation_1344]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1344]:
+        return cls._parse(val) # type: ignore
 
 class REF_021_1_4(Expansion):
     cat = 21
@@ -109253,9 +109231,9 @@ class REF_021_1_4(Expansion):
             raise AsterixError('unable to parse expansion')
         return rec # type: ignore
 
-class REF_062_1_2(Expansion):
-    cat = 62
-    variation = Variation_1180
+class REF_021_1_5(Expansion):
+    cat = 21
+    variation = Variation_826
 
     spec = variation.spec
 
@@ -109264,13 +109242,13 @@ class REF_062_1_2(Expansion):
     unparse_bits = variation.unparse_bits
 
     @classmethod
-    def make_extended(cls, val : Variation_1180_Arg) -> Variation_1180:
-        return Variation_1180(val)
+    def make_extended(cls, val : Variation_826_Arg) -> Variation_826:
+        return Variation_826(val)
 
     @classmethod
-    def parse(cls, val : bytes) -> Variation_1180:
+    def parse(cls, val : bytes) -> Variation_826:
         s = Bits.from_bytes(val)
-        (rec, s2) = Variation_1180.parse_bits(s)
+        (rec, s2) = Variation_826.parse_bits(s)
         if len(s2) != 0:
             raise AsterixError('unable to parse expansion')
         return rec # type: ignore
@@ -109293,6 +109271,28 @@ class REF_048_1_11(Expansion):
     def parse(cls, val : bytes) -> Variation_1098:
         s = Bits.from_bytes(val)
         (rec, s2) = Variation_1098.parse_bits(s)
+        if len(s2) != 0:
+            raise AsterixError('unable to parse expansion')
+        return rec # type: ignore
+
+class REF_062_1_2(Expansion):
+    cat = 62
+    variation = Variation_1180
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_extended(cls, val : Variation_1180_Arg) -> Variation_1180:
+        return Variation_1180(val)
+
+    @classmethod
+    def parse(cls, val : bytes) -> Variation_1180:
+        s = Bits.from_bytes(val)
+        (rec, s2) = Variation_1180.parse_bits(s)
         if len(s2) != 0:
             raise AsterixError('unable to parse expansion')
         return rec # type: ignore
@@ -109410,6 +109410,6 @@ manifest = {
     },
 }
 
-VERSION = '20230508.47724'
+VERSION = '20230511.48287'
 
-REFERENCE = '7b26d3950b997624e5bf521c099a3988499d1415'
+REFERENCE = 'fe1c225d536bcc0a3b3d5c899fe45d36ac1d0aba'
