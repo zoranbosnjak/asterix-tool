@@ -25,7 +25,7 @@ from scapy.all import rdpcap, IP, UDP
 import asterix as ast
 from asterix import *
 
-__version__ = "0.8.1"
+__version__ = "0.8.2"
 
 def output(*args):
     """Like 'print', but handle broken pipe exception and flush."""
@@ -154,7 +154,7 @@ class FmtPcap(Fmt):
         scapy_cap = rdpcap(infile)
         for packet in scapy_cap:
             try:
-                data = bytes(packet[UDP].payload)
+                data = bytes(packet[UDP].load)
             except IndexError:
                 continue
             ts = float(packet.time)
