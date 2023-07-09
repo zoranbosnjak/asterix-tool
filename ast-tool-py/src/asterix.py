@@ -108615,6 +108615,28 @@ class CAT_065_1_5(Basic):
     def parse(cls, val : RawDatablock) -> Datablock[Variation_1319]:
         return cls._parse(val) # type: ignore
 
+class CAT_065_1_6(Basic):
+    cat = 65
+    variation = Variation_1319
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1319_Arg) -> Variation_1319:
+        return Variation_1319(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1319, List[Variation_1319]]) -> Datablock[Variation_1319]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock) -> Datablock[Variation_1319]:
+        return cls._parse(val) # type: ignore
+
 class CAT_240_1_3(Basic):
     cat = 240
     variation = Variation_1334
@@ -108859,6 +108881,7 @@ manifest = {
         65: {
             '1.4': CAT_065_1_4,
             '1.5': CAT_065_1_5,
+            '1.6': CAT_065_1_6,
         },
         240: {
             '1.3': CAT_240_1_3,
@@ -108882,6 +108905,6 @@ manifest = {
     },
 }
 
-VERSION = '20230625.10060'
+VERSION = '20230709.9823'
 
-REFERENCE = 'a3ecfc911492943fb07604fca33ab48f9dd1296e'
+REFERENCE = 'ef250593217a2869fa19b7b88936de86e5c0910f'
