@@ -25,7 +25,7 @@ from scapy.all import rdpcap, IP, UDP
 import asterix as ast
 from asterix import *
 
-__version__ = "0.8.2"
+__version__ = "0.8.3"
 
 def output(*args):
     """Like 'print', but handle broken pipe exception and flush."""
@@ -569,6 +569,7 @@ def cmd_inspect(args):
     parse_errors = dict()
 
     def handle_event(line):
+        nonlocal hex_errors, raw_datablock_errors, unknown_categories, processed_categories, parse_errors
         try:
             s = bytes.fromhex(line)
         except ValueError:
@@ -577,6 +578,7 @@ def cmd_inspect(args):
         try:
             raw_datablocks = ast.RawDatablock.parse(s)
         except AsterixError:
+            raw_datablocks = []
             raw_datablock_errors += 1
         for raw_db in raw_datablocks:
             cat = raw_db.category
