@@ -22,6 +22,16 @@ import re
 Raw : TypeAlias = int
 ItemName : TypeAlias = str
 
+@dataclass
+class ParsingOptions:
+    no_check_spare : bool       # do not check spare bits value (zero)
+
+    @classmethod
+    def default(cls) -> 'ParsingOptions':
+        return ParsingOptions(
+            no_check_spare = False,
+        )
+
 class AsterixError(Exception):
     """Base class for asterix related errors."""
     def __init__(self, msg : Optional[str]=None):
@@ -218,10 +228,11 @@ class Spare:
     bit_offset8 : int
     bit_size : int
 
-    def parse_bits(self, s : Bits) -> Any:
+    def parse_bits(self, s : Bits, opt : ParsingOptions) -> Any:
         n = self.bit_size
-        if s.take(n).to_uinteger() != 0:
-            raise AsterixError('unexpected non-zero spare item')
+        if not opt.no_check_spare:
+            if s.take(n).to_uinteger() != 0:
+                raise AsterixError('unexpected non-zero spare item')
         return n
 
     def unparse_bits(self) -> Bits:
@@ -349,7 +360,7 @@ class Element(Variation):
     quantity : Quantity
 
     @classmethod
-    def parse_bits(cls, s : Bits) -> Any:
+    def parse_bits(cls, s : Bits, opt : ParsingOptions) -> Any:
         n = cls.bit_size
         (a,b) = s.split_at(n)
         return (cls(a), b)
@@ -424,18 +435,18 @@ def _raw_to_items(lst : List[Union[Spare, Tuple[ItemName, Any]]], raw : Raw) -> 
         assert_never(x)
     return items
 
-def _parse_group(s, lst):   # type: ignore
+def _parse_group(s, lst, opt):   # type: ignore
     """Helper function for 'Group' and 'Extended'."""
     reminder = s
     items = {}
     n = 0
     for i in lst:
         if isinstance(i, Spare):
-            result = i.parse_bits(reminder)
+            result = i.parse_bits(reminder, opt)
             reminder = reminder.drop(result)
             n += result
         else:
-            (item, reminder) = i[1].parse_bits(reminder)
+            (item, reminder) = i[1].parse_bits(reminder, opt)
             items[i[0]] = item
             n += len(item.unparse_bits())
     return (n, items)
@@ -445,8 +456,8 @@ class Group(Variation):
     subitems_dict : Dict[ItemName, Tuple[str, Any, int, int]]
 
     @classmethod
-    def parse_bits(cls, s : Bits) -> Any:
-        (n, items) = _parse_group(s, cls.subitems_list) # type: ignore
+    def parse_bits(cls, s : Bits, opt : ParsingOptions) -> Any:
+        (n, items) = _parse_group(s, cls.subitems_list, opt) # type: ignore
         (a, b) = s.split_at(n)
         return (cls((a, items)), b) # type: ignore
 
@@ -481,14 +492,14 @@ class Extended(Variation):
     subitems_dict : Dict[ItemName, Tuple[str, Any, int, int]]
 
     @classmethod
-    def parse_bits(cls, s : Bits) -> Any:
+    def parse_bits(cls, s : Bits, opt : ParsingOptions) -> Any:
         def is_last(grp : List[Any]) -> bool:
             return grp == cls.subitems_list[-1]
         reminder = s
         items = {}
         n = 0
         for grp in cls.subitems_list:
-            (m, sub) = _parse_group(reminder, grp) # type: ignore
+            (m, sub) = _parse_group(reminder, grp, opt) # type: ignore
             reminder = reminder.drop(m)
             items.update(sub)
             if is_last(grp) and cls.no_trailing_fx:
@@ -576,7 +587,7 @@ class Repetitive(Variation):
     variation_type : Any
 
     @classmethod
-    def parse_bits(cls, s : Bits) -> Any:
+    def parse_bits(cls, s : Bits, opt : ParsingOptions) -> Any:
         bs = cls.rep_byte_size
         items = []
         # parsing with FX
@@ -584,7 +595,7 @@ class Repetitive(Variation):
             n = 0
             reminder = s
             while True:
-                (item, reminder) = cls.variation_type.parse_bits(reminder)
+                (item, reminder) = cls.variation_type.parse_bits(reminder, opt)
                 (fx, reminder) = reminder.split_at(1)
                 items.append(item)
                 n += len(item.unparse_bits()) + 1
@@ -596,7 +607,7 @@ class Repetitive(Variation):
             n = rbs
             (m,reminder) = s.split_at(rbs)
             for i in range(m.to_uinteger()):
-                (item, reminder) = cls.variation_type.parse_bits(reminder)
+                (item, reminder) = cls.variation_type.parse_bits(reminder, opt)
                 items.append(item)
                 n += len(item.unparse_bits())
 
@@ -642,7 +653,7 @@ class Repetitive(Variation):
 class Explicit(Variation):
 
     @classmethod
-    def parse_bits(cls, s : Bits) -> Any:
+    def parse_bits(cls, s : Bits, opt : ParsingOptions) -> Any:
         (a,b) = s.split_at(8)
         n = a.to_uinteger() * 8
         (a,b) = s.split_at(n)
@@ -669,7 +680,7 @@ class Compound(Variation):
     subitems_dict : Dict[ItemName, Tuple[str, Any, int]]
 
     @classmethod
-    def _parse_fspec(cls, s : Bits) -> Any:
+    def _parse_fspec(cls, s : Bits, opt : ParsingOptions) -> Any:
         reminder = s
         if cls.fspec_fx:
             cnt = 0
@@ -689,8 +700,8 @@ class Compound(Variation):
             return (n, list(s.take(n)))
 
     @classmethod
-    def parse_bits(cls, s : Bits) -> Any:
-        result = cls._parse_fspec(s)
+    def parse_bits(cls, s : Bits, opt : ParsingOptions) -> Any:
+        result = cls._parse_fspec(s, opt)
         (n,fspec) = result
         items = {}
         reminder = s.drop(n)
@@ -700,7 +711,7 @@ class Compound(Variation):
             if i is None:
                 raise AsterixError('fx bit set for non-defined item')
             (subname, subcls) = i
-            result = subcls.parse_bits(reminder)
+            result = subcls.parse_bits(reminder, opt)
             (subitem, reminder) = result
             items[subname] = subitem
             n += len(subitem.unparse_bits())
@@ -803,14 +814,14 @@ class Basic(AsterixSpec):
     uap_selector_table : Any
 
     @classmethod
-    def _parse(cls, raw_db : RawDatablock, uap : Optional[str] = None) -> Any:
+    def _parse(cls, raw_db : RawDatablock, opt : ParsingOptions, uap : Optional[str] = None) -> Any:
         if raw_db.category != cls.cat:
             raise AsterixError('Wrong category')
         s = Bits.from_bytes(raw_db.raw_records)
         records = []
         while len(s) > 0:
             if hasattr(cls, 'variation'):
-                (rec, s) = cls.variation.parse_bits(s)
+                (rec, s) = cls.variation.parse_bits(s, opt)
             elif hasattr(cls, 'uaps'):
                 result = None
                 errors = {}
@@ -818,7 +829,7 @@ class Basic(AsterixSpec):
                 if uap is None:
                     for (name, var) in cls.uaps.items():
                         try:
-                            (rec, s2) = var.parse_bits(s)
+                            (rec, s2) = var.parse_bits(s, opt)
                             # parsing alone is not sufficient,
                             # need to confirm UAP selector
                             if cls._is_valid(rec):
@@ -831,7 +842,7 @@ class Basic(AsterixSpec):
                 # use specified UAP
                 else:
                     var = cls.uaps[uap]
-                    (rec, s) = var.parse_bits(s)
+                    (rec, s) = var.parse_bits(s, opt)
                     # if selector is available, validate
                     if not cls.uap_selector_item is None:
                         if not cls._is_valid(rec):
@@ -107552,8 +107563,8 @@ class CAT_001_1_2(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock, uap : Optional[Literal["plot", "track"]] = None) -> Any:
-        return cls._parse(val, uap=uap)
+    def parse(cls, val : RawDatablock, opt : ParsingOptions, uap : Optional[Literal["plot", "track"]] = None) -> Any:
+        return cls._parse(val, opt, uap=uap)
 
     @classmethod
     def is_valid(cls, arg : Union[Variation_63, Variation_77]) -> bool:
@@ -107596,8 +107607,8 @@ class CAT_001_1_3(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock, uap : Optional[Literal["plot", "track"]] = None) -> Any:
-        return cls._parse(val, uap=uap)
+    def parse(cls, val : RawDatablock, opt : ParsingOptions, uap : Optional[Literal["plot", "track"]] = None) -> Any:
+        return cls._parse(val, opt, uap=uap)
 
     @classmethod
     def is_valid(cls, arg : Union[Variation_63, Variation_77]) -> bool:
@@ -107640,8 +107651,8 @@ class CAT_001_1_4(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock, uap : Optional[Literal["plot", "track"]] = None) -> Any:
-        return cls._parse(val, uap=uap)
+    def parse(cls, val : RawDatablock, opt : ParsingOptions, uap : Optional[Literal["plot", "track"]] = None) -> Any:
+        return cls._parse(val, opt, uap=uap)
 
     @classmethod
     def is_valid(cls, arg : Union[Variation_63, Variation_77]) -> bool:
@@ -107666,8 +107677,8 @@ class CAT_002_1_0(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_90]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_90]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_002_1_1(Basic):
     cat = 2
@@ -107688,8 +107699,8 @@ class CAT_002_1_1(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_90]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_90]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_004_1_12(Basic):
     cat = 4
@@ -107710,8 +107721,8 @@ class CAT_004_1_12(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_202]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_202]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_008_1_2(Basic):
     cat = 8
@@ -107732,8 +107743,8 @@ class CAT_008_1_2(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_224]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_224]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_008_1_3(Basic):
     cat = 8
@@ -107754,8 +107765,8 @@ class CAT_008_1_3(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_224]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_224]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_009_2_1(Basic):
     cat = 9
@@ -107776,8 +107787,8 @@ class CAT_009_2_1(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_236]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_236]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_010_1_1(Basic):
     cat = 10
@@ -107798,8 +107809,8 @@ class CAT_010_1_1(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_304]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_304]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_011_1_2(Basic):
     cat = 11
@@ -107820,8 +107831,8 @@ class CAT_011_1_2(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_407]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_407]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_011_1_3(Basic):
     cat = 11
@@ -107842,8 +107853,8 @@ class CAT_011_1_3(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_424]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_424]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_015_1_0(Basic):
     cat = 15
@@ -107864,8 +107875,8 @@ class CAT_015_1_0(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_518]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_518]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_015_1_1(Basic):
     cat = 15
@@ -107886,8 +107897,8 @@ class CAT_015_1_1(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_518]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_518]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_016_1_0(Basic):
     cat = 16
@@ -107908,8 +107919,8 @@ class CAT_016_1_0(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_529]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_529]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_018_1_7(Basic):
     cat = 18
@@ -107930,8 +107941,8 @@ class CAT_018_1_7(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_587]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_587]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_019_1_3(Basic):
     cat = 19
@@ -107952,8 +107963,8 @@ class CAT_019_1_3(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_613]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_613]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_020_1_9(Basic):
     cat = 20
@@ -107974,8 +107985,8 @@ class CAT_020_1_9(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_670]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_670]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_020_1_10(Basic):
     cat = 20
@@ -107996,8 +108007,8 @@ class CAT_020_1_10(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_673]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_673]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_021_0_23(Basic):
     cat = 21
@@ -108018,8 +108029,8 @@ class CAT_021_0_23(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_735]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_735]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_021_0_24(Basic):
     cat = 21
@@ -108040,8 +108051,8 @@ class CAT_021_0_24(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_736]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_736]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_021_0_25(Basic):
     cat = 21
@@ -108062,8 +108073,8 @@ class CAT_021_0_25(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_736]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_736]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_021_0_26(Basic):
     cat = 21
@@ -108084,8 +108095,8 @@ class CAT_021_0_26(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_739]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_739]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_021_2_1(Basic):
     cat = 21
@@ -108106,8 +108117,8 @@ class CAT_021_2_1(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_895]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_895]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_021_2_2(Basic):
     cat = 21
@@ -108128,8 +108139,8 @@ class CAT_021_2_2(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_899]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_899]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_021_2_3(Basic):
     cat = 21
@@ -108150,8 +108161,8 @@ class CAT_021_2_3(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_902]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_902]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_021_2_4(Basic):
     cat = 21
@@ -108172,8 +108183,8 @@ class CAT_021_2_4(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_902]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_902]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_021_2_5(Basic):
     cat = 21
@@ -108194,8 +108205,8 @@ class CAT_021_2_5(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_905]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_905]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_021_2_6(Basic):
     cat = 21
@@ -108216,8 +108227,8 @@ class CAT_021_2_6(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_910]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_910]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_023_1_2(Basic):
     cat = 23
@@ -108238,8 +108249,8 @@ class CAT_023_1_2(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_932]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_932]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_023_1_3(Basic):
     cat = 23
@@ -108260,8 +108271,8 @@ class CAT_023_1_3(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_932]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_932]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_025_1_5(Basic):
     cat = 25
@@ -108282,8 +108293,8 @@ class CAT_025_1_5(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_951]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_951]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_032_1_1(Basic):
     cat = 32
@@ -108304,8 +108315,8 @@ class CAT_032_1_1(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_980]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_980]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_034_1_27(Basic):
     cat = 34
@@ -108326,8 +108337,8 @@ class CAT_034_1_27(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1022]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1022]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_034_1_28(Basic):
     cat = 34
@@ -108348,8 +108359,8 @@ class CAT_034_1_28(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1027]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1027]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_034_1_29(Basic):
     cat = 34
@@ -108370,8 +108381,8 @@ class CAT_034_1_29(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1029]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1029]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_048_1_27(Basic):
     cat = 48
@@ -108392,8 +108403,8 @@ class CAT_048_1_27(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1148]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1148]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_048_1_28(Basic):
     cat = 48
@@ -108414,8 +108425,8 @@ class CAT_048_1_28(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1151]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1151]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_048_1_29(Basic):
     cat = 48
@@ -108436,8 +108447,8 @@ class CAT_048_1_29(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1152]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1152]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_048_1_30(Basic):
     cat = 48
@@ -108458,8 +108469,8 @@ class CAT_048_1_30(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1152]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1152]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_048_1_31(Basic):
     cat = 48
@@ -108480,8 +108491,8 @@ class CAT_048_1_31(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1165]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1165]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_062_1_17(Basic):
     cat = 62
@@ -108502,8 +108513,8 @@ class CAT_062_1_17(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1284]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1284]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_062_1_18(Basic):
     cat = 62
@@ -108524,8 +108535,8 @@ class CAT_062_1_18(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1292]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1292]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_062_1_19(Basic):
     cat = 62
@@ -108546,8 +108557,8 @@ class CAT_062_1_19(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1295]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1295]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_063_1_6(Basic):
     cat = 63
@@ -108568,8 +108579,8 @@ class CAT_063_1_6(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1311]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1311]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_065_1_4(Basic):
     cat = 65
@@ -108590,8 +108601,8 @@ class CAT_065_1_4(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1319]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1319]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_065_1_5(Basic):
     cat = 65
@@ -108612,8 +108623,8 @@ class CAT_065_1_5(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1319]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1319]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_065_1_6(Basic):
     cat = 65
@@ -108634,8 +108645,8 @@ class CAT_065_1_6(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1319]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1319]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_240_1_3(Basic):
     cat = 240
@@ -108656,8 +108667,8 @@ class CAT_240_1_3(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1334]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1334]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_247_1_2(Basic):
     cat = 247
@@ -108678,8 +108689,8 @@ class CAT_247_1_2(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1337]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1337]:
+        return cls._parse(val, opt) # type: ignore
 
 class CAT_247_1_3(Basic):
     cat = 247
@@ -108700,8 +108711,8 @@ class CAT_247_1_3(Basic):
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock) -> Datablock[Variation_1337]:
-        return cls._parse(val) # type: ignore
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1337]:
+        return cls._parse(val, opt) # type: ignore
 
 class REF_021_1_4(Expansion):
     cat = 21
@@ -108718,9 +108729,9 @@ class REF_021_1_4(Expansion):
         return Variation_785(val)
 
     @classmethod
-    def parse(cls, val : bytes) -> Variation_785:
+    def parse(cls, val : bytes, opt : ParsingOptions) -> Variation_785:
         s = Bits.from_bytes(val)
-        (rec, s2) = Variation_785.parse_bits(s)
+        (rec, s2) = Variation_785.parse_bits(s, opt)
         if len(s2) != 0:
             raise AsterixError('unable to parse expansion')
         return rec # type: ignore
@@ -108740,9 +108751,9 @@ class REF_021_1_5(Expansion):
         return Variation_819(val)
 
     @classmethod
-    def parse(cls, val : bytes) -> Variation_819:
+    def parse(cls, val : bytes, opt : ParsingOptions) -> Variation_819:
         s = Bits.from_bytes(val)
-        (rec, s2) = Variation_819.parse_bits(s)
+        (rec, s2) = Variation_819.parse_bits(s, opt)
         if len(s2) != 0:
             raise AsterixError('unable to parse expansion')
         return rec # type: ignore
@@ -108762,9 +108773,9 @@ class REF_048_1_11(Expansion):
         return Variation_1091(val)
 
     @classmethod
-    def parse(cls, val : bytes) -> Variation_1091:
+    def parse(cls, val : bytes, opt : ParsingOptions) -> Variation_1091:
         s = Bits.from_bytes(val)
-        (rec, s2) = Variation_1091.parse_bits(s)
+        (rec, s2) = Variation_1091.parse_bits(s, opt)
         if len(s2) != 0:
             raise AsterixError('unable to parse expansion')
         return rec # type: ignore
@@ -108784,9 +108795,9 @@ class REF_062_1_2(Expansion):
         return Variation_1173(val)
 
     @classmethod
-    def parse(cls, val : bytes) -> Variation_1173:
+    def parse(cls, val : bytes, opt : ParsingOptions) -> Variation_1173:
         s = Bits.from_bytes(val)
-        (rec, s2) = Variation_1173.parse_bits(s)
+        (rec, s2) = Variation_1173.parse_bits(s, opt)
         if len(s2) != 0:
             raise AsterixError('unable to parse expansion')
         return rec # type: ignore
@@ -108905,6 +108916,6 @@ manifest = {
     },
 }
 
-VERSION = '20230709.9823'
+VERSION = '20230717.48514'
 
-REFERENCE = 'ef250593217a2869fa19b7b88936de86e5c0910f'
+REFERENCE = '0f15ae00042dfcde27ba19b018544fb70164d026'

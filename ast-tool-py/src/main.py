@@ -25,7 +25,7 @@ from scapy.all import rdpcap, IP, UDP
 import asterix as ast
 from asterix import *
 
-__version__ = "0.8.3"
+__version__ = "0.9.0"
 
 def output(*args):
     """Like 'print', but handle broken pipe exception and flush."""
@@ -260,6 +260,11 @@ def get_expansions(selection, expansions):
         result.append((cat, name))
     return result
 
+def get_parsing_options(args):
+    parsing_opt = ParsingOptions.default()
+    parsing_opt.no_check_spare = bool(args.no_check_spare)
+    return parsing_opt
+
 class AsterixSamples:
     """Asterix sample generator."""
     def __init__(self, gen, sel, exp, populate_all_items):
@@ -354,6 +359,7 @@ def cmd_gen_random(args):
             time.sleep(args.sleep)
 
 def cmd_asterix_decoder(args):
+    parsing_opt = get_parsing_options(args)
     sel = get_selection(args.empty_selection, args.cat or [], args.ref or [])
     exp = get_expansions(sel, args.expand or [])
     if args.truncate:
@@ -430,7 +436,7 @@ def cmd_asterix_decoder(args):
             sub = sel['REFS'][cat].variation
             bits = Bits.from_bytes(var.raw)
             try:
-                (val, b) = sub.parse_bits(bits)
+                (val, b) = sub.parse_bits(bits, parsing_opt)
                 if len(b):
                     raise AsterixError('Unexpected remaining bits in explicit item')
                 handle_variation(cat, i, val, path)
@@ -469,7 +475,7 @@ def cmd_asterix_decoder(args):
         if spec is None:
             return
         try:
-            db = spec.parse(db)
+            db = spec.parse(db, parsing_opt)
             for rec in db.records:
                 handle_record(cat, i+1, rec)
         except AsterixError as e:
@@ -567,6 +573,7 @@ def cmd_inspect(args):
     unknown_categories = set()
     processed_categories = set()
     parse_errors = dict()
+    parsing_opt = get_parsing_options(args)
 
     def handle_event(line):
         nonlocal hex_errors, raw_datablock_errors, unknown_categories, processed_categories, parse_errors
@@ -589,7 +596,7 @@ def cmd_inspect(args):
             for ed in editions:
                 Spec = ast.manifest['CATS'][cat][ed]
                 try:
-                    db = Spec.parse(raw_db)
+                    db = Spec.parse(raw_db, parsing_opt)
                 except AsterixError:
                     problems = parse_errors.get(cat, set())
                     problems.add(ed)
@@ -692,6 +699,10 @@ def main():
     parser.add_argument('--expand', nargs=2, metavar=('CAT', 'ITEM-NAME'),
         action='append',
         help='Expand CAT/ITEM-NAME with REF expansion')
+
+    parser.add_argument('--no-check-spare',
+        action='store_true',
+        help='do not check spare bits for zero value when parsing')
 
     subparsers = parser.add_subparsers(required=True, help='sub-commands')
 
