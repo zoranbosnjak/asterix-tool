@@ -40,7 +40,7 @@ Custom filter example:
 - Set [I020, 020, TST] bit to '1', if present.
 
 ```bash
-ast-tool from-udp --unicast 127.0.0.1 56780 | ast-tool-py custom --script restamp.py --call restamp
+ast-tool-py from-udp --unicast 127.0.0.1 56780 | ast-tool-py custom --script restamp.py --call restamp
 ```
 
 ```python
@@ -60,6 +60,8 @@ def process_record(t, cat, rec):
 
 def process_datablock(t, ast, raw_db):
     """Process single raw datablock."""
+    opt = ast.ParsingOptions.default()
+
     Spec019 = ast.CAT_019_1_3
     Spec020 = ast.CAT_020_1_10
 
@@ -69,7 +71,7 @@ def process_datablock(t, ast, raw_db):
         Spec = Spec020
     else:
         return(raw_db)
-    db = Spec.parse(raw_db)
+    db = Spec.parse(raw_db, opt)
     return Spec.make_datablock([process_record(t, Spec.cat, rec) for rec in db.records])
 
 # custom filter entry point function
