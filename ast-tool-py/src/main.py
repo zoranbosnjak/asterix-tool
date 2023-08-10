@@ -25,7 +25,7 @@ from scapy.all import rdpcap, IP, UDP
 import asterix as ast
 from asterix import *
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 
 def output(*args):
     """Like 'print', but handle broken pipe exception and flush."""
@@ -209,6 +209,17 @@ def string_to_edition(ed):
     """Convert edition string to a tuple, for example "1.2" -> (1,2)"""
     a,b = ed.split('.')
     return (int(a), int(b))
+
+def make_event_source(f, fmt, ch):
+    if f is None:
+        for line in fileinput.input('-'):
+            t_mono = time.monotonic()
+            t_utc = datetime.datetime.now(tz=datetime.timezone.utc)
+            yield (t_mono, t_utc, line)
+    else:
+        fmt = format_find(format_input, fmt)(ch)
+        for event in fmt.events(f):
+            yield(event)
 
 def cmd_show_manifest(args):
 
@@ -503,15 +514,9 @@ def cmd_asterix_decoder(args):
         truncate('timestamp: {}'.format(t if t is not None else '<unknown>'))
         handle_datagram(1, s)
 
-    if args.file is None:
-        for line in fileinput.input('-'):
-            t = datetime.datetime.now(tz=datetime.timezone.utc)
-            handle_event(t, line)
-    else:
-        fmt = format_find(format_input, args.format)(args.channel)
-        for event in fmt.events(args.file):
-            (t_mono, t_utc, data) = event
-            handle_event(t_utc, data)
+    for event in make_event_source(args.file, args.format, args.channel):
+        (t_mono, t_utc, data) = event
+        handle_event(t_utc, data)
 
 def cmd_from_udp(args):
     sel = selectors.DefaultSelector()
@@ -603,14 +608,9 @@ def cmd_inspect(args):
                     parse_errors[cat] = problems
 
     try:
-        if args.file is None:
-            for line in fileinput.input('-'):
-                handle_event(line)
-        else:
-            fmt = format_find(format_input, args.format)(args.channel)
-            for event in fmt.events(args.file):
-                (t_mono, t_utc, data) = event
-                handle_event(data)
+        for event in make_event_source(args.file, args.format, args.channel):
+            (t_mono, t_utc, data) = event
+            handle_event(data)
     except KeyboardInterrupt:
         pass
 
@@ -675,7 +675,8 @@ def cmd_custom(args):
     #   - output function (tx to stdout)
     #   Custom modul can process lines, for example: for line in rx: tx(line)
     f = run_globals[args.call]
-    f(ast, fileinput.input('-'), output, args.args)
+    src = make_event_source(args.file, args.format, args.channel)
+    f(ast, src, output, args.args)
 
 def main():
 
@@ -735,11 +736,11 @@ def main():
         metavar='N', default=0,
         help='limit parsing depth, 0 for none, default: %(default)s')
     parser_decode.add_argument('--file', metavar='filename',
-        help='use file input instead of realtime over STDIN')
+        help='Use file input instead of realtime over STDIN')
     parser_decode.add_argument('--format',
         choices=[fmt.name for fmt in format_input],
         default=format_input[0].name,
-        help='file data format, default: %(default)s')
+        help='File data format, default: %(default)s')
     parser_decode.add_argument('--channel', metavar='STR',
         help='Set channel name (not supported on all formats)')
 
@@ -768,11 +769,11 @@ def main():
         help='report asterix parsing status per category/edition')
     parser_inspect.set_defaults(func=cmd_inspect)
     parser_inspect.add_argument('--file', metavar='filename',
-        help='use file input instead of realtime over STDIN')
+        help='Use file input instead of realtime over STDIN')
     parser_inspect.add_argument('--format',
         choices=[fmt.name for fmt in format_input],
         default=format_input[0].name,
-        help='file data format, default: %(default)s')
+        help='File data format, default: %(default)s')
     parser_inspect.add_argument('--channel', metavar='STR',
         help='Set channel name (not supported on all formats)')
 
@@ -812,6 +813,14 @@ def main():
         required=True, metavar='callable')
     parser_custom.add_argument('--args', help='Additional arguments (string)',
         metavar='args')
+    parser_custom.add_argument('--file', metavar='filename',
+        help='Use file input instead of realtime over STDIN')
+    parser_custom.add_argument('--format',
+        choices=[fmt.name for fmt in format_input],
+        default=format_input[0].name,
+        help='File data format, default: %(default)s')
+    parser_custom.add_argument('--channel', metavar='STR',
+        help='Set channel name (not supported on all formats)')
 
     # Empty argument raises TypeError on some old pip/python versions.
     try:

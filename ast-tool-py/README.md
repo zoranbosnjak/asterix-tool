@@ -76,8 +76,8 @@ def process_datablock(t, ast, raw_db):
 
 # custom filter entry point function
 def restamp(ast, rx, tx, args):
-    for line in rx:
-        now = datetime.datetime.now(tz=datetime.timezone.utc)
+    for (t_mono, t_utc, line) in rx:
+        now = t_utc
         midnight = datetime.datetime.combine(now, datetime.time(0), now.tzinfo)
         t = now - midnight
         s = bytes.fromhex(line)
