@@ -485,8 +485,6 @@ class Group(Variation):
 
 class Extended(Variation):
     no_trailing_fx : bool # See [ref:extended-no-trailing-fx].
-    prim_bit_size : int
-    ext_bit_size : int
     groups_bit_sizes : List[int]
     subitems_list : List[List[Union[Spare, Tuple[ItemName, Any]]]]
     subitems_dict : Dict[ItemName, Tuple[str, Any, int, int]]
@@ -1220,8 +1218,6 @@ class Variation_12(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -4471,8 +4467,6 @@ class Variation_76(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -7562,8 +7556,6 @@ class Variation_144(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -9039,8 +9031,6 @@ class Variation_160(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -10125,8 +10115,6 @@ class Variation_186(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -12493,8 +12481,6 @@ class Variation_210(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -13213,8 +13199,6 @@ class Variation_222(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 24
-    ext_bit_size = 8
     groups_bit_sizes = [
         23,
     ]
@@ -13231,7 +13215,7 @@ class Variation_222(Extended):
     subitems_dict = {
         'F': ('Scaling Factor', Variation_219, 0, 5),
         'R': ('Current Reduction Stage in Use', Variation_220, 5, 3),
-        'Q': ('Processing Parameters', Variation_221, 0, 15),
+        'Q': ('Processing Parameters', Variation_221, 8, 15),
     }
 
     @overload
@@ -13881,8 +13865,6 @@ class Variation_227(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
     ]
@@ -14161,8 +14143,6 @@ class Variation_232(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
     ]
@@ -14999,8 +14979,6 @@ class Variation_250(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -16069,8 +16047,6 @@ class Variation_271(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -16969,8 +16945,6 @@ class Variation_286(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -20566,8 +20540,6 @@ class Variation_351(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -25808,8 +25780,6 @@ class Variation_418(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -28268,8 +28238,6 @@ class Variation_432(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
     ]
@@ -28522,8 +28490,6 @@ class Variation_439(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
     ]
@@ -36910,8 +36876,6 @@ class Variation_560(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -37378,8 +37342,6 @@ class Variation_573(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -40454,8 +40416,6 @@ class Variation_612(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -41378,8 +41338,6 @@ class Variation_630(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -42013,8 +41971,6 @@ class Variation_638(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -45361,8 +45317,6 @@ class Variation_674(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -47653,8 +47607,6 @@ class Variation_707(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -48430,8 +48382,6 @@ class Variation_724(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
     ]
@@ -52260,8 +52210,6 @@ class Variation_759(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 16
-    ext_bit_size = 8
     groups_bit_sizes = [
         15,
         7,
@@ -52485,8 +52433,6 @@ class Variation_762(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
     ]
@@ -55822,8 +55768,6 @@ class Variation_820(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -56687,8 +56631,6 @@ class Variation_833(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -57563,8 +57505,6 @@ class Variation_850(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -59441,8 +59381,6 @@ class Variation_888(Extended):
     variation = 'Extended'
 
     no_trailing_fx = True
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         8,
@@ -61932,8 +61870,6 @@ class Variation_900(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -63359,8 +63295,6 @@ class Variation_903(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -66386,8 +66320,6 @@ class Variation_910(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -68930,8 +68862,6 @@ class Variation_924(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -69188,8 +69118,6 @@ class Variation_926(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 16
-    ext_bit_size = 8
     groups_bit_sizes = [
         15,
         7,
@@ -69209,7 +69137,7 @@ class Variation_926(Extended):
     # name: (title, cls, group_offset, bit_size)
     subitems_dict = {
         'RP': ('Report Period for Category 021 Reports', Variation_874, 0, 8),
-        'SC': ('Service Class', Variation_925, 0, 3),
+        'SC': ('Service Class', Variation_925, 8, 3),
         'SSRP': ('Service Status Reporting Period', Variation_923, 0, 7),
     }
 
@@ -69354,8 +69282,6 @@ class Variation_929(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
     ]
@@ -70135,8 +70061,6 @@ class Variation_940(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -71861,8 +71785,6 @@ class Variation_957(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 24
-    ext_bit_size = 24
     groups_bit_sizes = [
         23,
     ]
@@ -71877,7 +71799,7 @@ class Variation_957(Extended):
     # name: (title, cls, group_offset, bit_size)
     subitems_dict = {
         'SUI': ('System Unit Identification', Variation_0, 0, 8),
-        'STN': ('System Track Number', Variation_221, 0, 15),
+        'STN': ('System Track Number', Variation_221, 8, 15),
     }
 
     @overload
@@ -79311,8 +79233,6 @@ class Variation_1053(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
     ]
@@ -82513,8 +82433,6 @@ class Variation_1105(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -83698,8 +83616,6 @@ class Variation_1123(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -88086,8 +88002,6 @@ class Variation_1164(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -89587,8 +89501,6 @@ class Variation_1174(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
     ]
@@ -90624,8 +90536,6 @@ class Variation_1190(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
     ]
@@ -93555,8 +93465,6 @@ class Variation_1235(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -97653,8 +97561,6 @@ class Variation_1265(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 24
-    ext_bit_size = 24
     groups_bit_sizes = [
         23,
         23,
@@ -97674,9 +97580,9 @@ class Variation_1265(Extended):
     # name: (title, cls, group_offset, bit_size)
     subitems_dict = {
         'MIDENT': ('Master System Unit Identification', Variation_0, 0, 8),
-        'MTRACK': ('Master System Track Number', Variation_221, 0, 15),
+        'MTRACK': ('Master System Track Number', Variation_221, 8, 15),
         'SIDENT': ('Slave System Unit Identification', Variation_0, 0, 8),
-        'STRACK': ('Slave System Track Number', Variation_221, 0, 15),
+        'STRACK': ('Slave System Track Number', Variation_221, 8, 15),
     }
 
     @overload
@@ -101198,8 +101104,6 @@ class Variation_1293(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -104648,8 +104552,6 @@ class Variation_1307(Extended):
     variation = 'Extended'
 
     no_trailing_fx = False
-    prim_bit_size = 8
-    ext_bit_size = 8
     groups_bit_sizes = [
         7,
         7,
@@ -108845,6 +108747,6 @@ manifest = {
     },
 }
 
-VERSION = '20230827.6742'
+VERSION = '20230919.43358'
 
-REFERENCE = '9decf0ad121ad5d2050c1a54d51d009be1653ed6'
+REFERENCE = 'be22926c326c99ef59168fe99953ce48fd175ad0'
