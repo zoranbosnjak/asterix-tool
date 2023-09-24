@@ -484,7 +484,7 @@ class Group(Variation):
         return self._set_item(name, f(x))
 
 class Extended(Variation):
-    no_trailing_fx : bool # See [ref:extended-no-trailing-fx].
+    no_trailing_fx : bool
     groups_bit_sizes : List[int]
     subitems_list : List[List[Union[Spare, Tuple[ItemName, Any]]]]
     subitems_dict : Dict[ItemName, Tuple[str, Any, int, int]]
@@ -108747,6 +108747,6 @@ manifest = {
     },
 }
 
-VERSION = '20230919.43358'
+VERSION = '20230920.40176'
 
-REFERENCE = 'be22926c326c99ef59168fe99953ce48fd175ad0'
+REFERENCE = '4425e0ca860ef241d44cdbe3a937df2aab54858d'
