@@ -2,6 +2,18 @@
 
 A versatile asterix data related command line tool.
 
+Features:
+
+- random asterix data generator
+- asterix decoder to text output
+- UDP receiver and transmitter
+- multicast mode support
+- asterix category/edition detector
+- stream recorder and replay
+- support for multiple recording file formats
+- simple integration with other standard command line tools via stdin/stdout
+- user defined asterix data processing with custom script
+
 This project uses
 [asterix-lib-generator](https://zoranbosnjak.github.io/asterix-lib-generator/)
 library generator, which in turn uses
@@ -188,4 +200,3 @@ This bash pipeline shall run without error until interrupted.
 ast-tool random | ast-tool decode --stop-on-error > /dev/null
 <press CTRL-C to interrupt>
 ```
-

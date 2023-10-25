@@ -25,12 +25,20 @@ from scapy.all import rdpcap, IP, UDP
 import asterix as ast
 from asterix import *
 
-__version__ = "0.10.0"
+__version__ = "0.11.0"
 
 def output(*args):
     """Like 'print', but handle broken pipe exception and flush."""
     try:
         print(*args, flush=True)
+    except BrokenPipeError:
+        sys.stdout = None
+        sys.exit(0)
+
+def output_binary(*args):
+    try:
+        sys.stdout.buffer.write(*args)
+        sys.stdout.buffer.flush()
     except BrokenPipeError:
         sys.stdout = None
         sys.exit(0)
@@ -77,9 +85,19 @@ class PCG32:
             val = val*pow(2,32) + self.next()
 
 class Fmt:
+    """File format base class.
+    Each subclass shall define one or both:
+        - 'write_event' method (to support recording)
+        - 'events' generator (to support replay)
+    """
     name : str
 
     def __init__(self, channel=None, sender=None):
+        self.channel = channel
+        self.sender = sender
+        self.on_init()
+
+    def on_init(self):
         pass
 
 class FmtSimple(Fmt):
@@ -98,14 +116,12 @@ class FmtSimple(Fmt):
             yield(t_mono, t_utc, data)
 
 class FmtVcr(Fmt):
-    """JSON based time format from the 'vcr' recording/replay project."""
+    """JSON based file format from the 'vcr' recording/replay project."""
     name = 'vcr'
     period = 0x100000000
     time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
-    def __init__(self, channel=None, sender=None):
-        self.channel = channel
-        self.sender = sender
+    def on_init(self):
         self.session = str(uuid.uuid4())[0:8]
         self.track = str(uuid.uuid4())[0:8]
         self.sequence = 0
@@ -196,8 +212,75 @@ class FmtBonita(Fmt):
             data = data.strip()
             yield (t_mono, t_utc, data)
 
-format_input  = [FmtSimple, FmtVcr, FmtPcap, FmtBonita]
-format_output = [FmtSimple, FmtVcr]
+class FmtFinal(Fmt):
+    """Final file format from Eurocontrol.
+        - 2 bytes total length, including length itself
+        - 1 byte 'error code'
+        - 1 byte 'board/line number'
+        - 1 byte recording day
+        - 3 bytes time (LSB=0.01s)
+        - ... asterix datablock(s)
+        - 4 bytes constant padding (0xa5a5a5a5)
+    """
+    name = 'final'
+
+    def on_init(self):
+        self.day0 = None
+        self.ch = bytes([int(self.channel or 0)])
+
+    def write_event(self, t_mono, t_utc, data):
+        if self.day0 is None:
+            self.day0 = t_utc.date()
+        datagram = bytes.fromhex(data)
+        total_length = (12 + len(datagram)).to_bytes(2, byteorder='big')
+        err = bytes([0x00])
+        day = t_utc.date()
+        delta = day - self.day0
+        recording_day = delta.days.to_bytes(1, byteorder='big')
+        ts_midnight = datetime.datetime(t_utc.year, t_utc.month, t_utc.day, tzinfo = t_utc.tzinfo)
+        seconds = (t_utc - ts_midnight).total_seconds()
+        time = round(seconds*100).to_bytes(3, byteorder='big')
+        padding = bytes([0xa5, 0xa5, 0xa5, 0xa5])
+        s = total_length + err + self.ch + recording_day + time + datagram + padding
+        output_binary(s)
+
+    def events(self, infile):
+        def loop(f):
+            while True:
+                n = f.read(2)
+                if not n:
+                    break
+                assert len(n) == 2, str(n)
+                n = (n[0]*256 + n[1]) - 2
+                s = f.read(n)
+                assert len(s) == n, str(s)
+                _err = s[0]
+                ch = s[1]
+                if self.channel is not None:
+                    if str(ch) != self.channel:
+                        continue
+                day = s[2]
+                t = (s[3]*256*256 + s[4]*256 + s[5]) * 0.01
+                data = s[6:][:-4]
+                padding = s[-4:]
+                assert padding == b'\xa5\xa5\xa5\xa5', str(padding)
+                t_mono = float(day)*24*3600 + t
+                # This is the best approximation. UTC time is not stored in this format,
+                # but it might be useful to have at least relative times.
+                t_utc = datetime.datetime.fromtimestamp(0, tz=datetime.timezone.utc) \
+                    + datetime.timedelta(seconds=t_mono)
+                yield (t_mono, t_utc, data.hex())
+
+        if infile is None:
+            infile = '-'
+        if infile == '-':
+            for i in loop(sys.stdin.buffer): yield i
+        else:
+            with open(infile, "rb") as f:
+                for i in loop(f): yield i
+
+format_input  = [FmtSimple, FmtVcr, FmtPcap, FmtBonita, FmtFinal]
+format_output = [FmtSimple, FmtVcr, FmtFinal]
 
 def format_find(lst, name):
     for i in lst:
@@ -835,4 +918,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
