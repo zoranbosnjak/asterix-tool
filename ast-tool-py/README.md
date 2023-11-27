@@ -13,12 +13,36 @@ Features:
 
 ## Installation
 
-Install latest git version to virtual environment
+This installation procedures requires `python >= 3.7` and `pip >= 21.3`.
+Tested under `ubuntu-22.04` and `ubuntu-20.04`.
+
+Prepare virtual environment:
 
 ```bash
+sudo apt -y install python3-venv
 python3 -m venv env
 source env/bin/activate
-pip install "git+https://github.com/zoranbosnjak/asterix-tool.git#subdirectory=ast-tool-py"
+python3 -m pip install wheel # might be required (e.g. under ubuntu 20.04)
+```
+
+Under some older OS versions (like ubuntu-18.04) it might be necessary to upgrade the
+the required versions first. In this case, the procedure to prepare the environment
+should be something like:
+
+```bash
+sudo apt -y install python3.8 python3.8-venv python3-pip
+python3.8 -m venv env
+source env/bin/activate
+python3 -m pip install --upgrade pip
+python --version # check version
+pip --version # check version
+python3 -m pip install wheel
+```
+
+Install latest git version of this project and check installation:
+
+```bash
+python3 -m pip install "git+https://github.com/zoranbosnjak/asterix-tool.git#subdirectory=ast-tool-py"
 ast-tool-py --version
 ast-tool-py --help
 ```
