@@ -76001,7 +76001,7 @@ class Variation_1021(Element):
         return self.__class__.table.get(self.to_uinteger())
 
 Variation_1022_Arg_Group = TypedDict('Variation_1022_Arg_Group', {
-    'HGT': Union[Variation_253, Variation_253_Arg],
+    'HGT': Union[Variation_255, Variation_255_Arg],
     'LAT': Union[Variation_686, Variation_686_Arg],
     'LON': Union[Variation_686, Variation_686_Arg],
 })
@@ -76012,21 +76012,21 @@ class Variation_1022(Group):
     bit_size = 64
 
     subitems_list = [
-        ('HGT', Variation_253),
+        ('HGT', Variation_255),
         ('LAT', Variation_686),
         ('LON', Variation_686),
     ]
 
     # name: (title, cls, group_offset, bit_size)
     subitems_dict = {
-        'HGT': ('Height of Data Source', Variation_253, 0, 16),
+        'HGT': ('Height of Data Source', Variation_255, 0, 16),
         'LAT': ('Latitude', Variation_686, 16, 24),
         'LON': ('Longitude', Variation_686, 40, 24),
     }
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['HGT']) -> Type[Variation_253]:
+    def spec(cls, key : Literal['HGT']) -> Type[Variation_255]:
         ...
 
     @overload
@@ -76040,9 +76040,9 @@ class Variation_1022(Group):
         ...
 
     @classmethod
-    def spec(cls, key : Union[Literal['HGT'], Literal['LAT'], Literal['LON']]) -> Union[Type['Variation_253'], Type['Variation_686'], Type['Variation_686']]:
+    def spec(cls, key : Union[Literal['HGT'], Literal['LAT'], Literal['LON']]) -> Union[Type['Variation_255'], Type['Variation_686'], Type['Variation_686']]:
         if key == 'HGT':
-            return Variation_253
+            return Variation_255
         if key == 'LAT':
             return Variation_686
         if key == 'LON':
@@ -76059,7 +76059,7 @@ class Variation_1022(Group):
         assert_never(arg)
 
     @overload
-    def get_item(self, name : Literal['HGT']) -> Variation_253:
+    def get_item(self, name : Literal['HGT']) -> Variation_255:
         ...
 
     @overload
@@ -76074,7 +76074,7 @@ class Variation_1022(Group):
         return self._get_item(name)
 
     @overload
-    def set_item(self, name : Literal['HGT'], val : Union[Variation_253, Variation_253_Arg]) -> 'Variation_1022':
+    def set_item(self, name : Literal['HGT'], val : Union[Variation_255, Variation_255_Arg]) -> 'Variation_1022':
         ...
 
     @overload
@@ -111185,6 +111185,6 @@ manifest = {
     },
 }
 
-VERSION = '20231025.21029'
+VERSION = '20231203.7133'
 
-REFERENCE = '29964ed87f1ad0bd30edb689ad7377ca7c2480e1'
+REFERENCE = '71b13c7fc63a96fec61b6b49bfb67d021fc12bdf'
