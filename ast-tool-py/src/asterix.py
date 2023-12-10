@@ -108426,8 +108426,11 @@ class Variation_1326(Element):
     bit_offset8 = 0
     bit_size = 8
     table = {
-        1: 'Video Summary message',
-        2: 'Video message',
+        1: 'System Position Report',
+        2: 'System Bearing Report',
+        3: 'System Position Report of conflicting transmission',
+        4: 'System Detection End Report',
+        5: 'Sensor Data Report',
     }
 
     def __init__(self, arg : Variation_1326_Arg) -> None:
@@ -108441,8 +108444,811 @@ class Variation_1326(Element):
     def table_value(self) -> Optional[str]:
         return self.__class__.table.get(self.to_uinteger())
 
-Variation_1327_Arg : TypeAlias = Union[Variation_972, Variation_972_Arg]
-class Variation_1327(Repetitive):
+Variation_1327_Arg_Group = TypedDict('Variation_1327_Arg_Group', {
+    'LAT': Union[Variation_147, Variation_147_Arg],
+    'LON': Union[Variation_147, Variation_147_Arg],
+})
+Variation_1327_Arg : TypeAlias = Union[Raw, Variation_1327_Arg_Group]
+class Variation_1327(Group):
+    variation = 'Group'
+
+    bit_size = 64
+
+    subitems_list = [
+        ('LAT', Variation_147),
+        ('LON', Variation_147),
+    ]
+
+    # name: (title, cls, group_offset, bit_size)
+    subitems_dict = {
+        'LAT': ('Latitude in WGS-84', Variation_147, 0, 32),
+        'LON': ('Longitude in WGS-84', Variation_147, 32, 32),
+    }
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['LAT']) -> Type[Variation_147]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['LON']) -> Type[Variation_147]:
+        ...
+
+    @classmethod
+    def spec(cls, key : Union[Literal['LAT'], Literal['LON']]) -> Union[Type['Variation_147'], Type['Variation_147']]:
+        if key == 'LAT':
+            return Variation_147
+        if key == 'LON':
+            return Variation_147
+        assert_never(key)
+
+    def __init__(self, arg : Variation_1327_Arg) -> None:
+        if isinstance(arg, tuple):
+            super().__init__(*arg); return
+        if isinstance(arg, dict):
+            super().__init__(*self._from_items(arg)); return
+        if isinstance(arg, Raw):
+            super().__init__(*self._from_raw(arg)); return
+        assert_never(arg)
+
+    @overload
+    def get_item(self, name : Literal['LAT']) -> Variation_147:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['LON']) -> Variation_147:
+        ...
+
+    def get_item(self, name : Union[Literal['LAT'], Literal['LON']]) -> Any:
+        return self._get_item(name)
+
+    @overload
+    def set_item(self, name : Literal['LAT'], val : Union[Variation_147, Variation_147_Arg]) -> 'Variation_1327':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['LON'], val : Union[Variation_147, Variation_147_Arg]) -> 'Variation_1327':
+        ...
+
+    def set_item(self, name : Any, val : Any) -> Any:
+        return self._set_item(name, val)
+
+    @overload
+    def modify_item(self, name : Literal['LAT'], f : Any) -> 'Variation_1327':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['LON'], f : Any) -> 'Variation_1327':
+        ...
+
+    def modify_item(self, name : Any, f : Any) -> Any:
+        return self._modify_item(name, f)
+
+Variation_1328_Arg : TypeAlias = Union[Raw,float,Tuple[float,Literal['°']]]
+class Variation_1328(Element):
+    variation = 'Element'
+
+    bit_offset8 = 0
+    bit_size = 16
+    quantity = Quantity('Unsigned', 1.0e-2, 0, '°')
+
+    def __init__(self, arg : Variation_1328_Arg) -> None:
+        if isinstance(arg, Bits):
+            super().__init__(arg); return
+        if isinstance(arg, Raw):
+            super().__init__(self._from_raw(arg)); return
+        if isinstance(arg, float):
+            super().__init__(self._from_float(arg)); return
+        if isinstance(arg, tuple):
+            super().__init__(self._from_float(arg[0])); return
+        assert_never(arg)
+
+    def to_quantity(self) -> float:
+        return self._to_quantity()
+
+Variation_1329_Arg : TypeAlias = Union[Raw,float,Tuple[float,Literal['m']]]
+class Variation_1329(Element):
+    variation = 'Element'
+
+    bit_offset8 = 0
+    bit_size = 8
+    quantity = Quantity('Unsigned', 100.0, 0, 'm')
+
+    def __init__(self, arg : Variation_1329_Arg) -> None:
+        if isinstance(arg, Bits):
+            super().__init__(arg); return
+        if isinstance(arg, Raw):
+            super().__init__(self._from_raw(arg)); return
+        if isinstance(arg, float):
+            super().__init__(self._from_float(arg)); return
+        if isinstance(arg, tuple):
+            super().__init__(self._from_float(arg[0])); return
+        assert_never(arg)
+
+    def to_quantity(self) -> float:
+        return self._to_quantity()
+
+Variation_1330_Arg : TypeAlias = Union[Variation_0, Variation_0_Arg]
+class Variation_1330(Repetitive):
+    variation = 'Repetitive'
+
+    rep_byte_size = 1
+    variation_bit_size = 8
+    variation_type = Variation_0
+
+    @classmethod
+    def spec(cls) -> Type[Variation_0]:
+        return Variation_0
+
+    def __init__(self, arg : List[Union[Variation_0, Variation_0_Arg]]) -> None:
+        if isinstance(arg, tuple):
+            super().__init__(*arg); return
+        if isinstance(arg, list):
+            super().__init__(*self._from_list(arg)); return
+        assert_never(arg)
+
+    def append_item(self, arg : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1330':
+        return self._append_item(arg) # type: ignore
+
+    def prepend_item(self, arg : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1330':
+        return self._prepend_item(arg) # type: ignore
+
+Variation_1331_Arg : TypeAlias = Union[Raw,float,Tuple[float,Literal['dBµV']]]
+class Variation_1331(Element):
+    variation = 'Element'
+
+    bit_offset8 = 0
+    bit_size = 16
+    quantity = Quantity('Signed', 1.0e-2, 0, 'dBµV')
+
+    def __init__(self, arg : Variation_1331_Arg) -> None:
+        if isinstance(arg, Bits):
+            super().__init__(arg); return
+        if isinstance(arg, Raw):
+            super().__init__(self._from_raw(arg)); return
+        if isinstance(arg, float):
+            super().__init__(self._from_float(arg)); return
+        if isinstance(arg, tuple):
+            super().__init__(self._from_float(arg[0])); return
+        assert_never(arg)
+
+    def to_quantity(self) -> float:
+        return self._to_quantity()
+
+Variation_1332_Arg = TypedDict('Variation_1332_Arg', {
+    '010': Union[Variation_1, Variation_1_Arg],
+    '015': Union[Variation_0, Variation_0_Arg],
+    '000': Union[Variation_1326, Variation_1326_Arg],
+    '030': Union[Variation_80, Variation_80_Arg],
+    '040': Union[Variation_0, Variation_0_Arg],
+    '090': Union[Variation_145, Variation_145_Arg],
+    '050': Union[Variation_1327, Variation_1327_Arg],
+    '060': Union[Variation_632, Variation_632_Arg],
+    '070': Union[Variation_1328, Variation_1328_Arg],
+    '080': Union[Variation_1328, Variation_1328_Arg],
+    '100': Union[Variation_0, Variation_0_Arg],
+    '110': Union[Variation_1329, Variation_1329_Arg],
+    '120': Union[Variation_1330, Variation_1330_Arg],
+    '130': Union[Variation_1327, Variation_1327_Arg],
+    '140': Union[Variation_632, Variation_632_Arg],
+    '150': Union[Variation_1329, Variation_1329_Arg],
+    '160': Union[Variation_64, Variation_64_Arg],
+    '170': Union[Variation_0, Variation_0_Arg],
+    '180': Union[Variation_1331, Variation_1331_Arg],
+    '190': Union[Variation_0, Variation_0_Arg],
+    '200': Union[Variation_699, Variation_699_Arg],
+    'SP': Union[Variation_62, Variation_62_Arg],
+}, total=False)
+class Variation_1332(Compound):
+    variation = 'Compound'
+
+    fspec_fx = True
+    fspec_max_bytes = 4
+
+    subitems_list = [
+        ('010', Variation_1),
+        ('015', Variation_0),
+        ('000', Variation_1326),
+        ('030', Variation_80),
+        ('040', Variation_0),
+        ('090', Variation_145),
+        ('050', Variation_1327),
+        ('060', Variation_632),
+        ('070', Variation_1328),
+        ('080', Variation_1328),
+        ('100', Variation_0),
+        ('110', Variation_1329),
+        ('120', Variation_1330),
+        ('130', Variation_1327),
+        ('140', Variation_632),
+        ('150', Variation_1329),
+        ('160', Variation_64),
+        ('170', Variation_0),
+        ('180', Variation_1331),
+        ('190', Variation_0),
+        ('200', Variation_699),
+        ('SP', Variation_62),
+    ]
+
+    # name: (title, cls, fspec)
+    subitems_dict = {
+        '010': ('Data Source Identifier', Variation_1, 0x80000000),
+        '015': ('Service Identification', Variation_0, 0x40000000),
+        '000': ('Message Type', Variation_1326, 0x20000000),
+        '030': ('Time of Day', Variation_80, 0x10000000),
+        '040': ('Report Number', Variation_0, 0x08000000),
+        '090': ('Radio Channel Name', Variation_145, 0x04000000),
+        '050': ('Position in WGS-84 Coordinates', Variation_1327, 0x02000000),
+        '060': ('Position in Cartesian Coordinates', Variation_632, 0x01800000),
+        '070': ('Local Bearing', Variation_1328, 0x01400000),
+        '080': ('System Bearing', Variation_1328, 0x01200000),
+        '100': ('Quality of Measurement', Variation_0, 0x01100000),
+        '110': ('Estimated Uncertainty', Variation_1329, 0x01080000),
+        '120': ('Contributing Sensors', Variation_1330, 0x01040000),
+        '130': ('Conflicting Transmitter Position in WGS-84 Coordinates', Variation_1327, 0x01020000),
+        '140': ('Conflicting Transmitter Position in Cartesian Coordinates', Variation_632, 0x01018000),
+        '150': ('Conflicting Transmitter Estimated Uncertainty', Variation_1329, 0x01014000),
+        '160': ('Track Number', Variation_64, 0x01012000),
+        '170': ('Sensor Identification', Variation_0, 0x01011000),
+        '180': ('Signal Level', Variation_1331, 0x01010800),
+        '190': ('Signal Quality', Variation_0, 0x01010400),
+        '200': ('Signal Elevation', Variation_699, 0x01010200),
+        'SP': ('Special Purpose Field', Variation_62, 0x01010180),
+    }
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['010']) -> Type[Variation_1]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['015']) -> Type[Variation_0]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['000']) -> Type[Variation_1326]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['030']) -> Type[Variation_80]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['040']) -> Type[Variation_0]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['090']) -> Type[Variation_145]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['050']) -> Type[Variation_1327]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['060']) -> Type[Variation_632]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['070']) -> Type[Variation_1328]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['080']) -> Type[Variation_1328]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['100']) -> Type[Variation_0]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['110']) -> Type[Variation_1329]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['120']) -> Type[Variation_1330]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['130']) -> Type[Variation_1327]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['140']) -> Type[Variation_632]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['150']) -> Type[Variation_1329]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['160']) -> Type[Variation_64]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['170']) -> Type[Variation_0]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['180']) -> Type[Variation_1331]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['190']) -> Type[Variation_0]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['200']) -> Type[Variation_699]:
+        ...
+
+    @overload
+    @classmethod
+    def spec(cls, key : Literal['SP']) -> Type[Variation_62]:
+        ...
+
+    @classmethod
+    def spec(cls, key : Union[Literal['010'], Literal['015'], Literal['000'], Literal['030'], Literal['040'], Literal['090'], Literal['050'], Literal['060'], Literal['070'], Literal['080'], Literal['100'], Literal['110'], Literal['120'], Literal['130'], Literal['140'], Literal['150'], Literal['160'], Literal['170'], Literal['180'], Literal['190'], Literal['200'], Literal['SP']]) -> Union[Type['Variation_1'], Type['Variation_0'], Type['Variation_1326'], Type['Variation_80'], Type['Variation_0'], Type['Variation_145'], Type['Variation_1327'], Type['Variation_632'], Type['Variation_1328'], Type['Variation_1328'], Type['Variation_0'], Type['Variation_1329'], Type['Variation_1330'], Type['Variation_1327'], Type['Variation_632'], Type['Variation_1329'], Type['Variation_64'], Type['Variation_0'], Type['Variation_1331'], Type['Variation_0'], Type['Variation_699'], Type['Variation_62']]:
+        if key == '010':
+            return Variation_1
+        if key == '015':
+            return Variation_0
+        if key == '000':
+            return Variation_1326
+        if key == '030':
+            return Variation_80
+        if key == '040':
+            return Variation_0
+        if key == '090':
+            return Variation_145
+        if key == '050':
+            return Variation_1327
+        if key == '060':
+            return Variation_632
+        if key == '070':
+            return Variation_1328
+        if key == '080':
+            return Variation_1328
+        if key == '100':
+            return Variation_0
+        if key == '110':
+            return Variation_1329
+        if key == '120':
+            return Variation_1330
+        if key == '130':
+            return Variation_1327
+        if key == '140':
+            return Variation_632
+        if key == '150':
+            return Variation_1329
+        if key == '160':
+            return Variation_64
+        if key == '170':
+            return Variation_0
+        if key == '180':
+            return Variation_1331
+        if key == '190':
+            return Variation_0
+        if key == '200':
+            return Variation_699
+        if key == 'SP':
+            return Variation_62
+        assert_never(key)
+
+    def __init__(self, arg : Optional[Variation_1332_Arg] = None) -> None:
+        if isinstance(arg, tuple):
+            super().__init__(*arg); return
+        super().__init__()
+        if arg is not None: self._update(arg)
+
+    @overload
+    def set_item(self, name : Literal['010'], val : Union[Variation_1, Variation_1_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['015'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['000'], val : Union[Variation_1326, Variation_1326_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['030'], val : Union[Variation_80, Variation_80_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['040'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['090'], val : Union[Variation_145, Variation_145_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['050'], val : Union[Variation_1327, Variation_1327_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['060'], val : Union[Variation_632, Variation_632_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['070'], val : Union[Variation_1328, Variation_1328_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['080'], val : Union[Variation_1328, Variation_1328_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['100'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['110'], val : Union[Variation_1329, Variation_1329_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['120'], val : Union[Variation_1330, Variation_1330_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['130'], val : Union[Variation_1327, Variation_1327_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['140'], val : Union[Variation_632, Variation_632_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['150'], val : Union[Variation_1329, Variation_1329_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['160'], val : Union[Variation_64, Variation_64_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['170'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['180'], val : Union[Variation_1331, Variation_1331_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['190'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['200'], val : Union[Variation_699, Variation_699_Arg]) -> 'Variation_1332':
+        ...
+
+    @overload
+    def set_item(self, name : Literal['SP'], val : Union[Variation_62, Variation_62_Arg]) -> 'Variation_1332':
+        ...
+
+    def set_item(self, name : Any, val : Any) -> Any:
+        return self._set_item(name, val)
+
+    @overload
+    def del_item(self, name : Literal['010']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['015']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['000']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['030']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['040']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['090']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['050']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['060']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['070']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['080']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['100']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['110']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['120']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['130']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['140']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['150']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['160']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['170']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['180']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['190']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['200']) -> 'Variation_1332':
+        ...
+
+    @overload
+    def del_item(self, name : Literal['SP']) -> 'Variation_1332':
+        ...
+
+    def del_item(self, name : Any) -> Any:
+        return self._del_item(name)
+
+    @overload
+    def get_item(self, name : Literal['010']) -> Variation_1:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['015']) -> Variation_0:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['000']) -> Variation_1326:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['030']) -> Variation_80:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['040']) -> Variation_0:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['090']) -> Variation_145:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['050']) -> Variation_1327:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['060']) -> Variation_632:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['070']) -> Variation_1328:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['080']) -> Variation_1328:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['100']) -> Variation_0:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['110']) -> Variation_1329:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['120']) -> Variation_1330:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['130']) -> Variation_1327:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['140']) -> Variation_632:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['150']) -> Variation_1329:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['160']) -> Variation_64:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['170']) -> Variation_0:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['180']) -> Variation_1331:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['190']) -> Variation_0:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['200']) -> Variation_699:
+        ...
+
+    @overload
+    def get_item(self, name : Literal['SP']) -> Variation_62:
+        ...
+
+    def get_item(self, name : Any) -> Any:
+        return self._get_item(name)
+
+    @overload
+    def modify_item(self, name : Literal['010'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['015'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['000'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['030'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['040'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['090'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['050'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['060'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['070'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['080'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['100'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['110'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['120'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['130'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['140'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['150'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['160'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['170'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['180'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['190'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['200'], f : Any) -> 'Variation_1332':
+        ...
+
+    @overload
+    def modify_item(self, name : Literal['SP'], f : Any) -> 'Variation_1332':
+        ...
+
+    def modify_item(self, name : Any, f : Any) -> Any:
+        return self._modify_item(name, f)
+
+Variation_1333_Arg : TypeAlias = Raw
+class Variation_1333(Element):
+    variation = 'Element'
+
+    bit_offset8 = 0
+    bit_size = 8
+    table = {
+        1: 'Video Summary message',
+        2: 'Video message',
+    }
+
+    def __init__(self, arg : Variation_1333_Arg) -> None:
+        if isinstance(arg, Bits):
+            super().__init__(arg); return
+        if isinstance(arg, Raw):
+            super().__init__(self._from_raw(arg)); return
+        assert_never(arg)
+
+    @property
+    def table_value(self) -> Optional[str]:
+        return self.__class__.table.get(self.to_uinteger())
+
+Variation_1334_Arg : TypeAlias = Union[Variation_972, Variation_972_Arg]
+class Variation_1334(Repetitive):
     variation = 'Repetitive'
 
     rep_byte_size = 1
@@ -108460,21 +109266,21 @@ class Variation_1327(Repetitive):
             super().__init__(*self._from_list(arg)); return
         assert_never(arg)
 
-    def append_item(self, arg : Union[Variation_972, Variation_972_Arg]) -> 'Variation_1327':
+    def append_item(self, arg : Union[Variation_972, Variation_972_Arg]) -> 'Variation_1334':
         return self._append_item(arg) # type: ignore
 
-    def prepend_item(self, arg : Union[Variation_972, Variation_972_Arg]) -> 'Variation_1327':
+    def prepend_item(self, arg : Union[Variation_972, Variation_972_Arg]) -> 'Variation_1334':
         return self._prepend_item(arg) # type: ignore
 
-Variation_1328_Arg : TypeAlias = Union[Raw,float,Tuple[float,Literal['ns']]]
-class Variation_1328(Element):
+Variation_1335_Arg : TypeAlias = Union[Raw,float,Tuple[float,Literal['ns']]]
+class Variation_1335(Element):
     variation = 'Element'
 
     bit_offset8 = 0
     bit_size = 32
     quantity = Quantity('Unsigned', 1.0, 0, 'ns')
 
-    def __init__(self, arg : Variation_1328_Arg) -> None:
+    def __init__(self, arg : Variation_1335_Arg) -> None:
         if isinstance(arg, Bits):
             super().__init__(arg); return
         if isinstance(arg, Raw):
@@ -108488,14 +109294,14 @@ class Variation_1328(Element):
     def to_quantity(self) -> float:
         return self._to_quantity()
 
-Variation_1329_Arg_Group = TypedDict('Variation_1329_Arg_Group', {
+Variation_1336_Arg_Group = TypedDict('Variation_1336_Arg_Group', {
     'STARTAZ': Union[Variation_14, Variation_14_Arg],
     'ENDAZ': Union[Variation_14, Variation_14_Arg],
     'STARTRG': Union[Variation_535, Variation_535_Arg],
-    'CELLDUR': Union[Variation_1328, Variation_1328_Arg],
+    'CELLDUR': Union[Variation_1335, Variation_1335_Arg],
 })
-Variation_1329_Arg : TypeAlias = Union[Raw, Variation_1329_Arg_Group]
-class Variation_1329(Group):
+Variation_1336_Arg : TypeAlias = Union[Raw, Variation_1336_Arg_Group]
+class Variation_1336(Group):
     variation = 'Group'
 
     bit_size = 96
@@ -108504,7 +109310,7 @@ class Variation_1329(Group):
         ('STARTAZ', Variation_14),
         ('ENDAZ', Variation_14),
         ('STARTRG', Variation_535),
-        ('CELLDUR', Variation_1328),
+        ('CELLDUR', Variation_1335),
     ]
 
     # name: (title, cls, group_offset, bit_size)
@@ -108512,7 +109318,7 @@ class Variation_1329(Group):
         'STARTAZ': ('Start Azimuth of the Cells Group', Variation_14, 0, 16),
         'ENDAZ': ('End Azimuth of the Cells Group', Variation_14, 16, 16),
         'STARTRG': ('Starting Range of the Cells Group, Expressed in Number of Cells', Variation_535, 32, 32),
-        'CELLDUR': ('Video Cell Duration in Nano-seconds', Variation_1328, 64, 32),
+        'CELLDUR': ('Video Cell Duration in Nano-seconds', Variation_1335, 64, 32),
     }
 
     @overload
@@ -108532,11 +109338,11 @@ class Variation_1329(Group):
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['CELLDUR']) -> Type[Variation_1328]:
+    def spec(cls, key : Literal['CELLDUR']) -> Type[Variation_1335]:
         ...
 
     @classmethod
-    def spec(cls, key : Union[Literal['STARTAZ'], Literal['ENDAZ'], Literal['STARTRG'], Literal['CELLDUR']]) -> Union[Type['Variation_14'], Type['Variation_14'], Type['Variation_535'], Type['Variation_1328']]:
+    def spec(cls, key : Union[Literal['STARTAZ'], Literal['ENDAZ'], Literal['STARTRG'], Literal['CELLDUR']]) -> Union[Type['Variation_14'], Type['Variation_14'], Type['Variation_535'], Type['Variation_1335']]:
         if key == 'STARTAZ':
             return Variation_14
         if key == 'ENDAZ':
@@ -108544,10 +109350,10 @@ class Variation_1329(Group):
         if key == 'STARTRG':
             return Variation_535
         if key == 'CELLDUR':
-            return Variation_1328
+            return Variation_1335
         assert_never(key)
 
-    def __init__(self, arg : Variation_1329_Arg) -> None:
+    def __init__(self, arg : Variation_1336_Arg) -> None:
         if isinstance(arg, tuple):
             super().__init__(*arg); return
         if isinstance(arg, dict):
@@ -108569,59 +109375,59 @@ class Variation_1329(Group):
         ...
 
     @overload
-    def get_item(self, name : Literal['CELLDUR']) -> Variation_1328:
+    def get_item(self, name : Literal['CELLDUR']) -> Variation_1335:
         ...
 
     def get_item(self, name : Union[Literal['STARTAZ'], Literal['ENDAZ'], Literal['STARTRG'], Literal['CELLDUR']]) -> Any:
         return self._get_item(name)
 
     @overload
-    def set_item(self, name : Literal['STARTAZ'], val : Union[Variation_14, Variation_14_Arg]) -> 'Variation_1329':
+    def set_item(self, name : Literal['STARTAZ'], val : Union[Variation_14, Variation_14_Arg]) -> 'Variation_1336':
         ...
 
     @overload
-    def set_item(self, name : Literal['ENDAZ'], val : Union[Variation_14, Variation_14_Arg]) -> 'Variation_1329':
+    def set_item(self, name : Literal['ENDAZ'], val : Union[Variation_14, Variation_14_Arg]) -> 'Variation_1336':
         ...
 
     @overload
-    def set_item(self, name : Literal['STARTRG'], val : Union[Variation_535, Variation_535_Arg]) -> 'Variation_1329':
+    def set_item(self, name : Literal['STARTRG'], val : Union[Variation_535, Variation_535_Arg]) -> 'Variation_1336':
         ...
 
     @overload
-    def set_item(self, name : Literal['CELLDUR'], val : Union[Variation_1328, Variation_1328_Arg]) -> 'Variation_1329':
+    def set_item(self, name : Literal['CELLDUR'], val : Union[Variation_1335, Variation_1335_Arg]) -> 'Variation_1336':
         ...
 
     def set_item(self, name : Any, val : Any) -> Any:
         return self._set_item(name, val)
 
     @overload
-    def modify_item(self, name : Literal['STARTAZ'], f : Any) -> 'Variation_1329':
+    def modify_item(self, name : Literal['STARTAZ'], f : Any) -> 'Variation_1336':
         ...
 
     @overload
-    def modify_item(self, name : Literal['ENDAZ'], f : Any) -> 'Variation_1329':
+    def modify_item(self, name : Literal['ENDAZ'], f : Any) -> 'Variation_1336':
         ...
 
     @overload
-    def modify_item(self, name : Literal['STARTRG'], f : Any) -> 'Variation_1329':
+    def modify_item(self, name : Literal['STARTRG'], f : Any) -> 'Variation_1336':
         ...
 
     @overload
-    def modify_item(self, name : Literal['CELLDUR'], f : Any) -> 'Variation_1329':
+    def modify_item(self, name : Literal['CELLDUR'], f : Any) -> 'Variation_1336':
         ...
 
     def modify_item(self, name : Any, f : Any) -> Any:
         return self._modify_item(name, f)
 
-Variation_1330_Arg : TypeAlias = Union[Raw,float,Tuple[float,Literal['fs']]]
-class Variation_1330(Element):
+Variation_1337_Arg : TypeAlias = Union[Raw,float,Tuple[float,Literal['fs']]]
+class Variation_1337(Element):
     variation = 'Element'
 
     bit_offset8 = 0
     bit_size = 32
     quantity = Quantity('Unsigned', 1.0, 0, 'fs')
 
-    def __init__(self, arg : Variation_1330_Arg) -> None:
+    def __init__(self, arg : Variation_1337_Arg) -> None:
         if isinstance(arg, Bits):
             super().__init__(arg); return
         if isinstance(arg, Raw):
@@ -108635,14 +109441,14 @@ class Variation_1330(Element):
     def to_quantity(self) -> float:
         return self._to_quantity()
 
-Variation_1331_Arg_Group = TypedDict('Variation_1331_Arg_Group', {
+Variation_1338_Arg_Group = TypedDict('Variation_1338_Arg_Group', {
     'STARTAZ': Union[Variation_14, Variation_14_Arg],
     'ENDAZ': Union[Variation_14, Variation_14_Arg],
     'STARTRG': Union[Variation_535, Variation_535_Arg],
-    'CELLDUR': Union[Variation_1330, Variation_1330_Arg],
+    'CELLDUR': Union[Variation_1337, Variation_1337_Arg],
 })
-Variation_1331_Arg : TypeAlias = Union[Raw, Variation_1331_Arg_Group]
-class Variation_1331(Group):
+Variation_1338_Arg : TypeAlias = Union[Raw, Variation_1338_Arg_Group]
+class Variation_1338(Group):
     variation = 'Group'
 
     bit_size = 96
@@ -108651,7 +109457,7 @@ class Variation_1331(Group):
         ('STARTAZ', Variation_14),
         ('ENDAZ', Variation_14),
         ('STARTRG', Variation_535),
-        ('CELLDUR', Variation_1330),
+        ('CELLDUR', Variation_1337),
     ]
 
     # name: (title, cls, group_offset, bit_size)
@@ -108659,7 +109465,7 @@ class Variation_1331(Group):
         'STARTAZ': ('Start Azimuth of the Cells Group', Variation_14, 0, 16),
         'ENDAZ': ('End Azimuth of the Cells Group', Variation_14, 16, 16),
         'STARTRG': ('Starting Range of the Cells Group, Expressed in Number of Cells', Variation_535, 32, 32),
-        'CELLDUR': ('Video Cell Duration in Femto-seconds', Variation_1330, 64, 32),
+        'CELLDUR': ('Video Cell Duration in Femto-seconds', Variation_1337, 64, 32),
     }
 
     @overload
@@ -108679,11 +109485,11 @@ class Variation_1331(Group):
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['CELLDUR']) -> Type[Variation_1330]:
+    def spec(cls, key : Literal['CELLDUR']) -> Type[Variation_1337]:
         ...
 
     @classmethod
-    def spec(cls, key : Union[Literal['STARTAZ'], Literal['ENDAZ'], Literal['STARTRG'], Literal['CELLDUR']]) -> Union[Type['Variation_14'], Type['Variation_14'], Type['Variation_535'], Type['Variation_1330']]:
+    def spec(cls, key : Union[Literal['STARTAZ'], Literal['ENDAZ'], Literal['STARTRG'], Literal['CELLDUR']]) -> Union[Type['Variation_14'], Type['Variation_14'], Type['Variation_535'], Type['Variation_1337']]:
         if key == 'STARTAZ':
             return Variation_14
         if key == 'ENDAZ':
@@ -108691,10 +109497,10 @@ class Variation_1331(Group):
         if key == 'STARTRG':
             return Variation_535
         if key == 'CELLDUR':
-            return Variation_1330
+            return Variation_1337
         assert_never(key)
 
-    def __init__(self, arg : Variation_1331_Arg) -> None:
+    def __init__(self, arg : Variation_1338_Arg) -> None:
         if isinstance(arg, tuple):
             super().__init__(*arg); return
         if isinstance(arg, dict):
@@ -108716,52 +109522,52 @@ class Variation_1331(Group):
         ...
 
     @overload
-    def get_item(self, name : Literal['CELLDUR']) -> Variation_1330:
+    def get_item(self, name : Literal['CELLDUR']) -> Variation_1337:
         ...
 
     def get_item(self, name : Union[Literal['STARTAZ'], Literal['ENDAZ'], Literal['STARTRG'], Literal['CELLDUR']]) -> Any:
         return self._get_item(name)
 
     @overload
-    def set_item(self, name : Literal['STARTAZ'], val : Union[Variation_14, Variation_14_Arg]) -> 'Variation_1331':
+    def set_item(self, name : Literal['STARTAZ'], val : Union[Variation_14, Variation_14_Arg]) -> 'Variation_1338':
         ...
 
     @overload
-    def set_item(self, name : Literal['ENDAZ'], val : Union[Variation_14, Variation_14_Arg]) -> 'Variation_1331':
+    def set_item(self, name : Literal['ENDAZ'], val : Union[Variation_14, Variation_14_Arg]) -> 'Variation_1338':
         ...
 
     @overload
-    def set_item(self, name : Literal['STARTRG'], val : Union[Variation_535, Variation_535_Arg]) -> 'Variation_1331':
+    def set_item(self, name : Literal['STARTRG'], val : Union[Variation_535, Variation_535_Arg]) -> 'Variation_1338':
         ...
 
     @overload
-    def set_item(self, name : Literal['CELLDUR'], val : Union[Variation_1330, Variation_1330_Arg]) -> 'Variation_1331':
+    def set_item(self, name : Literal['CELLDUR'], val : Union[Variation_1337, Variation_1337_Arg]) -> 'Variation_1338':
         ...
 
     def set_item(self, name : Any, val : Any) -> Any:
         return self._set_item(name, val)
 
     @overload
-    def modify_item(self, name : Literal['STARTAZ'], f : Any) -> 'Variation_1331':
+    def modify_item(self, name : Literal['STARTAZ'], f : Any) -> 'Variation_1338':
         ...
 
     @overload
-    def modify_item(self, name : Literal['ENDAZ'], f : Any) -> 'Variation_1331':
+    def modify_item(self, name : Literal['ENDAZ'], f : Any) -> 'Variation_1338':
         ...
 
     @overload
-    def modify_item(self, name : Literal['STARTRG'], f : Any) -> 'Variation_1331':
+    def modify_item(self, name : Literal['STARTRG'], f : Any) -> 'Variation_1338':
         ...
 
     @overload
-    def modify_item(self, name : Literal['CELLDUR'], f : Any) -> 'Variation_1331':
+    def modify_item(self, name : Literal['CELLDUR'], f : Any) -> 'Variation_1338':
         ...
 
     def modify_item(self, name : Any, f : Any) -> Any:
         return self._modify_item(name, f)
 
-Variation_1332_Arg : TypeAlias = Raw
-class Variation_1332(Element):
+Variation_1339_Arg : TypeAlias = Raw
+class Variation_1339(Element):
     variation = 'Element'
 
     bit_offset8 = 0
@@ -108771,7 +109577,7 @@ class Variation_1332(Element):
         1: 'Compression applied',
     }
 
-    def __init__(self, arg : Variation_1332_Arg) -> None:
+    def __init__(self, arg : Variation_1339_Arg) -> None:
         if isinstance(arg, Bits):
             super().__init__(arg); return
         if isinstance(arg, Raw):
@@ -108782,8 +109588,8 @@ class Variation_1332(Element):
     def table_value(self) -> Optional[str]:
         return self.__class__.table.get(self.to_uinteger())
 
-Variation_1333_Arg : TypeAlias = Raw
-class Variation_1333(Element):
+Variation_1340_Arg : TypeAlias = Raw
+class Variation_1340(Element):
     variation = 'Element'
 
     bit_offset8 = 0
@@ -108797,7 +109603,7 @@ class Variation_1333(Element):
         6: 'Ultra High Resolution (32 bits)',
     }
 
-    def __init__(self, arg : Variation_1333_Arg) -> None:
+    def __init__(self, arg : Variation_1340_Arg) -> None:
         if isinstance(arg, Bits):
             super().__init__(arg); return
         if isinstance(arg, Raw):
@@ -108808,47 +109614,47 @@ class Variation_1333(Element):
     def table_value(self) -> Optional[str]:
         return self.__class__.table.get(self.to_uinteger())
 
-Variation_1334_Arg_Group = TypedDict('Variation_1334_Arg_Group', {
-    'C': Union[Variation_1332, Variation_1332_Arg],
-    'RES': Union[Variation_1333, Variation_1333_Arg],
+Variation_1341_Arg_Group = TypedDict('Variation_1341_Arg_Group', {
+    'C': Union[Variation_1339, Variation_1339_Arg],
+    'RES': Union[Variation_1340, Variation_1340_Arg],
 })
-Variation_1334_Arg : TypeAlias = Union[Raw, Variation_1334_Arg_Group]
-class Variation_1334(Group):
+Variation_1341_Arg : TypeAlias = Union[Raw, Variation_1341_Arg_Group]
+class Variation_1341(Group):
     variation = 'Group'
 
     bit_size = 16
 
     subitems_list = [
-        ('C', Variation_1332),
+        ('C', Variation_1339),
         Spare(1, 7),
-        ('RES', Variation_1333),
+        ('RES', Variation_1340),
     ]
 
     # name: (title, cls, group_offset, bit_size)
     subitems_dict = {
-        'C': ('Data Compression Indicator', Variation_1332, 0, 1),
-        'RES': ('Bit Resolution', Variation_1333, 8, 8),
+        'C': ('Data Compression Indicator', Variation_1339, 0, 1),
+        'RES': ('Bit Resolution', Variation_1340, 8, 8),
     }
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['C']) -> Type[Variation_1332]:
+    def spec(cls, key : Literal['C']) -> Type[Variation_1339]:
         ...
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['RES']) -> Type[Variation_1333]:
+    def spec(cls, key : Literal['RES']) -> Type[Variation_1340]:
         ...
 
     @classmethod
-    def spec(cls, key : Union[Literal['C'], Literal['RES']]) -> Union[Type['Variation_1332'], Type['Variation_1333']]:
+    def spec(cls, key : Union[Literal['C'], Literal['RES']]) -> Union[Type['Variation_1339'], Type['Variation_1340']]:
         if key == 'C':
-            return Variation_1332
+            return Variation_1339
         if key == 'RES':
-            return Variation_1333
+            return Variation_1340
         assert_never(key)
 
-    def __init__(self, arg : Variation_1334_Arg) -> None:
+    def __init__(self, arg : Variation_1341_Arg) -> None:
         if isinstance(arg, tuple):
             super().__init__(*arg); return
         if isinstance(arg, dict):
@@ -108858,44 +109664,44 @@ class Variation_1334(Group):
         assert_never(arg)
 
     @overload
-    def get_item(self, name : Literal['C']) -> Variation_1332:
+    def get_item(self, name : Literal['C']) -> Variation_1339:
         ...
 
     @overload
-    def get_item(self, name : Literal['RES']) -> Variation_1333:
+    def get_item(self, name : Literal['RES']) -> Variation_1340:
         ...
 
     def get_item(self, name : Union[Literal['C'], Literal['RES']]) -> Any:
         return self._get_item(name)
 
     @overload
-    def set_item(self, name : Literal['C'], val : Union[Variation_1332, Variation_1332_Arg]) -> 'Variation_1334':
+    def set_item(self, name : Literal['C'], val : Union[Variation_1339, Variation_1339_Arg]) -> 'Variation_1341':
         ...
 
     @overload
-    def set_item(self, name : Literal['RES'], val : Union[Variation_1333, Variation_1333_Arg]) -> 'Variation_1334':
+    def set_item(self, name : Literal['RES'], val : Union[Variation_1340, Variation_1340_Arg]) -> 'Variation_1341':
         ...
 
     def set_item(self, name : Any, val : Any) -> Any:
         return self._set_item(name, val)
 
     @overload
-    def modify_item(self, name : Literal['C'], f : Any) -> 'Variation_1334':
+    def modify_item(self, name : Literal['C'], f : Any) -> 'Variation_1341':
         ...
 
     @overload
-    def modify_item(self, name : Literal['RES'], f : Any) -> 'Variation_1334':
+    def modify_item(self, name : Literal['RES'], f : Any) -> 'Variation_1341':
         ...
 
     def modify_item(self, name : Any, f : Any) -> Any:
         return self._modify_item(name, f)
 
-Variation_1335_Arg_Group = TypedDict('Variation_1335_Arg_Group', {
+Variation_1342_Arg_Group = TypedDict('Variation_1342_Arg_Group', {
     'NBVB': Union[Variation_64, Variation_64_Arg],
     'NBCELLS': Union[Variation_274, Variation_274_Arg],
 })
-Variation_1335_Arg : TypeAlias = Union[Raw, Variation_1335_Arg_Group]
-class Variation_1335(Group):
+Variation_1342_Arg : TypeAlias = Union[Raw, Variation_1342_Arg_Group]
+class Variation_1342(Group):
     variation = 'Group'
 
     bit_size = 40
@@ -108929,7 +109735,7 @@ class Variation_1335(Group):
             return Variation_274
         assert_never(key)
 
-    def __init__(self, arg : Variation_1335_Arg) -> None:
+    def __init__(self, arg : Variation_1342_Arg) -> None:
         if isinstance(arg, tuple):
             super().__init__(*arg); return
         if isinstance(arg, dict):
@@ -108950,122 +109756,122 @@ class Variation_1335(Group):
         return self._get_item(name)
 
     @overload
-    def set_item(self, name : Literal['NBVB'], val : Union[Variation_64, Variation_64_Arg]) -> 'Variation_1335':
+    def set_item(self, name : Literal['NBVB'], val : Union[Variation_64, Variation_64_Arg]) -> 'Variation_1342':
         ...
 
     @overload
-    def set_item(self, name : Literal['NBCELLS'], val : Union[Variation_274, Variation_274_Arg]) -> 'Variation_1335':
+    def set_item(self, name : Literal['NBCELLS'], val : Union[Variation_274, Variation_274_Arg]) -> 'Variation_1342':
         ...
 
     def set_item(self, name : Any, val : Any) -> Any:
         return self._set_item(name, val)
 
     @overload
-    def modify_item(self, name : Literal['NBVB'], f : Any) -> 'Variation_1335':
+    def modify_item(self, name : Literal['NBVB'], f : Any) -> 'Variation_1342':
         ...
 
     @overload
-    def modify_item(self, name : Literal['NBCELLS'], f : Any) -> 'Variation_1335':
+    def modify_item(self, name : Literal['NBCELLS'], f : Any) -> 'Variation_1342':
         ...
 
     def modify_item(self, name : Any, f : Any) -> Any:
         return self._modify_item(name, f)
 
-Variation_1336_Arg : TypeAlias = Raw
-class Variation_1336(Element):
+Variation_1343_Arg : TypeAlias = Raw
+class Variation_1343(Element):
     variation = 'Element'
 
     bit_offset8 = 0
     bit_size = 512
 
-    def __init__(self, arg : Variation_1336_Arg) -> None:
+    def __init__(self, arg : Variation_1343_Arg) -> None:
         if isinstance(arg, Bits):
             super().__init__(arg); return
         if isinstance(arg, Raw):
             super().__init__(self._from_raw(arg)); return
         assert_never(arg)
 
-Variation_1337_Arg : TypeAlias = Union[Variation_1336, Variation_1336_Arg]
-class Variation_1337(Repetitive):
+Variation_1344_Arg : TypeAlias = Union[Variation_1343, Variation_1343_Arg]
+class Variation_1344(Repetitive):
     variation = 'Repetitive'
 
     rep_byte_size = 1
     variation_bit_size = 512
-    variation_type = Variation_1336
+    variation_type = Variation_1343
 
     @classmethod
-    def spec(cls) -> Type[Variation_1336]:
-        return Variation_1336
+    def spec(cls) -> Type[Variation_1343]:
+        return Variation_1343
 
-    def __init__(self, arg : List[Union[Variation_1336, Variation_1336_Arg]]) -> None:
+    def __init__(self, arg : List[Union[Variation_1343, Variation_1343_Arg]]) -> None:
         if isinstance(arg, tuple):
             super().__init__(*arg); return
         if isinstance(arg, list):
             super().__init__(*self._from_list(arg)); return
         assert_never(arg)
 
-    def append_item(self, arg : Union[Variation_1336, Variation_1336_Arg]) -> 'Variation_1337':
+    def append_item(self, arg : Union[Variation_1343, Variation_1343_Arg]) -> 'Variation_1344':
         return self._append_item(arg) # type: ignore
 
-    def prepend_item(self, arg : Union[Variation_1336, Variation_1336_Arg]) -> 'Variation_1337':
+    def prepend_item(self, arg : Union[Variation_1343, Variation_1343_Arg]) -> 'Variation_1344':
         return self._prepend_item(arg) # type: ignore
 
-Variation_1338_Arg : TypeAlias = Raw
-class Variation_1338(Element):
+Variation_1345_Arg : TypeAlias = Raw
+class Variation_1345(Element):
     variation = 'Element'
 
     bit_offset8 = 0
     bit_size = 2048
 
-    def __init__(self, arg : Variation_1338_Arg) -> None:
+    def __init__(self, arg : Variation_1345_Arg) -> None:
         if isinstance(arg, Bits):
             super().__init__(arg); return
         if isinstance(arg, Raw):
             super().__init__(self._from_raw(arg)); return
         assert_never(arg)
 
-Variation_1339_Arg : TypeAlias = Union[Variation_1338, Variation_1338_Arg]
-class Variation_1339(Repetitive):
+Variation_1346_Arg : TypeAlias = Union[Variation_1345, Variation_1345_Arg]
+class Variation_1346(Repetitive):
     variation = 'Repetitive'
 
     rep_byte_size = 1
     variation_bit_size = 2048
-    variation_type = Variation_1338
+    variation_type = Variation_1345
 
     @classmethod
-    def spec(cls) -> Type[Variation_1338]:
-        return Variation_1338
+    def spec(cls) -> Type[Variation_1345]:
+        return Variation_1345
 
-    def __init__(self, arg : List[Union[Variation_1338, Variation_1338_Arg]]) -> None:
+    def __init__(self, arg : List[Union[Variation_1345, Variation_1345_Arg]]) -> None:
         if isinstance(arg, tuple):
             super().__init__(*arg); return
         if isinstance(arg, list):
             super().__init__(*self._from_list(arg)); return
         assert_never(arg)
 
-    def append_item(self, arg : Union[Variation_1338, Variation_1338_Arg]) -> 'Variation_1339':
+    def append_item(self, arg : Union[Variation_1345, Variation_1345_Arg]) -> 'Variation_1346':
         return self._append_item(arg) # type: ignore
 
-    def prepend_item(self, arg : Union[Variation_1338, Variation_1338_Arg]) -> 'Variation_1339':
+    def prepend_item(self, arg : Union[Variation_1345, Variation_1345_Arg]) -> 'Variation_1346':
         return self._prepend_item(arg) # type: ignore
 
-Variation_1340_Arg = TypedDict('Variation_1340_Arg', {
+Variation_1347_Arg = TypedDict('Variation_1347_Arg', {
     '010': Union[Variation_1, Variation_1_Arg],
-    '000': Union[Variation_1326, Variation_1326_Arg],
+    '000': Union[Variation_1333, Variation_1333_Arg],
     '020': Union[Variation_535, Variation_535_Arg],
-    '030': Union[Variation_1327, Variation_1327_Arg],
-    '040': Union[Variation_1329, Variation_1329_Arg],
-    '041': Union[Variation_1331, Variation_1331_Arg],
-    '048': Union[Variation_1334, Variation_1334_Arg],
-    '049': Union[Variation_1335, Variation_1335_Arg],
+    '030': Union[Variation_1334, Variation_1334_Arg],
+    '040': Union[Variation_1336, Variation_1336_Arg],
+    '041': Union[Variation_1338, Variation_1338_Arg],
+    '048': Union[Variation_1341, Variation_1341_Arg],
+    '049': Union[Variation_1342, Variation_1342_Arg],
     '050': Union[Variation_536, Variation_536_Arg],
-    '051': Union[Variation_1337, Variation_1337_Arg],
-    '052': Union[Variation_1339, Variation_1339_Arg],
+    '051': Union[Variation_1344, Variation_1344_Arg],
+    '052': Union[Variation_1346, Variation_1346_Arg],
     '140': Union[Variation_80, Variation_80_Arg],
     'RE': Union[Variation_202, Variation_202_Arg],
     'SP': Union[Variation_62, Variation_62_Arg],
 }, total=False)
-class Variation_1340(Compound):
+class Variation_1347(Compound):
     variation = 'Compound'
 
     fspec_fx = True
@@ -109073,16 +109879,16 @@ class Variation_1340(Compound):
 
     subitems_list = [
         ('010', Variation_1),
-        ('000', Variation_1326),
+        ('000', Variation_1333),
         ('020', Variation_535),
-        ('030', Variation_1327),
-        ('040', Variation_1329),
-        ('041', Variation_1331),
-        ('048', Variation_1334),
-        ('049', Variation_1335),
+        ('030', Variation_1334),
+        ('040', Variation_1336),
+        ('041', Variation_1338),
+        ('048', Variation_1341),
+        ('049', Variation_1342),
         ('050', Variation_536),
-        ('051', Variation_1337),
-        ('052', Variation_1339),
+        ('051', Variation_1344),
+        ('052', Variation_1346),
         ('140', Variation_80),
         ('RE', Variation_202),
         ('SP', Variation_62),
@@ -109091,16 +109897,16 @@ class Variation_1340(Compound):
     # name: (title, cls, fspec)
     subitems_dict = {
         '010': ('Data Source Identifier', Variation_1, 0x8000),
-        '000': ('Message Type', Variation_1326, 0x4000),
+        '000': ('Message Type', Variation_1333, 0x4000),
         '020': ('Video Record Header', Variation_535, 0x2000),
-        '030': ('Video Summary', Variation_1327, 0x1000),
-        '040': ('Video Header Nano', Variation_1329, 0x0800),
-        '041': ('Video Header Femto', Variation_1331, 0x0400),
-        '048': ('Video Cells Resolution & Data Compression Indicator', Variation_1334, 0x0200),
-        '049': ('Video Octets & Video Cells Counters', Variation_1335, 0x0180),
+        '030': ('Video Summary', Variation_1334, 0x1000),
+        '040': ('Video Header Nano', Variation_1336, 0x0800),
+        '041': ('Video Header Femto', Variation_1338, 0x0400),
+        '048': ('Video Cells Resolution & Data Compression Indicator', Variation_1341, 0x0200),
+        '049': ('Video Octets & Video Cells Counters', Variation_1342, 0x0180),
         '050': ('Video Block Low Data Volume', Variation_536, 0x0140),
-        '051': ('Video Block Medium Data Volume', Variation_1337, 0x0120),
-        '052': ('Video Block High Data Volume', Variation_1339, 0x0110),
+        '051': ('Video Block Medium Data Volume', Variation_1344, 0x0120),
+        '052': ('Video Block High Data Volume', Variation_1346, 0x0110),
         '140': ('Time of Day', Variation_80, 0x0108),
         'RE': ('Reserved Expansion Field', Variation_202, 0x0104),
         'SP': ('Special Purpose Field', Variation_62, 0x0102),
@@ -109113,7 +109919,7 @@ class Variation_1340(Compound):
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['000']) -> Type[Variation_1326]:
+    def spec(cls, key : Literal['000']) -> Type[Variation_1333]:
         ...
 
     @overload
@@ -109123,27 +109929,27 @@ class Variation_1340(Compound):
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['030']) -> Type[Variation_1327]:
+    def spec(cls, key : Literal['030']) -> Type[Variation_1334]:
         ...
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['040']) -> Type[Variation_1329]:
+    def spec(cls, key : Literal['040']) -> Type[Variation_1336]:
         ...
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['041']) -> Type[Variation_1331]:
+    def spec(cls, key : Literal['041']) -> Type[Variation_1338]:
         ...
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['048']) -> Type[Variation_1334]:
+    def spec(cls, key : Literal['048']) -> Type[Variation_1341]:
         ...
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['049']) -> Type[Variation_1335]:
+    def spec(cls, key : Literal['049']) -> Type[Variation_1342]:
         ...
 
     @overload
@@ -109153,12 +109959,12 @@ class Variation_1340(Compound):
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['051']) -> Type[Variation_1337]:
+    def spec(cls, key : Literal['051']) -> Type[Variation_1344]:
         ...
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['052']) -> Type[Variation_1339]:
+    def spec(cls, key : Literal['052']) -> Type[Variation_1346]:
         ...
 
     @overload
@@ -109177,29 +109983,29 @@ class Variation_1340(Compound):
         ...
 
     @classmethod
-    def spec(cls, key : Union[Literal['010'], Literal['000'], Literal['020'], Literal['030'], Literal['040'], Literal['041'], Literal['048'], Literal['049'], Literal['050'], Literal['051'], Literal['052'], Literal['140'], Literal['RE'], Literal['SP']]) -> Union[Type['Variation_1'], Type['Variation_1326'], Type['Variation_535'], Type['Variation_1327'], Type['Variation_1329'], Type['Variation_1331'], Type['Variation_1334'], Type['Variation_1335'], Type['Variation_536'], Type['Variation_1337'], Type['Variation_1339'], Type['Variation_80'], Type['Variation_202'], Type['Variation_62']]:
+    def spec(cls, key : Union[Literal['010'], Literal['000'], Literal['020'], Literal['030'], Literal['040'], Literal['041'], Literal['048'], Literal['049'], Literal['050'], Literal['051'], Literal['052'], Literal['140'], Literal['RE'], Literal['SP']]) -> Union[Type['Variation_1'], Type['Variation_1333'], Type['Variation_535'], Type['Variation_1334'], Type['Variation_1336'], Type['Variation_1338'], Type['Variation_1341'], Type['Variation_1342'], Type['Variation_536'], Type['Variation_1344'], Type['Variation_1346'], Type['Variation_80'], Type['Variation_202'], Type['Variation_62']]:
         if key == '010':
             return Variation_1
         if key == '000':
-            return Variation_1326
+            return Variation_1333
         if key == '020':
             return Variation_535
         if key == '030':
-            return Variation_1327
-        if key == '040':
-            return Variation_1329
-        if key == '041':
-            return Variation_1331
-        if key == '048':
             return Variation_1334
+        if key == '040':
+            return Variation_1336
+        if key == '041':
+            return Variation_1338
+        if key == '048':
+            return Variation_1341
         if key == '049':
-            return Variation_1335
+            return Variation_1342
         if key == '050':
             return Variation_536
         if key == '051':
-            return Variation_1337
+            return Variation_1344
         if key == '052':
-            return Variation_1339
+            return Variation_1346
         if key == '140':
             return Variation_80
         if key == 'RE':
@@ -109208,125 +110014,125 @@ class Variation_1340(Compound):
             return Variation_62
         assert_never(key)
 
-    def __init__(self, arg : Optional[Variation_1340_Arg] = None) -> None:
+    def __init__(self, arg : Optional[Variation_1347_Arg] = None) -> None:
         if isinstance(arg, tuple):
             super().__init__(*arg); return
         super().__init__()
         if arg is not None: self._update(arg)
 
     @overload
-    def set_item(self, name : Literal['010'], val : Union[Variation_1, Variation_1_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['010'], val : Union[Variation_1, Variation_1_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['000'], val : Union[Variation_1326, Variation_1326_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['000'], val : Union[Variation_1333, Variation_1333_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['020'], val : Union[Variation_535, Variation_535_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['020'], val : Union[Variation_535, Variation_535_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['030'], val : Union[Variation_1327, Variation_1327_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['030'], val : Union[Variation_1334, Variation_1334_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['040'], val : Union[Variation_1329, Variation_1329_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['040'], val : Union[Variation_1336, Variation_1336_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['041'], val : Union[Variation_1331, Variation_1331_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['041'], val : Union[Variation_1338, Variation_1338_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['048'], val : Union[Variation_1334, Variation_1334_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['048'], val : Union[Variation_1341, Variation_1341_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['049'], val : Union[Variation_1335, Variation_1335_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['049'], val : Union[Variation_1342, Variation_1342_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['050'], val : Union[Variation_536, Variation_536_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['050'], val : Union[Variation_536, Variation_536_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['051'], val : Union[Variation_1337, Variation_1337_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['051'], val : Union[Variation_1344, Variation_1344_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['052'], val : Union[Variation_1339, Variation_1339_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['052'], val : Union[Variation_1346, Variation_1346_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['140'], val : Union[Variation_80, Variation_80_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['140'], val : Union[Variation_80, Variation_80_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['RE'], val : Union[Variation_202, Variation_202_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['RE'], val : Union[Variation_202, Variation_202_Arg]) -> 'Variation_1347':
         ...
 
     @overload
-    def set_item(self, name : Literal['SP'], val : Union[Variation_62, Variation_62_Arg]) -> 'Variation_1340':
+    def set_item(self, name : Literal['SP'], val : Union[Variation_62, Variation_62_Arg]) -> 'Variation_1347':
         ...
 
     def set_item(self, name : Any, val : Any) -> Any:
         return self._set_item(name, val)
 
     @overload
-    def del_item(self, name : Literal['010']) -> 'Variation_1340':
+    def del_item(self, name : Literal['010']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['000']) -> 'Variation_1340':
+    def del_item(self, name : Literal['000']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['020']) -> 'Variation_1340':
+    def del_item(self, name : Literal['020']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['030']) -> 'Variation_1340':
+    def del_item(self, name : Literal['030']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['040']) -> 'Variation_1340':
+    def del_item(self, name : Literal['040']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['041']) -> 'Variation_1340':
+    def del_item(self, name : Literal['041']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['048']) -> 'Variation_1340':
+    def del_item(self, name : Literal['048']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['049']) -> 'Variation_1340':
+    def del_item(self, name : Literal['049']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['050']) -> 'Variation_1340':
+    def del_item(self, name : Literal['050']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['051']) -> 'Variation_1340':
+    def del_item(self, name : Literal['051']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['052']) -> 'Variation_1340':
+    def del_item(self, name : Literal['052']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['140']) -> 'Variation_1340':
+    def del_item(self, name : Literal['140']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['RE']) -> 'Variation_1340':
+    def del_item(self, name : Literal['RE']) -> 'Variation_1347':
         ...
 
     @overload
-    def del_item(self, name : Literal['SP']) -> 'Variation_1340':
+    def del_item(self, name : Literal['SP']) -> 'Variation_1347':
         ...
 
     def del_item(self, name : Any) -> Any:
@@ -109337,7 +110143,7 @@ class Variation_1340(Compound):
         ...
 
     @overload
-    def get_item(self, name : Literal['000']) -> Variation_1326:
+    def get_item(self, name : Literal['000']) -> Variation_1333:
         ...
 
     @overload
@@ -109345,23 +110151,23 @@ class Variation_1340(Compound):
         ...
 
     @overload
-    def get_item(self, name : Literal['030']) -> Variation_1327:
+    def get_item(self, name : Literal['030']) -> Variation_1334:
         ...
 
     @overload
-    def get_item(self, name : Literal['040']) -> Variation_1329:
+    def get_item(self, name : Literal['040']) -> Variation_1336:
         ...
 
     @overload
-    def get_item(self, name : Literal['041']) -> Variation_1331:
+    def get_item(self, name : Literal['041']) -> Variation_1338:
         ...
 
     @overload
-    def get_item(self, name : Literal['048']) -> Variation_1334:
+    def get_item(self, name : Literal['048']) -> Variation_1341:
         ...
 
     @overload
-    def get_item(self, name : Literal['049']) -> Variation_1335:
+    def get_item(self, name : Literal['049']) -> Variation_1342:
         ...
 
     @overload
@@ -109369,11 +110175,11 @@ class Variation_1340(Compound):
         ...
 
     @overload
-    def get_item(self, name : Literal['051']) -> Variation_1337:
+    def get_item(self, name : Literal['051']) -> Variation_1344:
         ...
 
     @overload
-    def get_item(self, name : Literal['052']) -> Variation_1339:
+    def get_item(self, name : Literal['052']) -> Variation_1346:
         ...
 
     @overload
@@ -109392,71 +110198,71 @@ class Variation_1340(Compound):
         return self._get_item(name)
 
     @overload
-    def modify_item(self, name : Literal['010'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['010'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['000'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['000'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['020'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['020'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['030'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['030'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['040'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['040'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['041'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['041'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['048'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['048'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['049'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['049'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['050'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['050'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['051'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['051'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['052'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['052'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['140'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['140'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['RE'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['RE'], f : Any) -> 'Variation_1347':
         ...
 
     @overload
-    def modify_item(self, name : Literal['SP'], f : Any) -> 'Variation_1340':
+    def modify_item(self, name : Literal['SP'], f : Any) -> 'Variation_1347':
         ...
 
     def modify_item(self, name : Any, f : Any) -> Any:
         return self._modify_item(name, f)
 
-Variation_1341_Arg_Group = TypedDict('Variation_1341_Arg_Group', {
+Variation_1348_Arg_Group = TypedDict('Variation_1348_Arg_Group', {
     'CAT': Union[Variation_0, Variation_0_Arg],
     'MAIN': Union[Variation_0, Variation_0_Arg],
     'SUB': Union[Variation_0, Variation_0_Arg],
 })
-Variation_1341_Arg : TypeAlias = Union[Raw, Variation_1341_Arg_Group]
-class Variation_1341(Group):
+Variation_1348_Arg : TypeAlias = Union[Raw, Variation_1348_Arg_Group]
+class Variation_1348(Group):
     variation = 'Group'
 
     bit_size = 24
@@ -109499,7 +110305,7 @@ class Variation_1341(Group):
             return Variation_0
         assert_never(key)
 
-    def __init__(self, arg : Variation_1341_Arg) -> None:
+    def __init__(self, arg : Variation_1348_Arg) -> None:
         if isinstance(arg, tuple):
             super().__init__(*arg); return
         if isinstance(arg, dict):
@@ -109524,69 +110330,69 @@ class Variation_1341(Group):
         return self._get_item(name)
 
     @overload
-    def set_item(self, name : Literal['CAT'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1341':
+    def set_item(self, name : Literal['CAT'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1348':
         ...
 
     @overload
-    def set_item(self, name : Literal['MAIN'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1341':
+    def set_item(self, name : Literal['MAIN'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1348':
         ...
 
     @overload
-    def set_item(self, name : Literal['SUB'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1341':
+    def set_item(self, name : Literal['SUB'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1348':
         ...
 
     def set_item(self, name : Any, val : Any) -> Any:
         return self._set_item(name, val)
 
     @overload
-    def modify_item(self, name : Literal['CAT'], f : Any) -> 'Variation_1341':
+    def modify_item(self, name : Literal['CAT'], f : Any) -> 'Variation_1348':
         ...
 
     @overload
-    def modify_item(self, name : Literal['MAIN'], f : Any) -> 'Variation_1341':
+    def modify_item(self, name : Literal['MAIN'], f : Any) -> 'Variation_1348':
         ...
 
     @overload
-    def modify_item(self, name : Literal['SUB'], f : Any) -> 'Variation_1341':
+    def modify_item(self, name : Literal['SUB'], f : Any) -> 'Variation_1348':
         ...
 
     def modify_item(self, name : Any, f : Any) -> Any:
         return self._modify_item(name, f)
 
-Variation_1342_Arg : TypeAlias = Union[Variation_1341, Variation_1341_Arg]
-class Variation_1342(Repetitive):
+Variation_1349_Arg : TypeAlias = Union[Variation_1348, Variation_1348_Arg]
+class Variation_1349(Repetitive):
     variation = 'Repetitive'
 
     rep_byte_size = 1
     variation_bit_size = 24
-    variation_type = Variation_1341
+    variation_type = Variation_1348
 
     @classmethod
-    def spec(cls) -> Type[Variation_1341]:
-        return Variation_1341
+    def spec(cls) -> Type[Variation_1348]:
+        return Variation_1348
 
-    def __init__(self, arg : List[Union[Variation_1341, Variation_1341_Arg]]) -> None:
+    def __init__(self, arg : List[Union[Variation_1348, Variation_1348_Arg]]) -> None:
         if isinstance(arg, tuple):
             super().__init__(*arg); return
         if isinstance(arg, list):
             super().__init__(*self._from_list(arg)); return
         assert_never(arg)
 
-    def append_item(self, arg : Union[Variation_1341, Variation_1341_Arg]) -> 'Variation_1342':
+    def append_item(self, arg : Union[Variation_1348, Variation_1348_Arg]) -> 'Variation_1349':
         return self._append_item(arg) # type: ignore
 
-    def prepend_item(self, arg : Union[Variation_1341, Variation_1341_Arg]) -> 'Variation_1342':
+    def prepend_item(self, arg : Union[Variation_1348, Variation_1348_Arg]) -> 'Variation_1349':
         return self._prepend_item(arg) # type: ignore
 
-Variation_1343_Arg = TypedDict('Variation_1343_Arg', {
+Variation_1350_Arg = TypedDict('Variation_1350_Arg', {
     '010': Union[Variation_1, Variation_1_Arg],
     '015': Union[Variation_0, Variation_0_Arg],
     '140': Union[Variation_80, Variation_80_Arg],
-    '550': Union[Variation_1342, Variation_1342_Arg],
+    '550': Union[Variation_1349, Variation_1349_Arg],
     'SP': Union[Variation_62, Variation_62_Arg],
     'RE': Union[Variation_202, Variation_202_Arg],
 }, total=False)
-class Variation_1343(Compound):
+class Variation_1350(Compound):
     variation = 'Compound'
 
     fspec_fx = True
@@ -109596,7 +110402,7 @@ class Variation_1343(Compound):
         ('010', Variation_1),
         ('015', Variation_0),
         ('140', Variation_80),
-        ('550', Variation_1342),
+        ('550', Variation_1349),
         None,
         ('SP', Variation_62),
         ('RE', Variation_202),
@@ -109607,7 +110413,7 @@ class Variation_1343(Compound):
         '010': ('Data Source Identifier', Variation_1, 0x80),
         '015': ('Service Identification', Variation_0, 0x40),
         '140': ('Time of Day', Variation_80, 0x20),
-        '550': ('Category Version Number Report', Variation_1342, 0x10),
+        '550': ('Category Version Number Report', Variation_1349, 0x10),
         'SP': ('Special Purpose Field', Variation_62, 0x04),
         'RE': ('Reserved Expansion Field', Variation_202, 0x02),
     }
@@ -109629,7 +110435,7 @@ class Variation_1343(Compound):
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['550']) -> Type[Variation_1342]:
+    def spec(cls, key : Literal['550']) -> Type[Variation_1349]:
         ...
 
     @overload
@@ -109643,7 +110449,7 @@ class Variation_1343(Compound):
         ...
 
     @classmethod
-    def spec(cls, key : Union[Literal['010'], Literal['015'], Literal['140'], Literal['550'], Literal['SP'], Literal['RE']]) -> Union[Type['Variation_1'], Type['Variation_0'], Type['Variation_80'], Type['Variation_1342'], Type['Variation_62'], Type['Variation_202']]:
+    def spec(cls, key : Union[Literal['010'], Literal['015'], Literal['140'], Literal['550'], Literal['SP'], Literal['RE']]) -> Union[Type['Variation_1'], Type['Variation_0'], Type['Variation_80'], Type['Variation_1349'], Type['Variation_62'], Type['Variation_202']]:
         if key == '010':
             return Variation_1
         if key == '015':
@@ -109651,68 +110457,68 @@ class Variation_1343(Compound):
         if key == '140':
             return Variation_80
         if key == '550':
-            return Variation_1342
+            return Variation_1349
         if key == 'SP':
             return Variation_62
         if key == 'RE':
             return Variation_202
         assert_never(key)
 
-    def __init__(self, arg : Optional[Variation_1343_Arg] = None) -> None:
+    def __init__(self, arg : Optional[Variation_1350_Arg] = None) -> None:
         if isinstance(arg, tuple):
             super().__init__(*arg); return
         super().__init__()
         if arg is not None: self._update(arg)
 
     @overload
-    def set_item(self, name : Literal['010'], val : Union[Variation_1, Variation_1_Arg]) -> 'Variation_1343':
+    def set_item(self, name : Literal['010'], val : Union[Variation_1, Variation_1_Arg]) -> 'Variation_1350':
         ...
 
     @overload
-    def set_item(self, name : Literal['015'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1343':
+    def set_item(self, name : Literal['015'], val : Union[Variation_0, Variation_0_Arg]) -> 'Variation_1350':
         ...
 
     @overload
-    def set_item(self, name : Literal['140'], val : Union[Variation_80, Variation_80_Arg]) -> 'Variation_1343':
+    def set_item(self, name : Literal['140'], val : Union[Variation_80, Variation_80_Arg]) -> 'Variation_1350':
         ...
 
     @overload
-    def set_item(self, name : Literal['550'], val : Union[Variation_1342, Variation_1342_Arg]) -> 'Variation_1343':
+    def set_item(self, name : Literal['550'], val : Union[Variation_1349, Variation_1349_Arg]) -> 'Variation_1350':
         ...
 
     @overload
-    def set_item(self, name : Literal['SP'], val : Union[Variation_62, Variation_62_Arg]) -> 'Variation_1343':
+    def set_item(self, name : Literal['SP'], val : Union[Variation_62, Variation_62_Arg]) -> 'Variation_1350':
         ...
 
     @overload
-    def set_item(self, name : Literal['RE'], val : Union[Variation_202, Variation_202_Arg]) -> 'Variation_1343':
+    def set_item(self, name : Literal['RE'], val : Union[Variation_202, Variation_202_Arg]) -> 'Variation_1350':
         ...
 
     def set_item(self, name : Any, val : Any) -> Any:
         return self._set_item(name, val)
 
     @overload
-    def del_item(self, name : Literal['010']) -> 'Variation_1343':
+    def del_item(self, name : Literal['010']) -> 'Variation_1350':
         ...
 
     @overload
-    def del_item(self, name : Literal['015']) -> 'Variation_1343':
+    def del_item(self, name : Literal['015']) -> 'Variation_1350':
         ...
 
     @overload
-    def del_item(self, name : Literal['140']) -> 'Variation_1343':
+    def del_item(self, name : Literal['140']) -> 'Variation_1350':
         ...
 
     @overload
-    def del_item(self, name : Literal['550']) -> 'Variation_1343':
+    def del_item(self, name : Literal['550']) -> 'Variation_1350':
         ...
 
     @overload
-    def del_item(self, name : Literal['SP']) -> 'Variation_1343':
+    def del_item(self, name : Literal['SP']) -> 'Variation_1350':
         ...
 
     @overload
-    def del_item(self, name : Literal['RE']) -> 'Variation_1343':
+    def del_item(self, name : Literal['RE']) -> 'Variation_1350':
         ...
 
     def del_item(self, name : Any) -> Any:
@@ -109731,7 +110537,7 @@ class Variation_1343(Compound):
         ...
 
     @overload
-    def get_item(self, name : Literal['550']) -> Variation_1342:
+    def get_item(self, name : Literal['550']) -> Variation_1349:
         ...
 
     @overload
@@ -109746,27 +110552,27 @@ class Variation_1343(Compound):
         return self._get_item(name)
 
     @overload
-    def modify_item(self, name : Literal['010'], f : Any) -> 'Variation_1343':
+    def modify_item(self, name : Literal['010'], f : Any) -> 'Variation_1350':
         ...
 
     @overload
-    def modify_item(self, name : Literal['015'], f : Any) -> 'Variation_1343':
+    def modify_item(self, name : Literal['015'], f : Any) -> 'Variation_1350':
         ...
 
     @overload
-    def modify_item(self, name : Literal['140'], f : Any) -> 'Variation_1343':
+    def modify_item(self, name : Literal['140'], f : Any) -> 'Variation_1350':
         ...
 
     @overload
-    def modify_item(self, name : Literal['550'], f : Any) -> 'Variation_1343':
+    def modify_item(self, name : Literal['550'], f : Any) -> 'Variation_1350':
         ...
 
     @overload
-    def modify_item(self, name : Literal['SP'], f : Any) -> 'Variation_1343':
+    def modify_item(self, name : Literal['SP'], f : Any) -> 'Variation_1350':
         ...
 
     @overload
-    def modify_item(self, name : Literal['RE'], f : Any) -> 'Variation_1343':
+    def modify_item(self, name : Literal['RE'], f : Any) -> 'Variation_1350':
         ...
 
     def modify_item(self, name : Any, f : Any) -> Any:
@@ -110916,9 +111722,9 @@ class CAT_065_1_6(Basic):
     def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1325]:
         return cls._parse(val, opt) # type: ignore
 
-class CAT_240_1_3(Basic):
-    cat = 240
-    variation = Variation_1340
+class CAT_205_1_0(Basic):
+    cat = 205
+    variation = Variation_1332
 
     spec = variation.spec
 
@@ -110927,20 +111733,42 @@ class CAT_240_1_3(Basic):
     unparse_bits = variation.unparse_bits
 
     @classmethod
-    def make_record(cls, val : Variation_1340_Arg) -> Variation_1340:
-        return Variation_1340(val)
+    def make_record(cls, val : Variation_1332_Arg) -> Variation_1332:
+        return Variation_1332(val)
 
     @classmethod
-    def make_datablock(cls, val : Union[Variation_1340, List[Variation_1340]]) -> Datablock[Variation_1340]:
+    def make_datablock(cls, val : Union[Variation_1332, List[Variation_1332]]) -> Datablock[Variation_1332]:
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1340]:
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1332]:
+        return cls._parse(val, opt) # type: ignore
+
+class CAT_240_1_3(Basic):
+    cat = 240
+    variation = Variation_1347
+
+    spec = variation.spec
+
+    parse_bits = variation.parse_bits
+
+    unparse_bits = variation.unparse_bits
+
+    @classmethod
+    def make_record(cls, val : Variation_1347_Arg) -> Variation_1347:
+        return Variation_1347(val)
+
+    @classmethod
+    def make_datablock(cls, val : Union[Variation_1347, List[Variation_1347]]) -> Datablock[Variation_1347]:
+        return Datablock(cls.cat, val)
+
+    @classmethod
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1347]:
         return cls._parse(val, opt) # type: ignore
 
 class CAT_247_1_2(Basic):
     cat = 247
-    variation = Variation_1343
+    variation = Variation_1350
 
     spec = variation.spec
 
@@ -110949,20 +111777,20 @@ class CAT_247_1_2(Basic):
     unparse_bits = variation.unparse_bits
 
     @classmethod
-    def make_record(cls, val : Variation_1343_Arg) -> Variation_1343:
-        return Variation_1343(val)
+    def make_record(cls, val : Variation_1350_Arg) -> Variation_1350:
+        return Variation_1350(val)
 
     @classmethod
-    def make_datablock(cls, val : Union[Variation_1343, List[Variation_1343]]) -> Datablock[Variation_1343]:
+    def make_datablock(cls, val : Union[Variation_1350, List[Variation_1350]]) -> Datablock[Variation_1350]:
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1343]:
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1350]:
         return cls._parse(val, opt) # type: ignore
 
 class CAT_247_1_3(Basic):
     cat = 247
-    variation = Variation_1343
+    variation = Variation_1350
 
     spec = variation.spec
 
@@ -110971,15 +111799,15 @@ class CAT_247_1_3(Basic):
     unparse_bits = variation.unparse_bits
 
     @classmethod
-    def make_record(cls, val : Variation_1343_Arg) -> Variation_1343:
-        return Variation_1343(val)
+    def make_record(cls, val : Variation_1350_Arg) -> Variation_1350:
+        return Variation_1350(val)
 
     @classmethod
-    def make_datablock(cls, val : Union[Variation_1343, List[Variation_1343]]) -> Datablock[Variation_1343]:
+    def make_datablock(cls, val : Union[Variation_1350, List[Variation_1350]]) -> Datablock[Variation_1350]:
         return Datablock(cls.cat, val)
 
     @classmethod
-    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1343]:
+    def parse(cls, val : RawDatablock, opt : ParsingOptions) -> Datablock[Variation_1350]:
         return cls._parse(val, opt) # type: ignore
 
 class REF_021_1_4(Expansion):
@@ -111163,6 +111991,9 @@ manifest = {
             '1.5': CAT_065_1_5,
             '1.6': CAT_065_1_6,
         },
+        205: {
+            '1.0': CAT_205_1_0,
+        },
         240: {
             '1.3': CAT_240_1_3,
         },
@@ -111185,6 +112016,6 @@ manifest = {
     },
 }
 
-VERSION = '20231203.7133'
+VERSION = '20231210.7221'
 
-REFERENCE = '71b13c7fc63a96fec61b6b49bfb67d021fc12bdf'
+REFERENCE = '23bc27bf298b10defd5125f904388b97cb69dc12'
