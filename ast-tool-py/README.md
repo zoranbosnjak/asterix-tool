@@ -47,6 +47,68 @@ ast-tool-py --version
 ast-tool-py --help
 ```
 
+### Offline installation
+
+If the target server is offline (that is: without internet access), use the
+following installation procedure (tested with `ubuntu-22.04`):
+
+- prepare installation bundle on auxilary server with internet access
+- transfer files to offline server
+- on the offline server, install from local disk
+
+**NOTE**:
+At the time of writing, `ubuntu-22.04` contains `pip` version `22.0.2` with a bug.
+For proper operation, `pip` needs to be upgraded on both auxilary and target
+server. Tested with `pip` version `23.3.1`.
+
+#### Prepare installation bundle
+
+Run on the server with internet access.
+
+```bash
+sudo apt -y install python3-pip
+mkdir ast-tool-py-bundle
+cd ast-tool-py-bundle
+
+# check pip version, upgrade if necessary (see note above)
+pip3 --version
+python3 -m pip install --upgrade pip
+pip3 --version
+# download python support packages and 'ast-tool-py' package
+python3 -m pip download -d . pip setuptools wheel
+python3 -m pip download -d . "git+https://github.com/zoranbosnjak/asterix-tool.git#subdirectory=ast-tool-py"
+```
+
+#### Install on offline server
+
+It is assumed that target server has `python`, `pip` and `venv` installed already.
+If required, install:
+
+```bash
+sudo apt -y install python3-pip python3-venv
+```
+
+Manually transfer `ast-tool-py-bundle/` to the target server and install.
+
+```bash
+# prepare 'env'
+cd
+python3 -m venv env
+source env/bin/activate
+
+cd ast-tool-py-bundle
+
+# check pip version, upgrade if necessary (see note above)
+pip3 --version
+python3 -m pip install --upgrade --no-index ./pip*
+pip3 --version
+
+# install ast-tool-py package
+python3 -m pip install --no-index --find-links=./ ./ast-tool*
+ast-tool-py --version
+ast-tool-py --help
+```
+
 ## Development
 
 Use `nix-shell` to setup development environment
@@ -808,4 +870,3 @@ cat recording.ff.gz | gunzip | ast-tool-py replay \
         --unicast ch1 127.0.0.1 56001 \
         --unicast ch2 127.0.0.1 56002
 ```
-
