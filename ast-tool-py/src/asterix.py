@@ -325,15 +325,10 @@ class StringOctal(StringType):
 
 class Quantity:
     """Quantity helper class."""
-    def __init__(self, sig : Literal['Signed', 'Unsigned'], scal : float, k : int, unit : str):
+    def __init__(self, sig : Literal['Signed', 'Unsigned'], lsb : float, unit : str):
         self.sig = sig
-        self.scal = scal
-        self.k = k
+        self.lsb = lsb
         self.unit = unit
-
-    @property
-    def lsb(self) -> float:
-        return self.scal / float(pow(2, self.k))
 
 class Variation:
     """Baseclass for all variations."""
@@ -865,7 +860,6 @@ class Basic(AsterixSpec):
 
 class Expansion(AsterixSpec):
     variation : Any
-
 # --- Generated code ---
 
 Variation_0_Arg : TypeAlias = Raw
@@ -1463,7 +1457,7 @@ class Variation_13(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 7, 'NM')
+    quantity = Quantity('Unsigned', 7.8125e-3, 'NM')
 
     def __init__(self, arg : Variation_13_Arg) -> None:
         if isinstance(arg, Bits):
@@ -1485,7 +1479,7 @@ class Variation_14(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 360.0, 16, '°')
+    quantity = Quantity('Unsigned', 5.4931640625e-3, '°')
 
     def __init__(self, arg : Variation_14_Arg) -> None:
         if isinstance(arg, Bits):
@@ -1800,7 +1794,7 @@ class Variation_21(Element):
 
     bit_offset8 = 2
     bit_size = 14
-    quantity = Quantity('Signed', 1.0, 2, 'FL')
+    quantity = Quantity('Signed', 0.25, 'FL')
 
     def __init__(self, arg : Variation_21_Arg) -> None:
         if isinstance(arg, Bits):
@@ -1964,7 +1958,7 @@ class Variation_25(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 7, 's')
+    quantity = Quantity('Unsigned', 7.8125e-3, 's')
 
     def __init__(self, arg : Variation_25_Arg) -> None:
         if isinstance(arg, Bits):
@@ -2134,7 +2128,7 @@ class Variation_28(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 1.0, 8, 'NM/s')
+    quantity = Quantity('Signed', 3.90625e-3, 'NM/s')
 
     def __init__(self, arg : Variation_28_Arg) -> None:
         if isinstance(arg, Bits):
@@ -2156,7 +2150,7 @@ class Variation_29(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 1.0, 0, 'dBm')
+    quantity = Quantity('Signed', 1.0, 'dBm')
 
     def __init__(self, arg : Variation_29_Arg) -> None:
         if isinstance(arg, Bits):
@@ -4085,7 +4079,7 @@ class Variation_65(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 6, 'NM')
+    quantity = Quantity('Signed', 1.5625e-2, 'NM')
 
     def __init__(self, arg : Variation_65_Arg) -> None:
         if isinstance(arg, Bits):
@@ -4188,7 +4182,7 @@ class Variation_67(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 14, 'NM/s')
+    quantity = Quantity('Unsigned', 6.103515625e-5, 'NM/s')
 
     def __init__(self, arg : Variation_67_Arg) -> None:
         if isinstance(arg, Bits):
@@ -5271,7 +5265,7 @@ class Variation_79(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 360.0, 8, '°')
+    quantity = Quantity('Unsigned', 1.40625, '°')
 
     def __init__(self, arg : Variation_79_Arg) -> None:
         if isinstance(arg, Bits):
@@ -5293,7 +5287,7 @@ class Variation_80(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Unsigned', 1.0, 7, 's')
+    quantity = Quantity('Unsigned', 7.8125e-3, 's')
 
     def __init__(self, arg : Variation_80_Arg) -> None:
         if isinstance(arg, Bits):
@@ -5627,7 +5621,7 @@ class Variation_87(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 1.0, 7, 'NM')
+    quantity = Quantity('Signed', 7.8125e-3, 'NM')
 
     def __init__(self, arg : Variation_87_Arg) -> None:
         if isinstance(arg, Bits):
@@ -5649,7 +5643,7 @@ class Variation_88(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 360.0, 14, '°')
+    quantity = Quantity('Signed', 2.197265625e-2, '°')
 
     def __init__(self, arg : Variation_88_Arg) -> None:
         if isinstance(arg, Bits):
@@ -8555,7 +8549,7 @@ class Variation_147(Element):
 
     bit_offset8 = 0
     bit_size = 32
-    quantity = Quantity('Signed', 180.0, 25, '°')
+    quantity = Quantity('Signed', 5.364418029785156e-6, '°')
 
     def __init__(self, arg : Variation_147_Arg) -> None:
         if isinstance(arg, Bits):
@@ -8577,7 +8571,7 @@ class Variation_148(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 25.0, 0, 'ft')
+    quantity = Quantity('Signed', 25.0, 'ft')
 
     def __init__(self, arg : Variation_148_Arg) -> None:
         if isinstance(arg, Bits):
@@ -8702,7 +8696,7 @@ class Variation_150(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Signed', 1.0, 1, 'm')
+    quantity = Quantity('Signed', 0.5, 'm')
 
     def __init__(self, arg : Variation_150_Arg) -> None:
         if isinstance(arg, Bits):
@@ -8827,7 +8821,7 @@ class Variation_152(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 1, 'm')
+    quantity = Quantity('Unsigned', 0.5, 'm')
 
     def __init__(self, arg : Variation_152_Arg) -> None:
         if isinstance(arg, Bits):
@@ -9237,7 +9231,7 @@ class Variation_162(Element):
 
     bit_offset8 = 5
     bit_size = 27
-    quantity = Quantity('Unsigned', 1.0, 0, '')
+    quantity = Quantity('Unsigned', 1.0, '')
 
     def __init__(self, arg : Variation_162_Arg) -> None:
         if isinstance(arg, Bits):
@@ -9302,7 +9296,7 @@ class Variation_164(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 2, 'FL')
+    quantity = Quantity('Unsigned', 0.25, 'FL')
 
     def __init__(self, arg : Variation_164_Arg) -> None:
         if isinstance(arg, Bits):
@@ -10678,7 +10672,7 @@ class Variation_190(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 1, '%')
+    quantity = Quantity('Unsigned', 0.5, '%')
 
     def __init__(self, arg : Variation_190_Arg) -> None:
         if isinstance(arg, Bits):
@@ -10841,7 +10835,7 @@ class Variation_192(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Unsigned', 1.0, 1, 'm')
+    quantity = Quantity('Unsigned', 0.5, 'm')
 
     def __init__(self, arg : Variation_192_Arg) -> None:
         if isinstance(arg, Bits):
@@ -10863,7 +10857,7 @@ class Variation_193(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 25.0, 0, 'ft')
+    quantity = Quantity('Unsigned', 25.0, 'ft')
 
     def __init__(self, arg : Variation_193_Arg) -> None:
         if isinstance(arg, Bits):
@@ -11078,7 +11072,7 @@ class Variation_195(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 32.0, 0, 'm')
+    quantity = Quantity('Signed', 32.0, 'm')
 
     def __init__(self, arg : Variation_195_Arg) -> None:
         if isinstance(arg, Bits):
@@ -13141,7 +13135,7 @@ class Variation_219(Element):
 
     bit_offset8 = 0
     bit_size = 5
-    quantity = Quantity('Signed', 1.0, 0, '')
+    quantity = Quantity('Signed', 1.0, '')
 
     def __init__(self, arg : Variation_219_Arg) -> None:
         if isinstance(arg, Bits):
@@ -13973,7 +13967,7 @@ class Variation_228(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 0, 'NM')
+    quantity = Quantity('Signed', 1.0, 'NM')
 
     def __init__(self, arg : Variation_228_Arg) -> None:
         if isinstance(arg, Bits):
@@ -15242,7 +15236,7 @@ class Variation_251(Element):
 
     bit_offset8 = 0
     bit_size = 32
-    quantity = Quantity('Signed', 180.0, 31, '°')
+    quantity = Quantity('Signed', 8.381903171539307e-8, '°')
 
     def __init__(self, arg : Variation_251_Arg) -> None:
         if isinstance(arg, Bits):
@@ -15345,7 +15339,7 @@ class Variation_253(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 0, 'm')
+    quantity = Quantity('Unsigned', 1.0, 'm')
 
     def __init__(self, arg : Variation_253_Arg) -> None:
         if isinstance(arg, Bits):
@@ -15448,7 +15442,7 @@ class Variation_255(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 0, 'm')
+    quantity = Quantity('Signed', 1.0, 'm')
 
     def __init__(self, arg : Variation_255_Arg) -> None:
         if isinstance(arg, Bits):
@@ -15632,7 +15626,7 @@ class Variation_258(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 4, 'm/s')
+    quantity = Quantity('Signed', 6.25e-2, 'm/s')
 
     def __init__(self, arg : Variation_258_Arg) -> None:
         if isinstance(arg, Bits):
@@ -16860,7 +16854,7 @@ class Variation_283(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 25.0, 2, 'ft')
+    quantity = Quantity('Signed', 6.25, 'ft')
 
     def __init__(self, arg : Variation_283_Arg) -> None:
         if isinstance(arg, Bits):
@@ -16882,7 +16876,7 @@ class Variation_284(Element):
 
     bit_offset8 = 0
     bit_size = 7
-    quantity = Quantity('Unsigned', 1.0, 0, 'm')
+    quantity = Quantity('Unsigned', 1.0, 'm')
 
     def __init__(self, arg : Variation_284_Arg) -> None:
         if isinstance(arg, Bits):
@@ -16904,7 +16898,7 @@ class Variation_285(Element):
 
     bit_offset8 = 0
     bit_size = 7
-    quantity = Quantity('Unsigned', 360.0, 7, '°')
+    quantity = Quantity('Unsigned', 2.8125, '°')
 
     def __init__(self, arg : Variation_285_Arg) -> None:
         if isinstance(arg, Bits):
@@ -17438,7 +17432,7 @@ class Variation_296(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 2, 'm')
+    quantity = Quantity('Unsigned', 0.25, 'm')
 
     def __init__(self, arg : Variation_296_Arg) -> None:
         if isinstance(arg, Bits):
@@ -17460,7 +17454,7 @@ class Variation_297(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 2, 'm')
+    quantity = Quantity('Signed', 0.25, 'm')
 
     def __init__(self, arg : Variation_297_Arg) -> None:
         if isinstance(arg, Bits):
@@ -17585,7 +17579,7 @@ class Variation_299(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 1.0, 0, 'm')
+    quantity = Quantity('Signed', 1.0, 'm')
 
     def __init__(self, arg : Variation_299_Arg) -> None:
         if isinstance(arg, Bits):
@@ -17607,7 +17601,7 @@ class Variation_300(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 0.15, 0, '°')
+    quantity = Quantity('Signed', 0.15, '°')
 
     def __init__(self, arg : Variation_300_Arg) -> None:
         if isinstance(arg, Bits):
@@ -17735,7 +17729,7 @@ class Variation_303(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 1.0, 4, 'm/s2')
+    quantity = Quantity('Signed', 6.25e-2, 'm/s2')
 
     def __init__(self, arg : Variation_303_Arg) -> None:
         if isinstance(arg, Bits):
@@ -18848,7 +18842,7 @@ class Variation_310(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 2, 'm/s')
+    quantity = Quantity('Signed', 0.25, 'm/s')
 
     def __init__(self, arg : Variation_310_Arg) -> None:
         if isinstance(arg, Bits):
@@ -18951,7 +18945,7 @@ class Variation_312(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 1.0, 2, 'm/s2')
+    quantity = Quantity('Signed', 0.25, 'm/s2')
 
     def __init__(self, arg : Variation_312_Arg) -> None:
         if isinstance(arg, Bits):
@@ -20888,7 +20882,7 @@ class Variation_352(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 2, 's')
+    quantity = Quantity('Unsigned', 0.25, 's')
 
     def __init__(self, arg : Variation_352_Arg) -> None:
         if isinstance(arg, Bits):
@@ -20910,7 +20904,7 @@ class Variation_353(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 2, 's')
+    quantity = Quantity('Unsigned', 0.25, 's')
 
     def __init__(self, arg : Variation_353_Arg) -> None:
         if isinstance(arg, Bits):
@@ -21311,7 +21305,7 @@ class Variation_356(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 2, 'FL')
+    quantity = Quantity('Signed', 0.25, 'FL')
 
     def __init__(self, arg : Variation_356_Arg) -> None:
         if isinstance(arg, Bits):
@@ -21355,7 +21349,7 @@ class Variation_358(Element):
 
     bit_offset8 = 1
     bit_size = 15
-    quantity = Quantity('Signed', 1.0, 2, 'FL')
+    quantity = Quantity('Signed', 0.25, 'FL')
 
     def __init__(self, arg : Variation_358_Arg) -> None:
         if isinstance(arg, Bits):
@@ -21458,7 +21452,7 @@ class Variation_360(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 25.0, 2, 'ft/min')
+    quantity = Quantity('Signed', 6.25, 'ft/min')
 
     def __init__(self, arg : Variation_360_Arg) -> None:
         if isinstance(arg, Bits):
@@ -22989,7 +22983,7 @@ class Variation_384(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 180.0, 31, '°')
+    quantity = Quantity('Signed', 8.381903171539307e-8, '°')
 
     def __init__(self, arg : Variation_384_Arg) -> None:
         if isinstance(arg, Bits):
@@ -23092,7 +23086,7 @@ class Variation_386(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 1, 'm')
+    quantity = Quantity('Signed', 0.5, 'm')
 
     def __init__(self, arg : Variation_386_Arg) -> None:
         if isinstance(arg, Bits):
@@ -23114,7 +23108,7 @@ class Variation_387(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 0.1, 0, 'm/s')
+    quantity = Quantity('Unsigned', 0.1, 'm/s')
 
     def __init__(self, arg : Variation_387_Arg) -> None:
         if isinstance(arg, Bits):
@@ -23217,7 +23211,7 @@ class Variation_389(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 0.1, 0, 'm/s')
+    quantity = Quantity('Signed', 0.1, 'm/s')
 
     def __init__(self, arg : Variation_389_Arg) -> None:
         if isinstance(arg, Bits):
@@ -23239,7 +23233,7 @@ class Variation_390(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0e-2, 0, 'm/s2')
+    quantity = Quantity('Unsigned', 1.0e-2, 'm/s2')
 
     def __init__(self, arg : Variation_390_Arg) -> None:
         if isinstance(arg, Bits):
@@ -28662,7 +28656,7 @@ class Variation_440(Element):
 
     bit_offset8 = 2
     bit_size = 14
-    quantity = Quantity('Unsigned', 1.0, 7, 's')
+    quantity = Quantity('Unsigned', 7.8125e-3, 's')
 
     def __init__(self, arg : Variation_440_Arg) -> None:
         if isinstance(arg, Bits):
@@ -28727,7 +28721,7 @@ class Variation_442(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0e-2, 0, 'm')
+    quantity = Quantity('Unsigned', 1.0e-2, 'm')
 
     def __init__(self, arg : Variation_442_Arg) -> None:
         if isinstance(arg, Bits):
@@ -29186,7 +29180,7 @@ class Variation_450(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 1.0, 7, '')
+    quantity = Quantity('Signed', 7.8125e-3, '')
 
     def __init__(self, arg : Variation_450_Arg) -> None:
         if isinstance(arg, Bits):
@@ -29311,7 +29305,7 @@ class Variation_452(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 2, 'm')
+    quantity = Quantity('Unsigned', 0.25, 'm')
 
     def __init__(self, arg : Variation_452_Arg) -> None:
         if isinstance(arg, Bits):
@@ -29551,7 +29545,7 @@ class Variation_455(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Signed', 1.0e-2, 0, 'm')
+    quantity = Quantity('Signed', 1.0e-2, 'm')
 
     def __init__(self, arg : Variation_455_Arg) -> None:
         if isinstance(arg, Bits):
@@ -29573,7 +29567,7 @@ class Variation_456(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Unsigned', 1.0e-2, 0, 'm')
+    quantity = Quantity('Unsigned', 1.0e-2, 'm')
 
     def __init__(self, arg : Variation_456_Arg) -> None:
         if isinstance(arg, Bits):
@@ -29595,7 +29589,7 @@ class Variation_457(Element):
 
     bit_offset8 = 0
     bit_size = 12
-    quantity = Quantity('Unsigned', 16.0, 0, 'm')
+    quantity = Quantity('Unsigned', 16.0, 'm')
 
     def __init__(self, arg : Variation_457_Arg) -> None:
         if isinstance(arg, Bits):
@@ -29617,7 +29611,7 @@ class Variation_458(Element):
 
     bit_offset8 = 4
     bit_size = 12
-    quantity = Quantity('Unsigned', 16.0, 0, 'm')
+    quantity = Quantity('Unsigned', 16.0, 'm')
 
     def __init__(self, arg : Variation_458_Arg) -> None:
         if isinstance(arg, Bits):
@@ -30127,7 +30121,7 @@ class Variation_463(Element):
 
     bit_offset8 = 0
     bit_size = 20
-    quantity = Quantity('Signed', 1.0e-2, 0, 'm/s')
+    quantity = Quantity('Signed', 1.0e-2, 'm/s')
 
     def __init__(self, arg : Variation_463_Arg) -> None:
         if isinstance(arg, Bits):
@@ -30149,7 +30143,7 @@ class Variation_464(Element):
 
     bit_offset8 = 4
     bit_size = 20
-    quantity = Quantity('Signed', 1.0e-2, 0, 'm/s')
+    quantity = Quantity('Signed', 1.0e-2, 'm/s')
 
     def __init__(self, arg : Variation_464_Arg) -> None:
         if isinstance(arg, Bits):
@@ -30252,7 +30246,7 @@ class Variation_466(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0e-2, 0, 'm/s')
+    quantity = Quantity('Unsigned', 1.0e-2, 'm/s')
 
     def __init__(self, arg : Variation_466_Arg) -> None:
         if isinstance(arg, Bits):
@@ -30746,7 +30740,7 @@ class Variation_471(Element):
 
     bit_offset8 = 0
     bit_size = 12
-    quantity = Quantity('Signed', 1.0, 4, 'm/s2')
+    quantity = Quantity('Signed', 6.25e-2, 'm/s2')
 
     def __init__(self, arg : Variation_471_Arg) -> None:
         if isinstance(arg, Bits):
@@ -30768,7 +30762,7 @@ class Variation_472(Element):
 
     bit_offset8 = 4
     bit_size = 12
-    quantity = Quantity('Signed', 1.0, 4, 'm/s2')
+    quantity = Quantity('Signed', 6.25e-2, 'm/s2')
 
     def __init__(self, arg : Variation_472_Arg) -> None:
         if isinstance(arg, Bits):
@@ -30871,7 +30865,7 @@ class Variation_474(Element):
 
     bit_offset8 = 0
     bit_size = 12
-    quantity = Quantity('Unsigned', 1.0, 4, 'm/s2')
+    quantity = Quantity('Unsigned', 6.25e-2, 'm/s2')
 
     def __init__(self, arg : Variation_474_Arg) -> None:
         if isinstance(arg, Bits):
@@ -30893,7 +30887,7 @@ class Variation_475(Element):
 
     bit_offset8 = 4
     bit_size = 12
-    quantity = Quantity('Unsigned', 1.0, 4, 'm/s2')
+    quantity = Quantity('Unsigned', 6.25e-2, 'm/s2')
 
     def __init__(self, arg : Variation_475_Arg) -> None:
         if isinstance(arg, Bits):
@@ -31409,7 +31403,7 @@ class Variation_480(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Signed', 1.0e-2, 0, 'm/s')
+    quantity = Quantity('Signed', 1.0e-2, 'm/s')
 
     def __init__(self, arg : Variation_480_Arg) -> None:
         if isinstance(arg, Bits):
@@ -31705,7 +31699,7 @@ class Variation_483(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0e-2, 0, 'm/s2')
+    quantity = Quantity('Signed', 1.0e-2, 'm/s2')
 
     def __init__(self, arg : Variation_483_Arg) -> None:
         if isinstance(arg, Bits):
@@ -31727,7 +31721,7 @@ class Variation_484(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0e-2, 0, 'm/s2')
+    quantity = Quantity('Unsigned', 1.0e-2, 'm/s2')
 
     def __init__(self, arg : Variation_484_Arg) -> None:
         if isinstance(arg, Bits):
@@ -32058,7 +32052,7 @@ class Variation_489(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Signed', 0.1, 0, 'm')
+    quantity = Quantity('Signed', 0.1, 'm')
 
     def __init__(self, arg : Variation_489_Arg) -> None:
         if isinstance(arg, Bits):
@@ -32080,7 +32074,7 @@ class Variation_490(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Unsigned', 0.1, 0, 'm')
+    quantity = Quantity('Unsigned', 0.1, 'm')
 
     def __init__(self, arg : Variation_490_Arg) -> None:
         if isinstance(arg, Bits):
@@ -32102,7 +32096,7 @@ class Variation_491(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Signed', 0.1, 0, 'm/s')
+    quantity = Quantity('Signed', 0.1, 'm/s')
 
     def __init__(self, arg : Variation_491_Arg) -> None:
         if isinstance(arg, Bits):
@@ -32124,7 +32118,7 @@ class Variation_492(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Unsigned', 0.1, 0, 'm/s')
+    quantity = Quantity('Unsigned', 0.1, 'm/s')
 
     def __init__(self, arg : Variation_492_Arg) -> None:
         if isinstance(arg, Bits):
@@ -32227,7 +32221,7 @@ class Variation_494(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 6, 'm/s2')
+    quantity = Quantity('Signed', 1.5625e-2, 'm/s2')
 
     def __init__(self, arg : Variation_494_Arg) -> None:
         if isinstance(arg, Bits):
@@ -32249,7 +32243,7 @@ class Variation_495(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 7, 'm/s2')
+    quantity = Quantity('Unsigned', 7.8125e-3, 'm/s2')
 
     def __init__(self, arg : Variation_495_Arg) -> None:
         if isinstance(arg, Bits):
@@ -32619,7 +32613,7 @@ class Variation_498(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 6, 'm/s')
+    quantity = Quantity('Unsigned', 1.5625e-2, 'm/s')
 
     def __init__(self, arg : Variation_498_Arg) -> None:
         if isinstance(arg, Bits):
@@ -32641,7 +32635,7 @@ class Variation_499(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 6, 'm/s2')
+    quantity = Quantity('Unsigned', 1.5625e-2, 'm/s2')
 
     def __init__(self, arg : Variation_499_Arg) -> None:
         if isinstance(arg, Bits):
@@ -33041,7 +33035,7 @@ class Variation_502(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 45.0, 16, '°')
+    quantity = Quantity('Unsigned', 6.866455078125e-4, '°')
 
     def __init__(self, arg : Variation_502_Arg) -> None:
         if isinstance(arg, Bits):
@@ -33063,7 +33057,7 @@ class Variation_503(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 180.0, 16, '°')
+    quantity = Quantity('Signed', 2.74658203125e-3, '°')
 
     def __init__(self, arg : Variation_503_Arg) -> None:
         if isinstance(arg, Bits):
@@ -33440,7 +33434,7 @@ class Variation_507(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 180.0, 16, '°/s')
+    quantity = Quantity('Signed', 2.74658203125e-3, '°/s')
 
     def __init__(self, arg : Variation_507_Arg) -> None:
         if isinstance(arg, Bits):
@@ -33462,7 +33456,7 @@ class Variation_508(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 45.0, 16, '°/s')
+    quantity = Quantity('Unsigned', 6.866455078125e-4, '°/s')
 
     def __init__(self, arg : Variation_508_Arg) -> None:
         if isinstance(arg, Bits):
@@ -33839,7 +33833,7 @@ class Variation_512(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 1.0, 0, 'dB')
+    quantity = Quantity('Signed', 1.0, 'dB')
 
     def __init__(self, arg : Variation_512_Arg) -> None:
         if isinstance(arg, Bits):
@@ -33861,7 +33855,7 @@ class Variation_513(Element):
 
     bit_offset8 = 7
     bit_size = 9
-    quantity = Quantity('Signed', 1.0, 0, 'dB')
+    quantity = Quantity('Signed', 1.0, 'dB')
 
     def __init__(self, arg : Variation_513_Arg) -> None:
         if isinstance(arg, Bits):
@@ -34067,7 +34061,7 @@ class Variation_516(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 10000.0, 16, 'm')
+    quantity = Quantity('Unsigned', 0.152587890625, 'm')
 
     def __init__(self, arg : Variation_516_Arg) -> None:
         if isinstance(arg, Bits):
@@ -34974,7 +34968,7 @@ class Variation_521(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 0, 's')
+    quantity = Quantity('Unsigned', 1.0, 's')
 
     def __init__(self, arg : Variation_521_Arg) -> None:
         if isinstance(arg, Bits):
@@ -35124,7 +35118,7 @@ class Variation_524(Element):
 
     bit_offset8 = 0
     bit_size = 32
-    quantity = Quantity('Signed', 2.0, 0, 'ns')
+    quantity = Quantity('Signed', 2.0, 'ns')
 
     def __init__(self, arg : Variation_524_Arg) -> None:
         if isinstance(arg, Bits):
@@ -35146,7 +35140,7 @@ class Variation_525(Element):
 
     bit_offset8 = 4
     bit_size = 20
-    quantity = Quantity('Unsigned', 1.0, 0, 'ns')
+    quantity = Quantity('Unsigned', 1.0, 'ns')
 
     def __init__(self, arg : Variation_525_Arg) -> None:
         if isinstance(arg, Bits):
@@ -35890,7 +35884,7 @@ class Variation_532(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Signed', 180.0, 25, '°')
+    quantity = Quantity('Signed', 5.364418029785156e-6, '°')
 
     def __init__(self, arg : Variation_532_Arg) -> None:
         if isinstance(arg, Bits):
@@ -36163,7 +36157,7 @@ class Variation_537(Element):
 
     bit_offset8 = 2
     bit_size = 14
-    quantity = Quantity('Unsigned', 1.0, 2, 'FL')
+    quantity = Quantity('Unsigned', 0.25, 'FL')
 
     def __init__(self, arg : Variation_537_Arg) -> None:
         if isinstance(arg, Bits):
@@ -37382,7 +37376,7 @@ class Variation_557(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 0, 's')
+    quantity = Quantity('Unsigned', 1.0, 's')
 
     def __init__(self, arg : Variation_557_Arg) -> None:
         if isinstance(arg, Bits):
@@ -38839,7 +38833,7 @@ class Variation_591(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 8, 'NM')
+    quantity = Quantity('Unsigned', 3.90625e-3, 'NM')
 
     def __init__(self, arg : Variation_591_Arg) -> None:
         if isinstance(arg, Bits):
@@ -38942,7 +38936,7 @@ class Variation_593(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 7, 'NM')
+    quantity = Quantity('Signed', 7.8125e-3, 'NM')
 
     def __init__(self, arg : Variation_593_Arg) -> None:
         if isinstance(arg, Bits):
@@ -41692,7 +41686,7 @@ class Variation_628(Element):
 
     bit_offset8 = 0
     bit_size = 32
-    quantity = Quantity('Signed', 180.0, 30, '°')
+    quantity = Quantity('Signed', 1.6763806343078613e-7, '°')
 
     def __init__(self, arg : Variation_628_Arg) -> None:
         if isinstance(arg, Bits):
@@ -44199,7 +44193,7 @@ class Variation_663(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 2, '')
+    quantity = Quantity('Unsigned', 0.25, '')
 
     def __init__(self, arg : Variation_663_Arg) -> None:
         if isinstance(arg, Bits):
@@ -47864,7 +47858,7 @@ class Variation_701(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Signed', 180.0, 23, '°')
+    quantity = Quantity('Signed', 2.1457672119140625e-5, '°')
 
     def __init__(self, arg : Variation_701_Arg) -> None:
         if isinstance(arg, Bits):
@@ -48039,7 +48033,7 @@ class Variation_706(Element):
 
     bit_offset8 = 4
     bit_size = 4
-    quantity = Quantity('Signed', 1.0, 0, '')
+    quantity = Quantity('Signed', 1.0, '')
 
     def __init__(self, arg : Variation_706_Arg) -> None:
         if isinstance(arg, Bits):
@@ -48445,7 +48439,7 @@ class Variation_714(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0e-2, 0, '°')
+    quantity = Quantity('Signed', 1.0e-2, '°')
 
     def __init__(self, arg : Variation_714_Arg) -> None:
         if isinstance(arg, Bits):
@@ -48570,7 +48564,7 @@ class Variation_717(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 0, 'kt')
+    quantity = Quantity('Unsigned', 1.0, 'kt')
 
     def __init__(self, arg : Variation_717_Arg) -> None:
         if isinstance(arg, Bits):
@@ -48592,7 +48586,7 @@ class Variation_718(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 14, 'NM/s')
+    quantity = Quantity('Signed', 6.103515625e-5, 'NM/s')
 
     def __init__(self, arg : Variation_718_Arg) -> None:
         if isinstance(arg, Bits):
@@ -48719,7 +48713,7 @@ class Variation_721(Element):
 
     bit_offset8 = 0
     bit_size = 7
-    quantity = Quantity('Signed', 1.0, 2, '°/s')
+    quantity = Quantity('Signed', 0.25, '°/s')
 
     def __init__(self, arg : Variation_721_Arg) -> None:
         if isinstance(arg, Bits):
@@ -48838,7 +48832,7 @@ class Variation_723(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 8, 's')
+    quantity = Quantity('Unsigned', 3.90625e-3, 's')
 
     def __init__(self, arg : Variation_723_Arg) -> None:
         if isinstance(arg, Bits):
@@ -48930,7 +48924,7 @@ class Variation_726(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 0, '°')
+    quantity = Quantity('Unsigned', 1.0, '°')
 
     def __init__(self, arg : Variation_726_Arg) -> None:
         if isinstance(arg, Bits):
@@ -48952,7 +48946,7 @@ class Variation_727(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 2, '°C')
+    quantity = Quantity('Signed', 0.25, '°C')
 
     def __init__(self, arg : Variation_727_Arg) -> None:
         if isinstance(arg, Bits):
@@ -49161,7 +49155,7 @@ class Variation_731(Element):
 
     bit_offset8 = 3
     bit_size = 13
-    quantity = Quantity('Signed', 25.0, 0, 'ft')
+    quantity = Quantity('Signed', 25.0, 'ft')
 
     def __init__(self, arg : Variation_731_Arg) -> None:
         if isinstance(arg, Bits):
@@ -49660,7 +49654,7 @@ class Variation_742(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 10.0, 0, 'ft')
+    quantity = Quantity('Signed', 10.0, 'ft')
 
     def __init__(self, arg : Variation_742_Arg) -> None:
         if isinstance(arg, Bits):
@@ -49782,7 +49776,7 @@ class Variation_747(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Unsigned', 1.0, 0, 's')
+    quantity = Quantity('Unsigned', 1.0, 's')
 
     def __init__(self, arg : Variation_747_Arg) -> None:
         if isinstance(arg, Bits):
@@ -49804,7 +49798,7 @@ class Variation_748(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0e-2, 0, 'NM')
+    quantity = Quantity('Unsigned', 1.0e-2, 'NM')
 
     def __init__(self, arg : Variation_748_Arg) -> None:
         if isinstance(arg, Bits):
@@ -52755,7 +52749,7 @@ class Variation_757(Element):
 
     bit_offset8 = 4
     bit_size = 12
-    quantity = Quantity('Unsigned', 0.1, 0, 'hPa')
+    quantity = Quantity('Unsigned', 0.1, 'hPa')
 
     def __init__(self, arg : Variation_757_Arg) -> None:
         if isinstance(arg, Bits):
@@ -52864,7 +52858,7 @@ class Variation_761(Element):
 
     bit_offset8 = 6
     bit_size = 10
-    quantity = Quantity('Unsigned', 45.0, 6, '°')
+    quantity = Quantity('Unsigned', 0.703125, '°')
 
     def __init__(self, arg : Variation_761_Arg) -> None:
         if isinstance(arg, Bits):
@@ -53292,7 +53286,7 @@ class Variation_772(Element):
 
     bit_offset8 = 4
     bit_size = 11
-    quantity = Quantity('Unsigned', 1.0, 3, 'kt')
+    quantity = Quantity('Unsigned', 0.125, 'kt')
 
     def __init__(self, arg : Variation_772_Arg) -> None:
         if isinstance(arg, Bits):
@@ -53314,7 +53308,7 @@ class Variation_773(Element):
 
     bit_offset8 = 0
     bit_size = 7
-    quantity = Quantity('Unsigned', 45.0, 4, '°')
+    quantity = Quantity('Unsigned', 2.8125, '°')
 
     def __init__(self, arg : Variation_773_Arg) -> None:
         if isinstance(arg, Bits):
@@ -58169,7 +58163,7 @@ class Variation_851(Element):
 
     bit_offset8 = 1
     bit_size = 15
-    quantity = Quantity('Unsigned', 1.0, 0, 'kt')
+    quantity = Quantity('Unsigned', 1.0, 'kt')
 
     def __init__(self, arg : Variation_851_Arg) -> None:
         if isinstance(arg, Bits):
@@ -58296,7 +58290,7 @@ class Variation_854(Element):
 
     bit_offset8 = 2
     bit_size = 30
-    quantity = Quantity('Unsigned', 1.0, 30, 's')
+    quantity = Quantity('Unsigned', 9.313225746154785e-10, 's')
 
     def __init__(self, arg : Variation_854_Arg) -> None:
         if isinstance(arg, Bits):
@@ -59315,7 +59309,7 @@ class Variation_876(Element):
 
     bit_offset8 = 1
     bit_size = 15
-    quantity = Quantity('Signed', 25.0, 2, 'ft/min')
+    quantity = Quantity('Signed', 6.25, 'ft/min')
 
     def __init__(self, arg : Variation_876_Arg) -> None:
         if isinstance(arg, Bits):
@@ -59499,7 +59493,7 @@ class Variation_879(Element):
 
     bit_offset8 = 1
     bit_size = 15
-    quantity = Quantity('Unsigned', 1.0, 14, 'NM/s')
+    quantity = Quantity('Unsigned', 6.103515625e-5, 'NM/s')
 
     def __init__(self, arg : Variation_879_Arg) -> None:
         if isinstance(arg, Bits):
@@ -59624,7 +59618,7 @@ class Variation_881(Element):
 
     bit_offset8 = 6
     bit_size = 10
-    quantity = Quantity('Signed', 1.0, 5, '°/s')
+    quantity = Quantity('Signed', 3.125e-2, '°/s')
 
     def __init__(self, arg : Variation_881_Arg) -> None:
         if isinstance(arg, Bits):
@@ -60028,7 +60022,7 @@ class Variation_889(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 1, 's')
+    quantity = Quantity('Unsigned', 0.5, 's')
 
     def __init__(self, arg : Variation_889_Arg) -> None:
         if isinstance(arg, Bits):
@@ -60984,7 +60978,7 @@ class Variation_910(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 0.1, 0, 's')
+    quantity = Quantity('Unsigned', 0.1, 's')
 
     def __init__(self, arg : Variation_910_Arg) -> None:
         if isinstance(arg, Bits):
@@ -69962,7 +69956,7 @@ class Variation_938(Element):
 
     bit_offset8 = 0
     bit_size = 7
-    quantity = Quantity('Unsigned', 1.0, 0, 's')
+    quantity = Quantity('Unsigned', 1.0, 's')
 
     def __init__(self, arg : Variation_938_Arg) -> None:
         if isinstance(arg, Bits):
@@ -70374,7 +70368,7 @@ class Variation_942(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 0, 'NM')
+    quantity = Quantity('Unsigned', 1.0, 'NM')
 
     def __init__(self, arg : Variation_942_Arg) -> None:
         if isinstance(arg, Bits):
@@ -72319,7 +72313,7 @@ class Variation_966(Element):
 
     bit_offset8 = 0
     bit_size = 32
-    quantity = Quantity('Signed', 180.0, 32, '°')
+    quantity = Quantity('Signed', 4.190951585769653e-8, '°')
 
     def __init__(self, arg : Variation_966_Arg) -> None:
         if isinstance(arg, Bits):
@@ -79227,7 +79221,7 @@ class Variation_1054(Element):
 
     bit_offset8 = 2
     bit_size = 14
-    quantity = Quantity('Signed', 25.0, 0, 'ft')
+    quantity = Quantity('Signed', 25.0, 'ft')
 
     def __init__(self, arg : Variation_1054_Arg) -> None:
         if isinstance(arg, Bits):
@@ -79501,7 +79495,7 @@ class Variation_1059(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 7, 's')
+    quantity = Quantity('Unsigned', 7.8125e-3, 's')
 
     def __init__(self, arg : Variation_1059_Arg) -> None:
         if isinstance(arg, Bits):
@@ -80429,7 +80423,7 @@ class Variation_1069(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 0.1, 0, 'dB')
+    quantity = Quantity('Unsigned', 0.1, 'dB')
 
     def __init__(self, arg : Variation_1069_Arg) -> None:
         if isinstance(arg, Bits):
@@ -80592,7 +80586,7 @@ class Variation_1071(Element):
 
     bit_offset8 = 0
     bit_size = 24
-    quantity = Quantity('Unsigned', 1.0, 8, 'NM')
+    quantity = Quantity('Unsigned', 3.90625e-3, 'NM')
 
     def __init__(self, arg : Variation_1071_Arg) -> None:
         if isinstance(arg, Bits):
@@ -80919,7 +80913,7 @@ class Variation_1079(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 0, '%')
+    quantity = Quantity('Unsigned', 1.0, '%')
 
     def __init__(self, arg : Variation_1079_Arg) -> None:
         if isinstance(arg, Bits):
@@ -81454,7 +81448,7 @@ class Variation_1087(Element):
 
     bit_offset8 = 1
     bit_size = 15
-    quantity = Quantity('Unsigned', 1.0, 0, 'ms')
+    quantity = Quantity('Unsigned', 1.0, 'ms')
 
     def __init__(self, arg : Variation_1087_Arg) -> None:
         if isinstance(arg, Bits):
@@ -81765,7 +81759,7 @@ class Variation_1092(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 0, 'ms')
+    quantity = Quantity('Unsigned', 1.0, 'ms')
 
     def __init__(self, arg : Variation_1092_Arg) -> None:
         if isinstance(arg, Bits):
@@ -82175,7 +82169,7 @@ class Variation_1100(Element):
 
     bit_offset8 = 1
     bit_size = 7
-    quantity = Quantity('Unsigned', 1.0, 0, 's')
+    quantity = Quantity('Unsigned', 1.0, 's')
 
     def __init__(self, arg : Variation_1100_Arg) -> None:
         if isinstance(arg, Bits):
@@ -84065,7 +84059,7 @@ class Variation_1123(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 360.0, 13, '°')
+    quantity = Quantity('Unsigned', 4.39453125e-2, '°')
 
     def __init__(self, arg : Variation_1123_Arg) -> None:
         if isinstance(arg, Bits):
@@ -84087,7 +84081,7 @@ class Variation_1124(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 1.0, 8, 'NM')
+    quantity = Quantity('Signed', 3.90625e-3, 'NM')
 
     def __init__(self, arg : Variation_1124_Arg) -> None:
         if isinstance(arg, Bits):
@@ -84964,7 +84958,7 @@ class Variation_1138(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 7, 'NM')
+    quantity = Quantity('Unsigned', 7.8125e-3, 'NM')
 
     def __init__(self, arg : Variation_1138_Arg) -> None:
         if isinstance(arg, Bits):
@@ -84986,7 +84980,7 @@ class Variation_1139(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 14, 'NM/s')
+    quantity = Quantity('Unsigned', 6.103515625e-5, 'NM/s')
 
     def __init__(self, arg : Variation_1139_Arg) -> None:
         if isinstance(arg, Bits):
@@ -85008,7 +85002,7 @@ class Variation_1140(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 360.0, 12, '°')
+    quantity = Quantity('Unsigned', 8.7890625e-2, '°')
 
     def __init__(self, arg : Variation_1140_Arg) -> None:
         if isinstance(arg, Bits):
@@ -85297,7 +85291,7 @@ class Variation_1146(Element):
 
     bit_offset8 = 6
     bit_size = 10
-    quantity = Quantity('Signed', 1.0, 0, 'm/s')
+    quantity = Quantity('Signed', 1.0, 'm/s')
 
     def __init__(self, arg : Variation_1146_Arg) -> None:
         if isinstance(arg, Bits):
@@ -85401,7 +85395,7 @@ class Variation_1148(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 0, 'm/s')
+    quantity = Quantity('Unsigned', 1.0, 'm/s')
 
     def __init__(self, arg : Variation_1148_Arg) -> None:
         if isinstance(arg, Bits):
@@ -85423,7 +85417,7 @@ class Variation_1149(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0, 0, 'MHz')
+    quantity = Quantity('Unsigned', 1.0, 'MHz')
 
     def __init__(self, arg : Variation_1149_Arg) -> None:
         if isinstance(arg, Bits):
@@ -93115,7 +93109,7 @@ class Variation_1224(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 8.0e-3, 0, 'Mach')
+    quantity = Quantity('Unsigned', 8.0e-3, 'Mach')
 
     def __init__(self, arg : Variation_1224_Arg) -> None:
         if isinstance(arg, Bits):
@@ -93137,7 +93131,7 @@ class Variation_1225(Element):
 
     bit_offset8 = 4
     bit_size = 12
-    quantity = Quantity('Unsigned', 0.1, 0, 'mb')
+    quantity = Quantity('Unsigned', 0.1, 'mb')
 
     def __init__(self, arg : Variation_1225_Arg) -> None:
         if isinstance(arg, Bits):
@@ -98238,7 +98232,7 @@ class Variation_1275(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Signed', 1.0, 7, 's')
+    quantity = Quantity('Signed', 7.8125e-3, 's')
 
     def __init__(self, arg : Variation_1275_Arg) -> None:
         if isinstance(arg, Bits):
@@ -98892,7 +98886,7 @@ class Variation_1281(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 180.0, 25, '°')
+    quantity = Quantity('Unsigned', 5.364418029785156e-6, '°')
 
     def __init__(self, arg : Variation_1281_Arg) -> None:
         if isinstance(arg, Bits):
@@ -98995,7 +98989,7 @@ class Variation_1283(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 25.0, 2, 'ft')
+    quantity = Quantity('Unsigned', 6.25, 'ft')
 
     def __init__(self, arg : Variation_1283_Arg) -> None:
         if isinstance(arg, Bits):
@@ -99017,7 +99011,7 @@ class Variation_1284(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 2, 'FL')
+    quantity = Quantity('Unsigned', 0.25, 'FL')
 
     def __init__(self, arg : Variation_1284_Arg) -> None:
         if isinstance(arg, Bits):
@@ -99039,7 +99033,7 @@ class Variation_1285(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 2, 'm/s')
+    quantity = Quantity('Unsigned', 0.25, 'm/s')
 
     def __init__(self, arg : Variation_1285_Arg) -> None:
         if isinstance(arg, Bits):
@@ -99142,7 +99136,7 @@ class Variation_1287(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 1.0, 2, 'm/s2')
+    quantity = Quantity('Unsigned', 0.25, 'm/s2')
 
     def __init__(self, arg : Variation_1287_Arg) -> None:
         if isinstance(arg, Bits):
@@ -99245,7 +99239,7 @@ class Variation_1289(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 25.0, 2, 'ft/min')
+    quantity = Quantity('Unsigned', 6.25, 'ft/min')
 
     def __init__(self, arg : Variation_1289_Arg) -> None:
         if isinstance(arg, Bits):
@@ -108370,7 +108364,7 @@ class Variation_1326(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0, 0, 'ms')
+    quantity = Quantity('Signed', 1.0, 'ms')
 
     def __init__(self, arg : Variation_1326_Arg) -> None:
         if isinstance(arg, Bits):
@@ -108392,7 +108386,7 @@ class Variation_1327(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0e-5, 0, '')
+    quantity = Quantity('Signed', 1.0e-5, '')
 
     def __init__(self, arg : Variation_1327_Arg) -> None:
         if isinstance(arg, Bits):
@@ -108495,7 +108489,7 @@ class Variation_1329(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 360.0, 16, '°')
+    quantity = Quantity('Signed', 5.4931640625e-3, '°')
 
     def __init__(self, arg : Variation_1329_Arg) -> None:
         if isinstance(arg, Bits):
@@ -109655,7 +109649,7 @@ class Variation_1342(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Unsigned', 1.0e-2, 0, '°')
+    quantity = Quantity('Unsigned', 1.0e-2, '°')
 
     def __init__(self, arg : Variation_1342_Arg) -> None:
         if isinstance(arg, Bits):
@@ -109677,7 +109671,7 @@ class Variation_1343(Element):
 
     bit_offset8 = 0
     bit_size = 8
-    quantity = Quantity('Unsigned', 100.0, 0, 'm')
+    quantity = Quantity('Unsigned', 100.0, 'm')
 
     def __init__(self, arg : Variation_1343_Arg) -> None:
         if isinstance(arg, Bits):
@@ -109724,7 +109718,7 @@ class Variation_1345(Element):
 
     bit_offset8 = 0
     bit_size = 16
-    quantity = Quantity('Signed', 1.0e-2, 0, 'dBµV')
+    quantity = Quantity('Signed', 1.0e-2, 'dBµV')
 
     def __init__(self, arg : Variation_1345_Arg) -> None:
         if isinstance(arg, Bits):
@@ -110402,7 +110396,7 @@ class Variation_1349(Element):
 
     bit_offset8 = 0
     bit_size = 32
-    quantity = Quantity('Unsigned', 1.0, 0, 'ns')
+    quantity = Quantity('Unsigned', 1.0, 'ns')
 
     def __init__(self, arg : Variation_1349_Arg) -> None:
         if isinstance(arg, Bits):
@@ -110549,7 +110543,7 @@ class Variation_1351(Element):
 
     bit_offset8 = 0
     bit_size = 32
-    quantity = Quantity('Unsigned', 1.0, 0, 'fs')
+    quantity = Quantity('Unsigned', 1.0, 'fs')
 
     def __init__(self, arg : Variation_1351_Arg) -> None:
         if isinstance(arg, Bits):
@@ -113165,6 +113159,6 @@ manifest = {
     },
 }
 
-VERSION = '20231217.7215'
+VERSION = '20231224.7093'
 
-REFERENCE = 'a9341f6155dfbfeb4ba6baf6564a53711bfe772e'
+REFERENCE = 'c53155b70fc8e3aa5932ccc150319a4c579ca79d'
