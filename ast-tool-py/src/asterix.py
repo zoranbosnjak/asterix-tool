@@ -10889,7 +10889,7 @@ class Variation_188(Element):
 
 Variation_189_Arg_Group = TypedDict('Variation_189_Arg_Group', {
     'TID': Union[Variation_187, Variation_187_Arg],
-    'CP': Union[Variation_93, Variation_93_Arg],
+    'CPC': Union[Variation_93, Variation_93_Arg],
     'CS': Union[Variation_188, Variation_188_Arg],
 })
 Variation_189_Arg : TypeAlias = Union[Raw, Variation_189_Arg_Group]
@@ -10900,14 +10900,14 @@ class Variation_189(Group):
 
     subitems_list = [
         ('TID', Variation_187),
-        ('CP', Variation_93),
+        ('CPC', Variation_93),
         ('CS', Variation_188),
     ]
 
     # name: (title, cls, group_offset, bit_size)
     subitems_dict = {
         'TID': ('Identification of Conflict Categories Definition Table', Variation_187, 0, 4),
-        'CP': ('Conflict Properties Class', Variation_93, 4, 3),
+        'CPC': ('Conflict Properties Class', Variation_93, 4, 3),
         'CS': ('Conflict Severity', Variation_188, 7, 1),
     }
 
@@ -10918,7 +10918,7 @@ class Variation_189(Group):
 
     @overload
     @classmethod
-    def spec(cls, key : Literal['CP']) -> Type[Variation_93]:
+    def spec(cls, key : Literal['CPC']) -> Type[Variation_93]:
         ...
 
     @overload
@@ -10927,10 +10927,10 @@ class Variation_189(Group):
         ...
 
     @classmethod
-    def spec(cls, key : Union[Literal['TID'], Literal['CP'], Literal['CS']]) -> Union[Type['Variation_187'], Type['Variation_93'], Type['Variation_188']]:
+    def spec(cls, key : Union[Literal['TID'], Literal['CPC'], Literal['CS']]) -> Union[Type['Variation_187'], Type['Variation_93'], Type['Variation_188']]:
         if key == 'TID':
             return Variation_187
-        if key == 'CP':
+        if key == 'CPC':
             return Variation_93
         if key == 'CS':
             return Variation_188
@@ -10950,14 +10950,14 @@ class Variation_189(Group):
         ...
 
     @overload
-    def get_item(self, name : Literal['CP']) -> Variation_93:
+    def get_item(self, name : Literal['CPC']) -> Variation_93:
         ...
 
     @overload
     def get_item(self, name : Literal['CS']) -> Variation_188:
         ...
 
-    def get_item(self, name : Union[Literal['TID'], Literal['CP'], Literal['CS']]) -> Any:
+    def get_item(self, name : Union[Literal['TID'], Literal['CPC'], Literal['CS']]) -> Any:
         return self._get_item(name)
 
     @overload
@@ -10965,7 +10965,7 @@ class Variation_189(Group):
         ...
 
     @overload
-    def set_item(self, name : Literal['CP'], val : Union[Variation_93, Variation_93_Arg]) -> 'Variation_189':
+    def set_item(self, name : Literal['CPC'], val : Union[Variation_93, Variation_93_Arg]) -> 'Variation_189':
         ...
 
     @overload
@@ -10980,7 +10980,7 @@ class Variation_189(Group):
         ...
 
     @overload
-    def modify_item(self, name : Literal['CP'], f : Any) -> 'Variation_189':
+    def modify_item(self, name : Literal['CPC'], f : Any) -> 'Variation_189':
         ...
 
     @overload
@@ -115028,6 +115028,6 @@ manifest = {
     },
 }
 
-VERSION = '20240225.6755'
+VERSION = '20240303.6783'
 
-REFERENCE = '6869e4549e6de2e8442ceec63d7679279286f851'
+REFERENCE = '58f75700aac83df9729c65fbb4d7beffba27f86c'
