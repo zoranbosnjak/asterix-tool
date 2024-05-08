@@ -6,7 +6,7 @@ authors = [
 ]
 description = "Asterix data processing tool"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -17,6 +17,7 @@ dependencies = [
     'typing_extensions; python_version < "3.10"',
     'scapy',
     'cryptography',
+    'libasterix',
 ]
 
 [project.scripts]
@@ -28,4 +29,3 @@ ast-tool-py = "main:main"
 
 [tool.setuptools.dynamic]
 version = {attr = "main.__version__"}
-

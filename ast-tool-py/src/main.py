@@ -21,10 +21,12 @@ import warnings
 from cryptography.utils import CryptographyDeprecationWarning
 warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
 
-from scapy.all import rdpcap, IP, UDP
+from typing import *
 
-import asterix as ast
-from asterix import *
+from scapy.all import rdpcap, IP, UDP # type: ignore
+
+from asterix.base import *
+import asterix.generated as gen
 
 __version__ = "0.12.0"
 
@@ -34,16 +36,18 @@ __version__ = "0.12.0"
 #   - channel name
 #   - actual data bytes
 
-class IO:
+Event: TypeAlias = Tuple[float, Optional[datetime.datetime], Optional[str], bytes]
+
+class CIO:
     """Input/output helper class, handles broken pipe exception and automatic flush.
     """
 
-    def __init__(self, simple_input, simple_output, flush):
-        self.simple_input = simple_input
-        self.simple_output = simple_output
+    def __init__(self, s_in : bool, s_out : bool, flush : bool) -> None:
+        self.simple_input = s_in
+        self.simple_output = s_out
         self.flush = flush
 
-    def rx(self):
+    def rx(self) -> Generator[Event, None, None]:
         for line in fileinput.input('-'):
             if self.simple_input:
                 t_mono = time.monotonic()
@@ -58,30 +62,30 @@ class IO:
                 data = bytes.fromhex(o['data'])
             yield (t_mono, t_utc, channel, data)
 
-    def tx_raw(self, s):
+    def tx_raw(self, s : str) -> None:
         try:
             print(s, flush=self.flush)
         except BrokenPipeError:
-            sys.stdout = None
+            sys.stdout = None # type: ignore
             sys.exit(0)
 
-    def tx_raw_bin(self, s):
+    def tx_raw_bin(self, s : bytes) -> None:
         try:
             sys.stdout.buffer.write(s)
             if self.flush:
                 sys.stdout.buffer.flush()
         except BrokenPipeError:
-            sys.stdout = None
+            sys.stdout = None # type: ignore
             sys.exit(0)
 
-    def tx(self, event):
+    def tx(self, event : Event) -> None:
         (t_mono, t_utc, channel, data) = event
         if self.simple_output:
             s = data.hex()
         else:
             s = json.dumps({
                 "tMono": t_mono,
-                "tUtc": t_utc.isoformat(),
+                "tUtc": t_utc.isoformat() if t_utc is not None else None,
                 "channel": channel,
                 "data": data.hex(),
             })
@@ -114,17 +118,17 @@ class PCG32:
         ix = self.next() % len(lst)
         return lst[ix]
 
-    def bool(self):
+    def bool(self) -> bool:
         """Generate random bool value."""
         return bool(self.next() % 2)
 
-    def bigint(self, bitsize):
+    def bigint(self, bitsize : int) -> int:
         """Generate random number of arbitrary bitsize."""
         val = self.next()
         size = 32
         while True:
             if size >= bitsize:
-                return val % pow(2,bitsize)
+                return val % pow(2,bitsize) # type: ignore
             size += 32
             val = val*pow(2,32) + self.next()
 
@@ -136,31 +140,34 @@ class Fmt:
     """
     name : str
 
-    def __init__(self, io):
+    def __init__(self, io : CIO):
         self.io = io
         self.on_init()
 
-    def on_init(self):
+    def on_init(self) -> None:
         pass
 
 class FmtSimple(Fmt):
-    """Simple line oriented data format: {timestamp-iso} {hex data} {channel} {time-mono-ns}"""
+    """Simple line oriented data format:
+       {timestamp-iso} {hex data} {channel} {time-mono-ns}"""
+
     name = 'simple'
 
-    def write_event(self, event):
+    def write_event(self, event : Event) -> None:
         (t_mono, t_utc, channel, data) = event
         if not channel:
             channel = '-'
         t_mono_ns = round(t_mono*1000*1000*1000)
-        self.io.tx_raw('{} {} {} {}'.format(t_utc.isoformat(), data.hex(), channel, t_mono_ns))
+        t_utc_iso = t_utc.isoformat() if t_utc is not None else None
+        self.io.tx_raw('{} {} {} {}'.format(t_utc_iso,
+            data.hex(), channel, t_mono_ns))
 
-    def events(self, infile):
+    def events(self, infile : str) -> Generator[Event, None, None]:
         for line in fileinput.input(infile or '-'):
-            (t, data, channel, t_mono_ns) = line.split()
+            (t, s, ch, t_mono_ns) = line.split()
             t_utc = datetime.datetime.fromisoformat(t)
-            data = bytes.fromhex(data)
-            if channel == '-':
-                channel = None
+            data = bytes.fromhex(s)
+            channel = None if ch == '-' else ch
             t_mono = int(t_mono_ns)/(1000*1000*1000)
             yield(t_mono, t_utc, channel, data)
 
@@ -170,17 +177,19 @@ class FmtVcr(Fmt):
     period = 0x100000000
     time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
-    def on_init(self):
+    def on_init(self) -> None:
         self.session = str(uuid.uuid4())[0:8]
-        self.channels = {}
+        self.channels : Dict[Optional[str], Tuple[str,int]] = {}
 
-    def write_event(self, event):
+    def write_event(self, event : Event) -> None:
         (t_mono, t_utc, channel, data) = event
         (track, sequence) = self.channels.get(channel, (str(uuid.uuid4())[0:8], 0))
+        tUtc_s = t_utc.strftime(self.__class__.time_format) \
+            if t_utc is not None else None
         rec = {
             "channel": channel,
             "tMono": round(t_mono*1000*1000*1000),
-            "tUtc": t_utc.strftime(self.__class__.time_format),
+            "tUtc": tUtc_s,
             "session": self.session,
             "track": track,
             "sequence": sequence,
@@ -193,7 +202,7 @@ class FmtVcr(Fmt):
         self.channels[channel] = (track, sequence)
         self.io.tx_raw(json.dumps(rec))
 
-    def events(self, infile):
+    def events(self, infile : str) -> Generator[Event, None, None]:
         for line in fileinput.input(infile or '-'):
             o = json.loads(line)
             t_mono = o['tMono']/(1000*1000*1000)
@@ -212,7 +221,7 @@ class FmtPcap(Fmt):
     """Wireshark/tcpdump file format."""
     name = 'pcap'
 
-    def events(self, infile):
+    def events(self, infile : str) -> Generator[Event, None, None]:
         if infile is None:
             raise Exception('expecting explicit filename')
         scapy_cap = rdpcap(infile)
@@ -231,7 +240,7 @@ class FmtBonita(Fmt):
     """Simple line oriented data format: {timestamp.seconds} : {hex data}"""
     name = 'bonita'
 
-    def events(self, infile):
+    def events(self, infile : str) -> Generator[Event, None, None]:
         fmt = '%a %b %d %H:%M:%S %Y UTC'
         start_time = None
         first_packet_time = None
@@ -249,7 +258,7 @@ class FmtBonita(Fmt):
                 try: locale.setlocale(locale.LC_ALL, loc)
                 except: pass
                 continue
-            t, data = line.split(':')
+            t, s = line.split(':')
             t_mono = float(t.strip())
             if first_packet_time is None:
                 first_packet_time = t_mono
@@ -257,7 +266,7 @@ class FmtBonita(Fmt):
             t_utc = None
             if start_time is not None:
                 t_utc = start_time + datetime.timedelta(seconds=delta)
-            data = bytes.fromhex(data.strip())
+            data = bytes.fromhex(s.strip())
             yield (t_mono, t_utc, None, data)
 
 class FmtFinal(Fmt):
@@ -272,11 +281,12 @@ class FmtFinal(Fmt):
     """
     name = 'final'
 
-    def on_init(self):
-        self.day0 = None
+    def on_init(self) -> None:
+        self.day0 : Optional[datetime.date] = None
 
-    def write_event(self, event):
-        (t_mono, t_utc, channel, data) = event
+    def write_event(self, event : Event) -> None:
+        (t_mono, _t_utc, channel, data) = event
+        t_utc : datetime.datetime = _t_utc # type: ignore
         ch = bytes([int(channel or 0)])
         if self.day0 is None:
             self.day0 = t_utc.date()
@@ -285,15 +295,16 @@ class FmtFinal(Fmt):
         day = t_utc.date()
         delta = day - self.day0
         recording_day = delta.days.to_bytes(1, byteorder='big')
-        ts_midnight = datetime.datetime(t_utc.year, t_utc.month, t_utc.day, tzinfo = t_utc.tzinfo)
+        ts_midnight = datetime.datetime(
+            t_utc.year, t_utc.month, t_utc.day, tzinfo = t_utc.tzinfo)
         seconds = (t_utc - ts_midnight).total_seconds()
         time = round(seconds*100).to_bytes(3, byteorder='big')
         padding = bytes([0xa5, 0xa5, 0xa5, 0xa5])
         s = total_length + err + ch + recording_day + time + data + padding
         self.io.tx_raw_bin(s)
 
-    def events(self, infile):
-        def loop(f):
+    def events(self, infile : str) -> Generator[Event, None, None]:
+        def loop(f : Any) -> Generator[Event, None, None]:
             while True:
                 n = f.read(2)
                 if not n:
@@ -310,7 +321,8 @@ class FmtFinal(Fmt):
                 padding = s[-4:]
                 assert padding == b'\xa5\xa5\xa5\xa5', str(padding)
                 t_mono = float(day)*24*3600 + t
-                # This is the best approximation. UTC time is not stored in this format,
+                # This is the best approximation.
+                # UTC time is not stored in this format,
                 # but it might be useful to have at least relative times.
                 t_utc = datetime.datetime.fromtimestamp(0, tz=datetime.timezone.utc) \
                     + datetime.timedelta(seconds=t_mono)
@@ -327,41 +339,50 @@ class FmtFinal(Fmt):
 format_input  = [FmtSimple, FmtVcr, FmtPcap, FmtBonita, FmtFinal]
 format_output = [FmtSimple, FmtVcr, FmtFinal]
 
-def format_find(lst, name):
+def format_find(lst : List[Any], name : str) -> Any:
     for i in lst:
         if i.name == name:
             return i
     return None
 
-def string_to_edition(ed):
+def string_to_edition(ed : str) -> Tuple[int, int]:
     """Convert edition string to a tuple, for example "1.2" -> (1,2)"""
     a,b = ed.split('.')
     return (int(a), int(b))
 
-def cmd_show_manifest(io, args):
+def cmd_show_manifest(io : CIO, args : Any) -> None:
 
-    def fmt(what, n, ed): # type: ignore
+    def fmt(what : str, n : int, ed : str) -> str:
         return '{} {}, edition {}'.format(what, str(n).zfill(3), ed)
 
-    def loop(arg, what):
-        for n in sorted(manifest[arg]):
-            d = manifest[arg][n]
-            for ed in sorted(d.keys(), key=string_to_edition, reverse=True):
+    def loop(arg : str, what : str) -> None:
+        for n in sorted(gen.manifest[arg]):
+            d = gen.manifest[arg][n]
+            keys = d.keys() # type: ignore
+            for ed in sorted(keys, key=string_to_edition, reverse=True):
                 print(fmt(what, n, ed))
                 if args.latest: break
 
     loop('CATS', 'cat')
     loop('REFS', 'ref')
 
-def get_selection(empty, explicit_cats, explicit_refs):
+def get_selection(empty : bool,
+                  explicit_cats : List[Tuple[str,str]],
+                  explicit_refs : List[Tuple[str,str]]
+                  ) -> Dict[str, Dict[int, AstSpec]]:
     """Get category selection."""
 
-    def get_latest(lst):
-        return sorted(lst, key=lambda pair: string_to_edition(pair[0]), reverse=True)[0]
+    manifest = gen.manifest
+
+    def get_latest(lst : List[Any]) -> Any:
+        return sorted(lst, key=lambda pair: string_to_edition(pair[0]),
+                      reverse=True)[0]
 
     # get latest
-    cats = {cat: get_latest(manifest['CATS'][cat].items())[1] for cat in manifest['CATS'].keys()}
-    refs = {cat: get_latest(manifest['REFS'][cat].items())[1] for cat in manifest['REFS'].keys()}
+    cats = {cat: get_latest(manifest['CATS'][cat].items())[1] # type: ignore
+            for cat in manifest['CATS'].keys()}
+    refs = {cat: get_latest(manifest['REFS'][cat].items())[1] # type: ignore
+            for cat in manifest['REFS'].keys()}
 
     # cleanup if required
     if empty:
@@ -373,75 +394,99 @@ def get_selection(empty, explicit_cats, explicit_refs):
         (cats, 'CATS', explicit_cats),
         (refs, 'REFS', explicit_refs),
         ]:
-        for (cat,ed) in c:
-            cat = int(cat)
-            a.update({cat: manifest[b][cat][ed]})
+        for (cat_i, ed) in c:
+            cat = int(cat_i)
+            a.update({cat: manifest[b][cat][ed]}) # type: ignore
     return {'CATS': cats, 'REFS': refs}
 
-def get_expansions(selection, expansions):
+def get_expansions(selection : Dict[str,
+        Dict[int, AstSpec]], expansions : List[Tuple[str, str]]
+        ) -> Any:
     result = []
-    for (cat, name) in expansions:
-        cat = int(cat)
+    for (cat_s, name) in expansions:
+        cat = int(cat_s)
         assert cat in selection['REFS'].keys(), 'REF not defined'
         spec = selection['CATS'][cat]
-        subitem = spec.variation.spec(name)
-        assert issubclass(subitem, Explicit)
+        uap = spec.uap # type: ignore
+        rec = uap.record
+        rule = rec.spec(name)
+        var = rule.variation
+        assert issubclass(var, Explicit)
         result.append((cat, name))
     return result
 
-def get_parsing_options(args):
-    parsing_opt = ParsingOptions.default()
-    parsing_opt.no_check_spare = bool(args.no_check_spare)
-    return parsing_opt
-
 class AsterixSamples:
     """Asterix sample generator."""
-    def __init__(self, gen, sel, exp, populate_all_items):
+    def __init__(self, gen : PCG32,
+            sel : Dict[Any,Any], exp : Dict[Any, Any],
+            populate_all_items : bool) -> None:
         self.gen = gen
         self.expand = set(exp)
         self.populate_all_items = populate_all_items
 
         # for some specs it is not possible to generate valid record,
-        # without knowing the profile, so skip those
+        # without knowing the UAP, so skip those
         self.valid_specs = {}
         for (cat, spec) in sel['CATS'].items():
-            if hasattr(spec, 'make_record') or hasattr(spec, 'is_valid'):
+            if issubclass(spec.uap, UapSingle):
                 self.valid_specs[cat] = spec
         assert self.valid_specs # non-empty list is required
         self.refs = sel['REFS']
 
-    def __iter__(self):
+    def __iter__(self) -> 'AsterixSamples':
         return self
 
-    def random_record(self, cat, cls):
+    def random_record(self, cat : int, cls : Type[AstSpec]) -> AstSpec:
         gen = self.gen
 
-        def random_var(var, name=None):
+        #def random_var(var : type[Variation], name : Optional[str] = None) -> Any:
+        @no_type_check
+        def random_var(var):
 
             if issubclass(var, Element):
                 return gen.bigint(var.bit_size)
 
             if issubclass(var, Group):
-                return gen.bigint(var.bit_size)
+                return tuple([random_item(i) for (i,_size) in var.items_list])
 
             if issubclass(var, Extended):
-                values = [gen.bigint(i) for i in var.groups_bit_sizes]
-                values = values[0:1+(gen.next() % len(values))]
-                return tuple(values)
+                groups = var.items_list
+                n = gen.next() % len(groups)
+                groups = groups[0:n+1]
+                result1 = []
+                for g in groups:
+                    result2 = []
+                    for x in g:
+                        if x is None:
+                            result2.append(None)
+                        else:
+                            (i, _size) = x
+                            result2.append(random_item(i))
+                    result1.append(tuple(result2))
+                print(var)
+                print(result1)
+                return tuple(result1)
 
             if issubclass(var, Repetitive):
                 n = 1 + (gen.next() % 10)
-                return [gen.bigint(var.variation_bit_size) for i in range(n)]
+                return [random_var(var.variation) for i in range(n)]
 
             if issubclass(var, Explicit):
+                return None # TODO
+                '''
                 this_item = (cat, name)
                 if not this_item in self.expand:
                     return None
                 sub = self.refs[cat].variation
                 val = random_var(sub)
                 return sub(val).unparse_bits().to_bytes() or None # avoid empty
+                '''
 
             if issubclass(var, Compound):
+                return None # TODO
+                print('todo compound', var)
+                raise NotImplementedError
+                '''
                 d = {}
                 for (name, (_title, sub, _fspec)) in var.subitems_dict.items():
                     populate_this_item = self.populate_all_items or gen.bool()
@@ -450,10 +495,44 @@ class AsterixSamples:
                         if not x is None:
                             d[name] = x
                 return d or None # turn {} into None, to skip this subitem
+                '''
             raise Exception('internal error, unexpected variation', var)
 
-        while True:
+        @no_type_check
+        def random_item(t):
+            if issubclass(t, Spare):
+                return 0
+            if issubclass(t, Item):
+                return random_rule(t.non_spare.rule)
+            raise Exception('internal error, unexpected type', t)
 
+        @no_type_check
+        def random_rule(t):
+            if issubclass(t, RuleVariationContextFree):
+                cls = t.variation
+            elif issubclass(t, RuleVariationDependent):
+                cls = t.default_variation
+            else:
+                raise Exception('internal error, unexpected type', t)
+            return random_var(cls)
+
+        @no_type_check
+        def random_rec(t):
+            d = {}
+            for (key, cls) in t.items_dict.items():
+                populate = self.populate_all_items or gen.bool()
+                if populate:
+                    rule = random_rule(cls)
+                    if rule is not None:
+                        d[key] = rule
+            return t.create(d)
+
+        uap = cls.uap # type: ignore
+        r = random_rec(uap.record)
+        return r # type: ignore
+
+        '''
+        while True:
             if hasattr(cls, 'make_record'):
                 var = cls.variation
                 rec = cls.make_record(random_var(var))
@@ -463,17 +542,18 @@ class AsterixSamples:
                 rec = cls.make_record_unsafe(uap, random_var(var))
                 if not cls.is_valid(rec):
                     continue
-
             return rec
+        '''
 
-    def __next__(self):
+    def __next__(self) -> bytes:
         cat = self.gen.choose(list(self.valid_specs.keys()))
         cls = self.valid_specs[cat]
         rec = self.random_record(cat, cls)
-        db = cls.make_datablock([rec])
-        return db.unparse()
+        db = cls.create([rec])
+        bs = db.unparse().to_bytes()
+        return bs # type: ignore
 
-def cmd_gen_random(io, args):
+def cmd_gen_random(io : CIO, args : Any) -> None:
     """Generate random samples."""
     sel = get_selection(args.empty_selection, args.cat or [], args.ref or [])
     exp = get_expansions(sel, args.expand or [])
@@ -492,6 +572,7 @@ def cmd_gen_random(io, args):
         if args.sleep is not None:
             time.sleep(args.sleep)
 
+'''
 def cmd_asterix_decoder(io, args):
     parsing_opt = get_parsing_options(args)
     sel = get_selection(args.empty_selection, args.cat or [], args.ref or [])
@@ -783,8 +864,9 @@ def cmd_custom(io, args):
     #   - all command line arguments
     f = run_globals[args.call]
     f(ast, io, args)
+'''
 
-def check_ttl(arg):
+def check_ttl(arg : int) -> int:
     ttlInterval = (1, 255)
     try:
         val = int(arg)
@@ -797,12 +879,14 @@ def check_ttl(arg):
         raise argparse.ArgumentTypeError('must be in interval [{},{}]'.format(ttlInterval[0], ttlInterval[1]))
     return val
 
-def main():
+def main() -> None:
 
     parser = argparse.ArgumentParser(description='Asterix data processor.')
 
+    ast_version = '??' # ast.VERSION
+
     parser.add_argument('--version', action='version',
-        version='%(prog)s {}, asterix-lib {}'.format(__version__, ast.VERSION),
+        version='%(prog)s {}, asterix-lib {}'.format(__version__, ast_version),
         help='show the version number and exit')
 
     parser.add_argument('--empty-selection', action='store_true',
@@ -824,7 +908,8 @@ def main():
         action='store_true',
         help='Do not check spare bits for zero value when parsing')
 
-    parser.add_argument('--multicast-ttl', dest='ttl', type=check_ttl, default=32,
+    parser.add_argument('--multicast-ttl', dest='ttl',
+        type=check_ttl, default=32, # type: ignore
         help='Time to live for outgoing multicast traffic, default: %(default)s')
 
     parser.add_argument('--simple-input', action='store_true',
@@ -842,7 +927,8 @@ def main():
     subparsers = parser.add_subparsers(required=True, help='sub-commands')
 
     # 'manifest' command
-    parser_manifest = subparsers.add_parser('manifest', help='show available categories')
+    parser_manifest = subparsers.add_parser('manifest',
+        help='show available categories')
     parser_manifest.set_defaults(func=cmd_show_manifest)
     parser_manifest.add_argument('--latest', action='store_true',
         help='show latest editions only')
@@ -859,12 +945,14 @@ def main():
     parser_random.add_argument('--channel', metavar='STR', action='append',
         default=[], help='Channel name (can be specified multiple times)')
 
+    '''
     # 'decode' command
     parser_decode = subparsers.add_parser('decode', help='asterix decoder')
     parser_decode.set_defaults(func=cmd_asterix_decoder)
     parser_decode.add_argument('--truncate', type=int,
         metavar='N', default=0,
-        help='truncate long data lines to N characters or 0 for none, default: %(default)s')
+        help='truncate long data lines to N characters or 0 for none, \
+            default: %(default)s')
     parser_decode.add_argument('--stop-on-error',
         action='store_true',
         help='exit on first parsing error')
@@ -875,9 +963,11 @@ def main():
     # 'from-udp' command
     parser_from_udp = subparsers.add_parser('from-udp', help='UDP datagram receiver')
     parser_from_udp.set_defaults(func=cmd_from_udp)
-    parser_from_udp.add_argument('--unicast', action='append', help='Unicast UDP input',
+    parser_from_udp.add_argument('--unicast', action='append',
+        help='Unicast UDP input',
         default=[], nargs=3, metavar=('channel', 'ip', 'port'))
-    parser_from_udp.add_argument('--multicast', action='append', help='Multicast UDP input',
+    parser_from_udp.add_argument('--multicast', action='append',
+        help='Multicast UDP input',
         default=[], nargs=4, metavar=('channel', 'mcast-ip', 'port', 'local-ip'))
 
     # 'to-udp' command
@@ -928,6 +1018,7 @@ def main():
         required=True, metavar='callable')
     parser_custom.add_argument('--args', help='Additional arguments (string)',
         metavar='args')
+    '''
 
     # Empty argument raises TypeError on some old pip/python versions.
     try:
@@ -936,7 +1027,7 @@ def main():
         print("Arguments are required, try '--help'.")
         sys.exit(0)
 
-    io = IO( \
+    io = CIO( \
         args.simple or args.simple_input, \
         args.simple or args.simple_output, \
         not args.no_flush)
@@ -948,4 +1039,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
