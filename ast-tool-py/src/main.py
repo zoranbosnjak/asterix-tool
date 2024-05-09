@@ -588,36 +588,43 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
             return False
         return i > max_level
 
+    '''
     @no_type_check
     def path_line(i, path, title, cls_name, bs):
         truncate('{}{}: "{}", {}, len={} bits, bin={}'.format('  '*i,
-            path, title, cls_name, len(bs), str(bs)))
+            path, title, cls_name, len(bs), bs))
+    '''
 
     @no_type_check
     def handle_variation(cat, i, path, var):
         if too_deep(i): return
-        # cls = var.__class__
-
         if isinstance(var, Element):
             x = var.as_uint()
-            '''
-            if hasattr(var, 'table_value'):
-                tv = var.table_value
-                if tv is None:
-                    tv = '(undefined value)'
-                truncate('{}value: {} -> {}'.format('  '*i, x, tv))
-            elif hasattr(var, 'to_string'):
-                truncate('{}value: {} -> {}'.format('  '*i, x, repr(var.to_string())))
-            elif hasattr(var, 'to_quantity'):
-                truncate('{}value: {} -> {} {}'.format('  '*i, x, var.to_quantity(),
-                    var.__class__.quantity.unit))
+            dsc = 'value: {} = {} = {}'.format(x, hex(x), oct(x))
+            rule = var.get_rule()
+            if isinstance(rule, RuleContentContextFree):
+                content = rule.get_content()
+                if isinstance(content, ContentTable):
+                    tv = content.table_value()
+                    if tv is None:
+                        tv = '(undefined value)'
+                    dsc = 'value: {} -> "{}"'.format(x, tv)
+                elif isinstance(content, ContentString):
+                    s = content.as_string()
+                    dsc = 'value: {}, str: "{}"'.format(x, s)
+                elif isinstance(content, ContentQuantity):
+                    dsc = 'value: {}, quantity: {} {}'.format(x, content.as_quantity(),
+                        content.__class__.unit)
+            elif isinstance(rule, RuleContentDependent):
+                pass # Content dependent... TODO
             else:
-                truncate('{}value: {} = {} = {}'.format('  '*i, x, hex(x), oct(x)))
-            '''
+                raise Exception('internal error, unexpected type', rule)
+            truncate('{}Element: {}'.format('  '*i, dsc))
 
         elif isinstance(var, Group):
+            for item in var.arg:
+                handle_item(cat, i, path, item)
             '''
-            for j in cls.subitems_list:
                 if type(j) is tuple:
                     name = j[0]
                     title = cls.subitems_dict[name][0]
@@ -690,11 +697,23 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
             raise Exception('internal error, unexpected variation', var)
 
     @no_type_check
+    def handle_item(cat, i, path, item):
+        if isinstance(item, Spare):
+            bs = item.unparse()
+            truncate('{}(Spare): len={} bits, bin={}'.format('  '*i, len(bs), bs))
+        elif isinstance(item, Item):
+            name = item.arg.__class__.name
+            handle_nonspare(cat, i, path+[name], item.arg)
+        else:
+            raise Exception('internal error, unexpected type', item)
+
+    @no_type_check
     def handle_rulevar(cat, i, path, rule):
         if isinstance(rule, RuleVariationContextFree):
-            handle_variation(cat, i+1, path, rule.get_variation())
+            handle_variation(cat, i, path, rule.get_variation())
         elif isinstance(rule, RuleVariationDependent):
-            return # TODO
+            pass # TODO
+            #truncate('{}depending...'.format('  '*i))
         else:
             raise Exception('internal error, unexpected type', rule)
 
@@ -703,7 +722,7 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
         title = nsp.title
         bs = nsp.unparse()
         truncate('{}{}: "{}", len={} bits, bin={}'.format('  '*i,
-            path, title, len(bs), str(bs)))
+            path, title, len(bs), bs))
         handle_rulevar(cat, i+1, path, nsp.get_rule())
 
     @no_type_check
