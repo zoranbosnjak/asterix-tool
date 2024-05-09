@@ -115,6 +115,14 @@ Use `nix-shell` to setup development environment
 
 ```bash
 nix-shell
+# run static code check and tests once
+mypy
+pytest
+
+# monitor changes in .py files, check automatically on any change
+find . | grep "\.py" | entr sh -c 'clear && date && mypy && pytest'
+
+
 ./update-from-upstream.sh
 python3 ./src/main.py --version
 alias ast-tool-py='python3 ./src/main.py'

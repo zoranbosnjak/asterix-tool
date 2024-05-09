@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Asterix data processing tool
 
@@ -463,8 +462,6 @@ class AsterixSamples:
                             (i, _size) = x
                             result2.append(random_item(i))
                     result1.append(tuple(result2))
-                print(var)
-                print(result1)
                 return tuple(result1)
 
             if issubclass(var, Repetitive):
@@ -572,18 +569,18 @@ def cmd_gen_random(io : CIO, args : Any) -> None:
         if args.sleep is not None:
             time.sleep(args.sleep)
 
-'''
-def cmd_asterix_decoder(io, args):
-    parsing_opt = get_parsing_options(args)
+def cmd_asterix_decoder(io : CIO, args : Any) -> None:
     sel = get_selection(args.empty_selection, args.cat or [], args.ref or [])
     exp = get_expansions(sel, args.expand or [])
     if args.truncate:
+        @no_type_check
         def smax(n, s):
             return s if (len(s) <= n) else (s[0:n] + '|')
         truncate = lambda s: print(smax(args.truncate, s))
     else:
         truncate = lambda s: print(s)
 
+    @no_type_check
     def too_deep(i):
         """Parsing level check."""
         max_level = args.parsing_level
@@ -591,15 +588,19 @@ def cmd_asterix_decoder(io, args):
             return False
         return i > max_level
 
-    def handle_variation(cat, i, var, path):
-        if too_deep(i): return
-        cls = var.__class__
+    @no_type_check
+    def path_line(i, path, title, cls_name, bs):
+        truncate('{}{}: "{}", {}, len={} bits, bin={}'.format('  '*i,
+            path, title, cls_name, len(bs), str(bs)))
 
-        def path_line(name, title, bits):
-            truncate('{}{}: "{}", {}, len={} bits, bin={}'.format('  '*i, path+[name], title, sub.__class__.variation, len(bits), str(bits)))
+    @no_type_check
+    def handle_variation(cat, i, path, var):
+        if too_deep(i): return
+        # cls = var.__class__
 
         if isinstance(var, Element):
-            x = var.to_uinteger()
+            x = var.as_uint()
+            '''
             if hasattr(var, 'table_value'):
                 tv = var.table_value
                 if tv is None:
@@ -608,11 +609,14 @@ def cmd_asterix_decoder(io, args):
             elif hasattr(var, 'to_string'):
                 truncate('{}value: {} -> {}'.format('  '*i, x, repr(var.to_string())))
             elif hasattr(var, 'to_quantity'):
-                truncate('{}value: {} -> {} {}'.format('  '*i, x, var.to_quantity(), var.__class__.quantity.unit))
+                truncate('{}value: {} -> {} {}'.format('  '*i, x, var.to_quantity(),
+                    var.__class__.quantity.unit))
             else:
                 truncate('{}value: {} = {} = {}'.format('  '*i, x, hex(x), oct(x)))
+            '''
 
         elif isinstance(var, Group):
+            '''
             for j in cls.subitems_list:
                 if type(j) is tuple:
                     name = j[0]
@@ -623,8 +627,10 @@ def cmd_asterix_decoder(io, args):
                     handle_variation(cat, i+1, sub, path+[name])
                 else:
                     truncate('{}Spare len={} bits'.format('  '*i, j.bit_size))
+            '''
 
         elif isinstance(var, Extended):
+            '''
             for j in cls.subitems_list:
                 for k in j:
                     if type(k) is tuple:
@@ -638,13 +644,17 @@ def cmd_asterix_decoder(io, args):
                         handle_variation(cat, i+1, sub, path+[name])
                     else:
                         truncate('{}Spare len={} bits'.format('  '*i, k.bit_size))
+            '''
 
         elif isinstance(var, Repetitive):
+            '''
             for cnt, sub in enumerate(var):
                 truncate('{}subitem {}'.format('  '*i, cnt))
                 handle_variation(cat, i+1, sub, path+[cnt])
+            '''
 
         elif isinstance(var, Explicit):
+            '''
             this_item = (cat, path[0])
             if not this_item in exp:
                 return
@@ -660,8 +670,10 @@ def cmd_asterix_decoder(io, args):
                 truncate('Unable to parse explicit subitem:', s.hex())
                 if args.stop_on_error:
                     sys.exit(1)
+            '''
 
         elif isinstance(var, Compound):
+            '''
             for j in cls.subitems_list:
                 if j is None:
                     continue
@@ -673,39 +685,70 @@ def cmd_asterix_decoder(io, args):
                 bits = sub.unparse_bits()
                 path_line(name, title, bits)
                 handle_variation(cat, i+1, sub, path+[name])
+            '''
         else:
             raise Exception('internal error, unexpected variation', var)
 
+    @no_type_check
+    def handle_rulevar(cat, i, path, rule):
+        if isinstance(rule, RuleVariationContextFree):
+            handle_variation(cat, i+1, path, rule.get_variation())
+        elif isinstance(rule, RuleVariationDependent):
+            return # TODO
+        else:
+            raise Exception('internal error, unexpected type', rule)
+
+    @no_type_check
+    def handle_nonspare(cat, i, path, nsp):
+        title = nsp.title
+        bs = nsp.unparse()
+        truncate('{}{}: "{}", len={} bits, bin={}'.format('  '*i,
+            path, title, len(bs), str(bs)))
+        handle_rulevar(cat, i+1, path, nsp.get_rule())
+
+    @no_type_check
     def handle_record(cat, i, rec):
         if too_deep(i): return
-        raw = rec.unparse_bits().to_bytes()
+        raw = rec.unparse().to_bytes()
         truncate('{}record: len={} bytes, hex={}'.format('  '*i, len(raw), raw.hex()))
-        handle_variation(cat, i+1, rec, [])
+        for (name, nsp) in rec.items_regular.items():
+            handle_nonspare(cat, i+1, [name], nsp)
 
+    @no_type_check
     def handle_datablock(i, db):
         if too_deep(i): return
-        cat = db.category
-        truncate('{}datablock: cat={}, len={} bytes, records={}'.format('  '*i, cat, db.length, db.raw_records.hex()))
+        cat = db.get_category()
+        n = db.get_length()
+        bs = db.get_raw_records()
+        d = bs.to_bytes().hex()
+        truncate('{}datablock: cat={}, len={} bytes, records={}'.format('  '*i, cat, n, d))
         spec = sel['CATS'].get(cat)
         if spec is None:
             return
-        try:
-            db = spec.parse(db, parsing_opt)
-            for rec in db.records:
+        uap = spec.uap
+        if issubclass(uap, UapSingle):
+            result = uap.parse(bs)
+            if isinstance(result, ValueError):
+                truncate('Error! {}'.format(result))
+                truncate('Unable to parse datablock: {}'.format(d))
+                if args.stop_on_error:
+                    sys.exit(1)
+                return
+            for rec in result:
                 handle_record(cat, i+1, rec)
-        except AsterixError as e:
-            truncate('Error! {}'.format(e))
-            truncate('Unable to parse datablock: {}'.format(db.unparse().hex()))
-            if args.stop_on_error:
-                sys.exit(1)
+        elif issubclass(uap, UapMultiple):
+            result = spec.uap.parse_any_uap(bs)
+            # TODO
+        else:
+            raise Exception('internal error, unexpected type', uap)
 
+    @no_type_check
     def handle_datagram(i, s):
         if too_deep(i): return
         truncate('{}datagram: len={} bytes, hex={}'.format('  '*i, len(s), s.hex()))
-        try:
-            dbs = RawDatablock.parse(s)
-        except AsterixError as e:
-            truncate('Error! {}'.format(e))
+        dbs = RawDatablock.parse(Bits.from_bytes(s))
+        if isinstance(dbs, ValueError):
+            truncate('Error! {}'.format(dbs))
             truncate('Unable to parse datagram: {}'.format(s.hex()))
             if args.stop_on_error:
                 sys.exit(1)
@@ -713,6 +756,7 @@ def cmd_asterix_decoder(io, args):
         for db in dbs:
             handle_datablock(i+1, db)
 
+    @no_type_check
     def handle_event(t, s):
         truncate('timestamp: {}'.format(t if t is not None else '<unknown>'))
         handle_datagram(1, s)
@@ -721,7 +765,7 @@ def cmd_asterix_decoder(io, args):
         (t_mono, t_utc, channel, data) = event
         handle_event(t_utc, data)
 
-def cmd_from_udp(io, args):
+def cmd_from_udp(io : CIO, args : Any) -> None:
     sockets = {}
     sel = selectors.DefaultSelector()
     for (channel, ip, port) in args.unicast:
@@ -746,12 +790,12 @@ def cmd_from_udp(io, args):
         for key, mask in select_events:
             t_mono = time.monotonic()
             t_utc = datetime.datetime.now(tz=datetime.timezone.utc)
-            sock = key.fileobj
-            channel = sockets[sock]
+            f = key.fileobj
+            channel = sockets[f] # type: ignore
             (data, addr) = sock.recvfrom(pow(2,16))
             io.tx((t_mono, t_utc, channel, data))
 
-def cmd_to_udp(io, args):
+def cmd_to_udp(io : CIO, args : Any) -> None:
     sockets = []
     for (channel, ip, port) in args.unicast:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -769,7 +813,9 @@ def cmd_to_udp(io, args):
             if channel2 == '*' or channel1 == channel2:
                 sock.sendto(data, (ip, port))
 
-def cmd_inspect(io, args):
+def cmd_inspect(io : CIO, args : Any) -> None:
+    raise NotImplementedError
+'''
     raw_datablock_errors = 0
     unknown_categories = set()
     processed_categories = set()
@@ -820,13 +866,14 @@ def cmd_inspect(io, args):
         if not problems:
             continue
         print('{} -> {}'.format(cat, sorted(problems, key=string_to_edition)))
+'''
 
-def cmd_record(io, args):
+def cmd_record(io : CIO, args : Any) -> None:
     fmt = format_find(format_output, args.format)(io)
     for event in io.rx():
         fmt.write_event(event)
 
-def cmd_replay(io, args):
+def cmd_replay(io : CIO, args : Any) -> None:
     fmt = format_find(format_input, args.format)(io)
     offset = None # not known until the first event
     for event in fmt.events(args.infile):
@@ -842,7 +889,9 @@ def cmd_replay(io, args):
                     time.sleep(delta)
             io.tx(event)
 
-def cmd_custom(io, args):
+def cmd_custom(io : CIO, args : Any) -> None:
+    raise NotImplementedError
+'''
     # import custom script
     filename = args.script
     p = os.path.dirname(os.path.abspath(filename))
@@ -876,7 +925,8 @@ def check_ttl(arg : int) -> int:
         assert val >= ttlInterval[0]
         assert val <= ttlInterval[1]
     except AssertionError:
-        raise argparse.ArgumentTypeError('must be in interval [{},{}]'.format(ttlInterval[0], ttlInterval[1]))
+        raise argparse.ArgumentTypeError('must be in interval [{},{}]'.format(
+            ttlInterval[0], ttlInterval[1]))
     return val
 
 def main() -> None:
@@ -945,7 +995,6 @@ def main() -> None:
     parser_random.add_argument('--channel', metavar='STR', action='append',
         default=[], help='Channel name (can be specified multiple times)')
 
-    '''
     # 'decode' command
     parser_decode = subparsers.add_parser('decode', help='asterix decoder')
     parser_decode.set_defaults(func=cmd_asterix_decoder)
@@ -1018,7 +1067,6 @@ def main() -> None:
         required=True, metavar='callable')
     parser_custom.add_argument('--args', help='Additional arguments (string)',
         metavar='args')
-    '''
 
     # Empty argument raises TypeError on some old pip/python versions.
     try:
