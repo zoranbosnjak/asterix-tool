@@ -25,6 +25,7 @@ from typing import *
 from scapy.all import rdpcap, IP, UDP # type: ignore
 
 from asterix.base import *
+import asterix.base as base
 import asterix.generated as gen
 
 __version__ = "0.12.0"
@@ -89,6 +90,13 @@ class CIO:
                 "data": data.hex(),
             })
         self.tx_raw(s)
+
+    def tx_simple(self, data : bytes, channel : Optional[str] = None) -> None:
+        """Simple wrapper around 'tx' function."""
+        t_mono = time.monotonic()
+        t_utc = datetime.datetime.now(tz=datetime.timezone.utc)
+        event = (t_mono, t_utc, channel, data)
+        self.tx(event)
 
 class PCG32:
     """Simple random number generator,
@@ -408,7 +416,8 @@ def get_expansions(selection : Dict[str,
         spec = selection['CATS'][cat]
         uap = spec.uap # type: ignore
         rec = uap.record
-        rule = rec.spec(name)
+        nsp = rec.spec(name)
+        rule = nsp.rule
         var = rule.variation
         assert issubclass(var, Explicit)
         result.append((cat, name))
@@ -519,7 +528,7 @@ class AsterixSamples:
             for (key, cls) in t.items_dict.items():
                 populate = self.populate_all_items or gen.bool()
                 if populate:
-                    rule = random_rule(cls)
+                    rule = random_rule(cls.rule)
                     if rule is not None:
                         d[key] = rule
             return t.create(d)
@@ -588,13 +597,6 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
             return False
         return i > max_level
 
-    '''
-    @no_type_check
-    def path_line(i, path, title, cls_name, bs):
-        truncate('{}{}: "{}", {}, len={} bits, bin={}'.format('  '*i,
-            path, title, cls_name, len(bs), bs))
-    '''
-
     @no_type_check
     def handle_variation(cat, i, path, var):
         if too_deep(i): return
@@ -616,7 +618,7 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
                     dsc = 'value: {}, quantity: {} {}'.format(x, content.as_quantity(),
                         content.__class__.unit)
             elif isinstance(rule, RuleContentDependent):
-                pass # Content dependent... TODO
+                dsc += ' (content dependent)'
             else:
                 raise Exception('internal error, unexpected type', rule)
             truncate('{}Element: {}'.format('  '*i, dsc))
@@ -624,75 +626,43 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
         elif isinstance(var, Group):
             for item in var.arg:
                 handle_item(cat, i, path, item)
-            '''
-                if type(j) is tuple:
-                    name = j[0]
-                    title = cls.subitems_dict[name][0]
-                    sub = var.get_item(name)
-                    bits = sub.unparse_bits()
-                    path_line(name, title, bits)
-                    handle_variation(cat, i+1, sub, path+[name])
-                else:
-                    truncate('{}Spare len={} bits'.format('  '*i, j.bit_size))
-            '''
 
         elif isinstance(var, Extended):
-            '''
-            for j in cls.subitems_list:
-                for k in j:
-                    if type(k) is tuple:
-                        name = k[0]
-                        title = cls.subitems_dict[name][0]
-                        sub = var.get_item(name)
-                        if sub is None:
-                            continue
-                        bits = sub.unparse_bits()
-                        path_line(name, title, bits)
-                        handle_variation(cat, i+1, sub, path+[name])
-                    else:
-                        truncate('{}Spare len={} bits'.format('  '*i, k.bit_size))
-            '''
+            for lst in var.arg:
+                for item in lst:
+                    if item is not None:
+                        handle_item(cat, i, path, item)
 
         elif isinstance(var, Repetitive):
-            '''
-            for cnt, sub in enumerate(var):
-                truncate('{}subitem {}'.format('  '*i, cnt))
-                handle_variation(cat, i+1, sub, path+[cnt])
-            '''
+            for cnt, sub in enumerate(var.arg):
+                truncate('{}subitem ({})'.format('  '*i, cnt))
+                handle_variation(cat, i+1, path+['({})'.format(cnt)], sub)
 
         elif isinstance(var, Explicit):
-            '''
             this_item = (cat, path[0])
             if not this_item in exp:
                 return
-            sub = sel['REFS'][cat].variation
-            bits = Bits.from_bytes(var.raw)
-            try:
-                (val, b) = sub.parse_bits(bits, parsing_opt)
-                if len(b):
-                    raise AsterixError('Unexpected remaining bits in explicit item')
-                handle_variation(cat, i, val, path)
-            except AsterixError as e:
-                truncate('Error!', e)
-                truncate('Unable to parse explicit subitem:', s.hex())
+            sub = sel['REFS'][cat]
+            bs = Bits.from_bytes(var.get_bytes())
+            result = sub.expansion.parse(bs)
+            if isinstance(result, ValueError):
+                truncate('Error! {}'.format(result))
+                truncate('Unable to parse expansion: {}'.format(bs))
                 if args.stop_on_error:
                     sys.exit(1)
-            '''
+                return
+            obj, bs2 = result
+            if len(bs2):
+                truncate('Unexpected remaining bits in explicit item: {}'.format(bs2))
+                if args.stop_on_error:
+                    sys.exit(1)
+                return
+            for (name, nsp) in obj.arg.items():
+                handle_nonspare(cat, i, path+[name], nsp)
 
         elif isinstance(var, Compound):
-            '''
-            for j in cls.subitems_list:
-                if j is None:
-                    continue
-                name = j[0]
-                title = cls.subitems_dict[name][0]
-                sub = var.get_item(name)
-                if sub is None:
-                    continue
-                bits = sub.unparse_bits()
-                path_line(name, title, bits)
-                handle_variation(cat, i+1, sub, path+[name])
-            '''
+            for (name, nsp) in var.arg.items():
+                handle_nonspare(cat, i, path+[name], nsp)
         else:
             raise Exception('internal error, unexpected variation', var)
 
@@ -712,8 +682,7 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
         if isinstance(rule, RuleVariationContextFree):
             handle_variation(cat, i, path, rule.get_variation())
         elif isinstance(rule, RuleVariationDependent):
-            pass # TODO
-            #truncate('{}depending...'.format('  '*i))
+            truncate('{}(content dependent structure)'.format('  '*i))
         else:
             raise Exception('internal error, unexpected type', rule)
 
@@ -756,8 +725,22 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
             for rec in result:
                 handle_record(cat, i+1, rec)
         elif issubclass(uap, UapMultiple):
-            result = spec.uap.parse_any_uap(bs)
-            # TODO
+            results = spec.uap.parse_any_uap(bs)
+            if len(results) == 0:
+                truncate('Unable to parse datablock: {}'.format(d))
+                if args.stop_on_error:
+                    sys.exit(1)
+                return
+            elif len(results) == 1:
+                truncate('{}multiple UAP record, looks like:'.format('  '*(i+1)))
+                result = results[0]
+                for rec in result:
+                    handle_record(cat, i+2, rec)
+            else:
+                for (n, result) in enumerate(results):
+                    truncate('{}result ({}) - multiple parsing results:'.format('  '*(i+1), n))
+                    for rec in result:
+                        handle_record(cat, i+2, rec)
         else:
             raise Exception('internal error, unexpected type', uap)
 
@@ -909,8 +892,6 @@ def cmd_replay(io : CIO, args : Any) -> None:
             io.tx(event)
 
 def cmd_custom(io : CIO, args : Any) -> None:
-    raise NotImplementedError
-'''
     # import custom script
     filename = args.script
     p = os.path.dirname(os.path.abspath(filename))
@@ -926,13 +907,13 @@ def cmd_custom(io : CIO, args : Any) -> None:
     exec(code, run_globals)
     sys.path.pop(0)
 
-    # Call user function with the following arguments
-    #   - asterix module (already imported)
+    # Create and call user function with the following arguments
+    #   - asterix base module (already imported)
+    #   - asterix generated module (already imported)
     #   - IO instance for standard input/output
     #   - all command line arguments
-    f = run_globals[args.call]
-    f(ast, io, args)
-'''
+    f = run_globals[args.call] # type: ignore
+    f(base, gen, io, args) # type: ignore
 
 def check_ttl(arg : int) -> int:
     ttlInterval = (1, 255)
