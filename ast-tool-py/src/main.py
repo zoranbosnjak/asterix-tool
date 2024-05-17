@@ -804,35 +804,42 @@ def cmd_to_udp(io : CIO, args : Any) -> None:
                 sock.sendto(data, (ip, port))
 
 def cmd_inspect(io : CIO, args : Any) -> None:
-    raise NotImplementedError
-'''
     raw_datablock_errors = 0
-    unknown_categories = set()
-    processed_categories = set()
-    parse_errors = dict()
-    parsing_opt = get_parsing_options(args)
+    unknown_categories : Set[int] = set()
+    processed_categories : Set[int] = set()
+    parse_errors : Dict[int, Any] = dict()
 
+    @no_type_check
     def handle_event(s):
         nonlocal raw_datablock_errors, unknown_categories, processed_categories, parse_errors
-        try:
-            raw_datablocks = ast.RawDatablock.parse(s)
-        except AsterixError:
+        raw_datablocks = RawDatablock.parse(Bits.from_bytes(s))
+        if isinstance(raw_datablocks, ValueError):
             raw_datablocks = []
             raw_datablock_errors += 1
         for raw_db in raw_datablocks:
-            cat = raw_db.category
-            editions = ast.manifest['CATS'].get(cat)
+            cat = raw_db.get_category()
+            editions = gen.manifest['CATS'].get(cat)
             if editions is None:
                 unknown_categories.add(cat)
             processed_categories.add(cat)
+            bs = raw_db.get_raw_records()
             for ed in editions:
-                Spec = ast.manifest['CATS'][cat][ed]
-                try:
-                    db = Spec.parse(raw_db, parsing_opt)
-                except AsterixError:
-                    problems = parse_errors.get(cat, set())
-                    problems.add(ed)
-                    parse_errors[cat] = problems
+                Spec = gen.manifest['CATS'][cat][ed]
+                uap = Spec.uap
+                if issubclass(uap, UapSingle):
+                    result = uap.parse(bs)
+                    if isinstance(result, ValueError):
+                        problems = parse_errors.get(cat, set())
+                        problems.add(ed)
+                        parse_errors[cat] = problems
+                elif issubclass(uap, UapMultiple):
+                    results = spec.uap.parse_any_uap(bs)
+                    if len(results) == 0:
+                        problems = parse_errors.get(cat, set())
+                        problems.add(ed)
+                        parse_errors[cat] = problems
+                else:
+                    raise Exception('internal error, unexpected type', uap)
 
     try:
         for event in io.rx():
@@ -846,7 +853,7 @@ def cmd_inspect(io : CIO, args : Any) -> None:
     print('unknown categories: {}'.format(sorted(unknown_categories)))
     print('success category/edition:')
     for cat in sorted(processed_categories):
-        editions = set(ast.manifest['CATS'][cat].keys())
+        editions = set(gen.manifest['CATS'][cat].keys()) # type: ignore
         problems = parse_errors.get(cat, set())
         editions.difference_update(problems)
         print('{} -> {}'.format(cat, sorted(editions, key=string_to_edition)))
@@ -856,7 +863,6 @@ def cmd_inspect(io : CIO, args : Any) -> None:
         if not problems:
             continue
         print('{} -> {}'.format(cat, sorted(problems, key=string_to_edition)))
-'''
 
 def cmd_record(io : CIO, args : Any) -> None:
     fmt = format_find(format_output, args.format)(io)
