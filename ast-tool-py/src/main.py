@@ -449,7 +449,7 @@ class AsterixSamples:
 
         #def random_var(var : type[Variation], name : Optional[str] = None) -> Any:
         @no_type_check
-        def random_var(var):
+        def random_var(var, name=None):
 
             if issubclass(var, Element):
                 return gen.bigint(var.bit_size)
@@ -478,30 +478,32 @@ class AsterixSamples:
                 return [random_var(var.variation) for i in range(n)]
 
             if issubclass(var, Explicit):
-                return None # TODO
-                '''
                 this_item = (cat, name)
                 if not this_item in self.expand:
                     return None
-                sub = self.refs[cat].variation
-                val = random_var(sub)
-                return sub(val).unparse_bits().to_bytes() or None # avoid empty
-                '''
-
-            if issubclass(var, Compound):
-                return None # TODO
-                print('todo compound', var)
-                raise NotImplementedError
-                '''
+                exp = self.refs[cat].expansion
                 d = {}
-                for (name, (_title, sub, _fspec)) in var.subitems_dict.items():
+                for (name, cls) in exp.items_dict.items():
                     populate_this_item = self.populate_all_items or gen.bool()
                     if populate_this_item:
-                        x = random_var(sub, name)
-                        if not x is None:
-                            d[name] = x
+                        rule = random_rule(cls.rule, name)
+                        if not rule is None:
+                            d[name] = rule
+                if not d:
+                    return None
+                obj = exp.create(d)
+                return obj.unparse().to_bytes() or None # avoid empty
+
+            if issubclass(var, Compound):
+                d = {}
+                for (name, cls) in var.items_dict.items():
+                    populate_this_item = self.populate_all_items or gen.bool()
+                    if populate_this_item:
+                        rule = random_rule(cls.rule, name)
+                        if not rule is None:
+                            d[name] = rule
                 return d or None # turn {} into None, to skip this subitem
-                '''
+
             raise Exception('internal error, unexpected variation', var)
 
         @no_type_check
@@ -513,14 +515,14 @@ class AsterixSamples:
             raise Exception('internal error, unexpected type', t)
 
         @no_type_check
-        def random_rule(t):
+        def random_rule(t, name=None):
             if issubclass(t, RuleVariationContextFree):
                 cls = t.variation
             elif issubclass(t, RuleVariationDependent):
                 cls = t.default_variation
             else:
                 raise Exception('internal error, unexpected type', t)
-            return random_var(cls)
+            return random_var(cls, name)
 
         @no_type_check
         def random_rec(t):
@@ -528,7 +530,7 @@ class AsterixSamples:
             for (key, cls) in t.items_dict.items():
                 populate = self.populate_all_items or gen.bool()
                 if populate:
-                    rule = random_rule(cls.rule)
+                    rule = random_rule(cls.rule, key)
                     if rule is not None:
                         d[key] = rule
             return t.create(d)
@@ -536,20 +538,6 @@ class AsterixSamples:
         uap = cls.uap # type: ignore
         r = random_rec(uap.record)
         return r # type: ignore
-
-        '''
-        while True:
-            if hasattr(cls, 'make_record'):
-                var = cls.variation
-                rec = cls.make_record(random_var(var))
-            else:
-                uap = gen.choose(list(cls.uaps.keys()))
-                var = cls.uaps[uap]
-                rec = cls.make_record_unsafe(uap, random_var(var))
-                if not cls.is_valid(rec):
-                    continue
-            return rec
-        '''
 
     def __next__(self) -> bytes:
         cat = self.gen.choose(list(self.valid_specs.keys()))
