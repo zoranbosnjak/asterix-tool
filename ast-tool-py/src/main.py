@@ -427,10 +427,12 @@ class AsterixSamples:
     """Asterix sample generator."""
     def __init__(self, gen : PCG32,
             sel : Dict[Any,Any], exp : Dict[Any, Any],
-            populate_all_items : bool) -> None:
+            populate_all_items : bool,
+            max_records : int) -> None:
         self.gen = gen
         self.expand = set(exp)
         self.populate_all_items = populate_all_items
+        self.max_records = max_records
 
         # for some specs it is not possible to generate valid record,
         # without knowing the UAP, so skip those
@@ -542,8 +544,12 @@ class AsterixSamples:
     def __next__(self) -> bytes:
         cat = self.gen.choose(list(self.valid_specs.keys()))
         cls = self.valid_specs[cat]
-        rec = self.random_record(cat, cls)
-        db = cls.create([rec])
+        records = []
+        n = self.gen.choose(list(range(self.max_records))) + 1
+        for i in range(n):
+            rec = self.random_record(cat, cls)
+            records.append(rec)
+        db = cls.create(records)
         bs = db.unparse().to_bytes()
         return bs # type: ignore
 
@@ -557,7 +563,7 @@ def cmd_gen_random(io : CIO, args : Any) -> None:
         seed = random.randint(0,pow(2,64)-1)
     gen = PCG32(seed)
     channel = None
-    for data in AsterixSamples(gen, sel, exp, populate_all_items):
+    for data in AsterixSamples(gen, sel, exp, populate_all_items, args.max_records):
         t_mono = time.monotonic()
         t_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         if args.channel:
@@ -923,6 +929,18 @@ def check_ttl(arg : int) -> int:
             ttlInterval[0], ttlInterval[1]))
     return val
 
+def check_min(arg : int) -> Any:
+    @no_type_check
+    def f(x : int) -> int:
+        try:
+            x = int(x)
+        except ValueError:
+            raise argparse.ArgumentTypeError('must be integer')
+        if x < arg:
+            raise argparse.ArgumentTypeError('range error')
+        return x
+    return f
+
 def main() -> None:
 
     parser = argparse.ArgumentParser(description='Asterix data processor.')
@@ -988,6 +1006,8 @@ def main() -> None:
         help='Populate all defined items instead of random selection')
     parser_random.add_argument('--channel', metavar='STR', action='append',
         default=[], help='Channel name (can be specified multiple times)')
+    parser_random.add_argument('--max-records', default=5, type=check_min(1),
+        help='Max number of records per datablock, default: %(default)s')
 
     # 'decode' command
     parser_decode = subparsers.add_parser('decode', help='asterix decoder')
