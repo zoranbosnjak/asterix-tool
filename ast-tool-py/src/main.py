@@ -428,10 +428,12 @@ class AsterixSamples:
     def __init__(self, gen : PCG32,
             sel : Dict[Any,Any], exp : Dict[Any, Any],
             populate_all_items : bool,
+            max_datablocks : int,
             max_records : int) -> None:
         self.gen = gen
         self.expand = set(exp)
         self.populate_all_items = populate_all_items
+        self.max_datablocks = max_datablocks
         self.max_records = max_records
 
         # for some specs it is not possible to generate valid record,
@@ -542,16 +544,19 @@ class AsterixSamples:
         return r # type: ignore
 
     def __next__(self) -> bytes:
-        cat = self.gen.choose(list(self.valid_specs.keys()))
-        cls = self.valid_specs[cat]
-        records = []
-        n = self.gen.choose(list(range(self.max_records))) + 1
-        for i in range(n):
-            rec = self.random_record(cat, cls)
-            records.append(rec)
-        db = cls.create(records)
-        bs = db.unparse().to_bytes()
-        return bs # type: ignore
+        bs = b''
+        n1 = self.gen.choose(list(range(self.max_datablocks))) + 1
+        n2 = self.gen.choose(list(range(self.max_records))) + 1
+        for i in range(n1):
+            cat = self.gen.choose(list(self.valid_specs.keys()))
+            cls = self.valid_specs[cat]
+            records = []
+            for j in range(n2):
+                rec = self.random_record(cat, cls)
+                records.append(rec)
+            db = cls.create(records)
+            bs += db.unparse().to_bytes()
+        return bs
 
 def cmd_gen_random(io : CIO, args : Any) -> None:
     """Generate random samples."""
@@ -563,7 +568,7 @@ def cmd_gen_random(io : CIO, args : Any) -> None:
         seed = random.randint(0,pow(2,64)-1)
     gen = PCG32(seed)
     channel = None
-    for data in AsterixSamples(gen, sel, exp, populate_all_items, args.max_records):
+    for data in AsterixSamples(gen, sel, exp, populate_all_items, args.max_datablocks, args.max_records):
         t_mono = time.monotonic()
         t_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         if args.channel:
@@ -1006,6 +1011,8 @@ def main() -> None:
         help='Populate all defined items instead of random selection')
     parser_random.add_argument('--channel', metavar='STR', action='append',
         default=[], help='Channel name (can be specified multiple times)')
+    parser_random.add_argument('--max-datablocks', default=5, type=check_min(1),
+        help='Max number of datablocks per datagram, default: %(default)s')
     parser_random.add_argument('--max-records', default=5, type=check_min(1),
         help='Max number of records per datablock, default: %(default)s')
 
