@@ -28,7 +28,7 @@ from asterix.base import *
 import asterix.base as base
 import asterix.generated as gen
 
-__version__ = "0.12.0"
+__version__ = "0.13.0"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -414,11 +414,11 @@ def get_expansions(selection : Dict[str,
         cat = int(cat_s)
         assert cat in selection['REFS'].keys(), 'REF not defined'
         spec = selection['CATS'][cat]
-        uap = spec.uap # type: ignore
-        rec = uap.record
+        uap = spec.cv_uap # type: ignore
+        rec = uap.cv_record
         nsp = rec.spec(name)
-        rule = nsp.rule
-        var = rule.variation
+        rule = nsp.cv_rule
+        var = rule.cv_variation
         assert issubclass(var, Explicit)
         result.append((cat, name))
     return result
@@ -440,7 +440,7 @@ class AsterixSamples:
         # without knowing the UAP, so skip those
         self.valid_specs = {}
         for (cat, spec) in sel['CATS'].items():
-            if issubclass(spec.uap, UapSingle):
+            if issubclass(spec.cv_uap, UapSingle):
                 self.valid_specs[cat] = spec
         assert self.valid_specs # non-empty list is required
         self.refs = sel['REFS']
@@ -456,13 +456,13 @@ class AsterixSamples:
         def random_var(var, name=None):
 
             if issubclass(var, Element):
-                return gen.bigint(var.bit_size)
+                return gen.bigint(var.cv_bit_size)
 
             if issubclass(var, Group):
-                return tuple([random_item(i) for (i,_size) in var.items_list])
+                return tuple([random_item(i) for (i,_size) in var.cv_items_list])
 
             if issubclass(var, Extended):
-                groups = var.items_list
+                groups = var.cv_items_list
                 n = gen.next() % len(groups)
                 groups = groups[0:n+1]
                 result1 = []
@@ -479,7 +479,7 @@ class AsterixSamples:
 
             if issubclass(var, Repetitive):
                 n = 1 + (gen.next() % 10)
-                return [random_var(var.variation) for i in range(n)]
+                return [random_var(var.cv_variation) for i in range(n)]
 
             if issubclass(var, Explicit):
                 this_item = (cat, name)
@@ -487,10 +487,10 @@ class AsterixSamples:
                     return None
                 exp = self.refs[cat].expansion
                 d = {}
-                for (name, cls) in exp.items_dict.items():
+                for (name, cls) in exp.cv_items_dict.items():
                     populate_this_item = self.populate_all_items or gen.bool()
                     if populate_this_item:
-                        rule = random_rule(cls.rule, name)
+                        rule = random_rule(cls.cv_rule, name)
                         if not rule is None:
                             d[name] = rule
                 if not d:
@@ -500,10 +500,10 @@ class AsterixSamples:
 
             if issubclass(var, Compound):
                 d = {}
-                for (name, cls) in var.items_dict.items():
+                for (name, cls) in var.cv_items_dict.items():
                     populate_this_item = self.populate_all_items or gen.bool()
                     if populate_this_item:
-                        rule = random_rule(cls.rule, name)
+                        rule = random_rule(cls.cv_rule, name)
                         if not rule is None:
                             d[name] = rule
                 return d or None # turn {} into None, to skip this subitem
@@ -515,15 +515,15 @@ class AsterixSamples:
             if issubclass(t, Spare):
                 return 0
             if issubclass(t, Item):
-                return random_rule(t.non_spare.rule)
+                return random_rule(t.cv_non_spare.cv_rule)
             raise Exception('internal error, unexpected type', t)
 
         @no_type_check
         def random_rule(t, name=None):
             if issubclass(t, RuleVariationContextFree):
-                cls = t.variation
+                cls = t.cv_variation
             elif issubclass(t, RuleVariationDependent):
-                cls = t.default_variation
+                cls = t.cv_default_variation
             else:
                 raise Exception('internal error, unexpected type', t)
             return random_var(cls, name)
@@ -531,16 +531,16 @@ class AsterixSamples:
         @no_type_check
         def random_rec(t):
             d = {}
-            for (key, cls) in t.items_dict.items():
+            for (key, cls) in t.cv_items_dict.items():
                 populate = self.populate_all_items or gen.bool()
                 if populate:
-                    rule = random_rule(cls.rule, key)
+                    rule = random_rule(cls.cv_rule, key)
                     if rule is not None:
                         d[key] = rule
             return t.create(d)
 
-        uap = cls.uap # type: ignore
-        r = random_rec(uap.record)
+        uap = cls.cv_uap # type: ignore
+        r = random_rec(uap.cv_record)
         return r # type: ignore
 
     def __next__(self) -> bytes:
@@ -602,9 +602,9 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
         if isinstance(var, Element):
             x = var.as_uint()
             dsc = 'value: {} = {} = {}'.format(x, hex(x), oct(x))
-            rule = var.get_rule()
+            rule = var.rule
             if isinstance(rule, RuleContentContextFree):
-                content = rule.get_content()
+                content = rule.content
                 if isinstance(content, ContentTable):
                     tv = content.table_value()
                     if tv is None:
@@ -615,7 +615,7 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
                     dsc = 'value: {}, str: "{}"'.format(x, s)
                 elif isinstance(content, ContentQuantity):
                     dsc = 'value: {}, quantity: {} {}'.format(x, content.as_quantity(),
-                        content.__class__.unit)
+                        content.__class__.cv_unit)
             elif isinstance(rule, RuleContentDependent):
                 dsc += ' (content dependent)'
             else:
@@ -671,7 +671,7 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
             bs = item.unparse()
             truncate('{}(Spare): len={} bits, bin={}'.format('  '*i, len(bs), bs))
         elif isinstance(item, Item):
-            name = item.arg.__class__.name
+            name = item.arg.__class__.cv_name
             handle_nonspare(cat, i, path+[name], item.arg)
         else:
             raise Exception('internal error, unexpected type', item)
@@ -679,7 +679,7 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
     @no_type_check
     def handle_rulevar(cat, i, path, rule):
         if isinstance(rule, RuleVariationContextFree):
-            handle_variation(cat, i, path, rule.get_variation())
+            handle_variation(cat, i, path, rule.variation)
         elif isinstance(rule, RuleVariationDependent):
             truncate('{}(content dependent structure)'.format('  '*i))
         else:
@@ -687,11 +687,11 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
 
     @no_type_check
     def handle_nonspare(cat, i, path, nsp):
-        title = nsp.title
+        title = nsp.cv_title
         bs = nsp.unparse()
         truncate('{}{}: "{}", len={} bits, bin={}'.format('  '*i,
             path, title, len(bs), bs))
-        handle_rulevar(cat, i+1, path, nsp.get_rule())
+        handle_rulevar(cat, i+1, path, nsp.rule)
 
     @no_type_check
     def handle_record(cat, i, rec):
@@ -712,7 +712,7 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
         spec = sel['CATS'].get(cat)
         if spec is None:
             return
-        uap = spec.uap
+        uap = spec.cv_uap
         if issubclass(uap, UapSingle):
             result = uap.parse(bs)
             if isinstance(result, ValueError):
@@ -724,7 +724,7 @@ def cmd_asterix_decoder(io : CIO, args : Any) -> None:
             for rec in result:
                 handle_record(cat, i+1, rec)
         elif issubclass(uap, UapMultiple):
-            results = spec.uap.parse_any_uap(bs)
+            results = spec.cv_uap.parse_any_uap(bs)
             if len(results) == 0:
                 truncate('Unable to parse datablock: {}'.format(d))
                 if args.stop_on_error:
@@ -836,7 +836,7 @@ def cmd_inspect(io : CIO, args : Any) -> None:
             bs = raw_db.get_raw_records()
             for ed in editions:
                 Spec = gen.manifest['CATS'][cat][ed]
-                uap = Spec.uap
+                uap = Spec.cv_uap
                 if issubclass(uap, UapSingle):
                     result = uap.parse(bs)
                     if isinstance(result, ValueError):
