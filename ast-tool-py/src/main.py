@@ -28,7 +28,7 @@ from asterix.base import *
 import asterix.base as base
 import asterix.generated as gen
 
-__version__ = "0.13.0"
+__version__ = "0.14.0"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
