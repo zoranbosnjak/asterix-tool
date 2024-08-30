@@ -7,6 +7,7 @@ import fileinput
 import random
 import os
 import sys
+import importlib.metadata
 import time
 import datetime
 import socket
@@ -950,10 +951,10 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description='Asterix data processor.')
 
-    ast_version = '??' # ast.VERSION
+    libasterix_version = importlib.metadata.version('libasterix')
 
     parser.add_argument('--version', action='version',
-        version='%(prog)s {}, asterix-lib {}'.format(__version__, ast_version),
+        version='%(prog)s {}, libasterix {}'.format(__version__, libasterix_version),
         help='show the version number and exit')
 
     parser.add_argument('--empty-selection', action='store_true',

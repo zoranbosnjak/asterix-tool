@@ -3,8 +3,8 @@
 *A versatile asterix data related command line tool*
 
 This project uses
-[asterix-lib-generator](https://zoranbosnjak.github.io/asterix-lib-generator/)
-library generator, which in turn uses
+* [asterix-libs](https://github.com/zoranbosnjak/asterix-libs#readme)
+library collection, which in turn uses
 [asterix-specs](https://zoranbosnjak.github.io/asterix-specs/)
 definition files. To add support for additional asterix
 category/edition, please contribute patch to
@@ -71,4 +71,3 @@ Run script:
 chmod 755 random-udp.sh
 ./random-udp.sh 0.3 127.0.0.1 59123
 ```
-

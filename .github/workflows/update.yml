@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@master
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
@@ -17,8 +20,8 @@ jobs:
           update=$(git status --short)
           if [ -n "$update" ]; then
             git add .
-            export REV=$(git ls-remote https://github.com/zoranbosnjak/asterix-lib-generator HEAD | awk '{print $1}')
-            git commit -m "Periodic sync with upstream #${REV::7}"
+            export REV=$(nix-shell -p jq --run "cat nix/asterix-libs.json | jq -r '.rev'")
+            git commit -m "Periodic sync with asterix-libs #$REV"
             git push
           fi
 
