@@ -1,18 +1,18 @@
 { sources ? import ../nix/sources.nix
 , pkgs ? import sources.nixpkgs {}
-, asterixlibRef ? builtins.fromJSON (builtins.readFile ../nix/asterix-libs.json)
+, asterixlibsRef ? builtins.fromJSON (builtins.readFile ../nix/asterix-libs.json)
 , inShell ? null
 }:
 
 let
 
   asterixlibDir = pkgs.fetchgit {
-    url = asterixlibRef.url;
-    rev = asterixlibRef.rev;
-    sha256 = asterixlibRef.sha256;
+    url = asterixlibsRef.url;
+    rev = asterixlibsRef.rev;
+    sha256 = asterixlibsRef.sha256;
   };
 
-  asterixLib = pkgs.callPackage
+  libasterix = pkgs.callPackage
     "${asterixlibDir}/libs/python" {inShell=false; inherit sources pkgs;};
 
   deps = [
@@ -24,7 +24,7 @@ let
     pkgs.python3Packages.build
     pkgs.python3Packages.setuptools
     pkgs.python3Packages.scapy
-    asterixLib
+    libasterix
   ];
 
   env = pkgs.mkShell {

@@ -115,6 +115,10 @@ Use `nix-shell` to setup development environment
 
 ```bash
 nix-shell
+
+# prettify python source code
+autopep8 --in-place --aggressive --aggressive <filename> <filename>...
+
 # run static code check and tests once
 mypy
 pytest
