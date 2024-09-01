@@ -2,6 +2,9 @@
 
 # Asterix data processing tool
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 import asterix.generated as gen
 import asterix.base as base
 from asterix.base import *
@@ -22,12 +25,7 @@ import json
 import locale
 from enum import Enum
 
-import warnings
-from cryptography.utils import CryptographyDeprecationWarning
-warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
-
-
-__version__ = "0.16.0"
+__version__ = "0.16.1"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time

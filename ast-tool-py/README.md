@@ -936,7 +936,10 @@ Test:
 # create recording file
 ast-tool-py random --seed 0 --sleep 0.05 --channel ch1 --channel ch2 \
     | stdbuf -oL head -n 100 \
-    | ast-tool-py record > recording
+    | ast-tool-py record | tee recording
+
+# inspect recording file, make sure to use valid editions in custom script
+cat recording | ast-tool-py replay | ast-tool-py inspect
 
 # replay, restamp, resend
 cat recording | ast-tool-py replay \

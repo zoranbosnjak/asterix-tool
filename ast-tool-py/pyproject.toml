@@ -16,7 +16,6 @@ classifiers = [
 dependencies = [
     'typing_extensions; python_version < "3.10"',
     'scapy',
-    'cryptography',
     'libasterix',
 ]
 
