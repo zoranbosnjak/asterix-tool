@@ -1,21 +1,52 @@
 { sources ? import ../nix/sources.nix
-, packages ? import sources.nixpkgs {}
+, pkgs ? import sources.nixpkgs {}
+, asterixlibsRef ? builtins.fromJSON (builtins.readFile ../nix/asterix-libs.json)
+, inShell ? null
 }:
 
 let
-  deps = with packages; [
-    python3
-    python3Packages.setuptools
-    python3Packages.scapy
+
+  asterixlibDir = pkgs.fetchgit {
+    url = asterixlibsRef.url;
+    rev = asterixlibsRef.rev;
+    sha256 = asterixlibsRef.sha256;
+  };
+
+  libasterix = pkgs.callPackage
+    "${asterixlibDir}/libs/python" {inShell=false; inherit sources pkgs;};
+
+  deps = [
+    pkgs.python3
+    pkgs.python3Packages.mypy
+    pkgs.python3Packages.pytest
+    pkgs.python3Packages.hypothesis
+    pkgs.python3Packages.autopep8
+    pkgs.python3Packages.build
+    pkgs.python3Packages.setuptools
+    pkgs.python3Packages.scapy
+    libasterix
   ];
 
-in packages.python3Packages.buildPythonPackage rec {
-  name = "ast-tool-py";
-  format = "pyproject";
-  src = ./.;
-  propagatedBuildInputs = deps;
-  shellHook = ''
-    ast-tool() { python ./src/main.py "$@"; }
-  '';
-}
+  env = pkgs.mkShell {
+    packages = [
+        (pkgs.python3.withPackages (python-pkgs: deps))
+    ];
 
+    shellHook = ''
+        export PYTHONPATH=$(pwd)/src:$PYTHONPATH
+    '';
+    };
+
+  drv = pkgs.python3Packages.buildPythonPackage rec {
+    name = "ast-tool-py";
+    format = "pyproject";
+    src = ./.;
+    propagatedBuildInputs = deps;
+    shellHook = ''
+        ast-tool() { python ./src/main.py "$@"; }
+    '';
+  };
+
+in if inShell == false
+   then drv
+   else if pkgs.lib.inNixShell then env else drv

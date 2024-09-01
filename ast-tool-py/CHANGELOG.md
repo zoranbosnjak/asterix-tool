@@ -9,3 +9,7 @@
 * Command line arguments simplification, `--channel` argument can be appended.
 * README.md file extended with examples.
 
+## 0.16.0 (2024-09-01)
+
+* Switched to `asterix-libs`.
+

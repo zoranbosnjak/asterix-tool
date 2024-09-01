@@ -3,21 +3,18 @@
 *A versatile asterix data related command line tool*
 
 This project uses
-[asterix-lib-generator](https://zoranbosnjak.github.io/asterix-lib-generator/)
-library generator, which in turn uses
+* [asterix-libs](https://github.com/zoranbosnjak/asterix-libs#readme)
+library collection, which in turn uses
 [asterix-specs](https://zoranbosnjak.github.io/asterix-specs/)
 definition files. To add support for additional asterix
 category/edition, please contribute patch to
 [asterix-specs repository](https://github.com/zoranbosnjak/asterix-specs)
 and this project will inherit the change automatically.
 
-Multiple implementations of the same asterix tool are foreseen:
+## python implementation
 
-- [python implementation](ast-tool-py/README.md)
-- haskell implementation (work in progress)
-
-See individual implementation subdirectory for install instructions,
-features list and usage details.
+For install instructions, features list, usage details and examples see
+[ast-tool-py](ast-tool-py/README.md).
 
 ## Subcommand composition with bash
 
@@ -71,4 +68,3 @@ Run script:
 chmod 755 random-udp.sh
 ./random-udp.sh 0.3 127.0.0.1 59123
 ```
-

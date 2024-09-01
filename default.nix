@@ -6,7 +6,7 @@
 
 let
   env = packages.stdenv.mkDerivation {
-    name = "asterix-specs-environment";
+    name = "asterix-tool-environment";
     buildInputs = [];
     shellHook = ''
       echo "Run nix-shell inside individual sub-directory!"
@@ -43,4 +43,3 @@ in
   if inShell == false
     then drv
     else if packages.lib.inNixShell then env else drv
-
