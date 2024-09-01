@@ -266,15 +266,15 @@ Examples:
 ast-tool-py random | ast-tool-py to-udp --unicast "*" 127.0.0.1 56780
 
 # forward UDP from one port to another
-ast-tool-py from-udp --unicast "ch1" 127.0.0.1 56780 | \
-    ast-tool-py to-udp --unicast "*" 127.0.0.1 56781
+ast-tool-py from-udp --unicast "ch1" 127.0.0.1 56780 \
+    | ast-tool-py to-udp --unicast "*" 127.0.0.1 56781
 
 # decode data from UDP
 ast-tool-py from-udp --unicast "ch1" 127.0.0.1 56781 | ast-tool-py decode
 
 # distribute data by channel name (ch1 -> 56001, ch2 -> 56002)
-ast-tool-py random --sleep 0.3 --channel ch1 --channel ch2 |
-    ast-tool-py to-udp \
+ast-tool-py random --sleep 0.3 --channel ch1 --channel ch2 \
+    | ast-tool-py to-udp \
         --unicast "ch1" 127.0.0.1 56001 \
         --unicast "ch2" 127.0.0.1 56002
 
@@ -316,8 +316,8 @@ ast-tool-py random --sleep 0.2 | stdbuf -oL head -n 10 | ast-tool-py record > re
 
 # use binary final file format
 ast-tool-py record --help # check supported recording file formats
-ast-tool-py random --sleep 0.2 | stdbuf -oL head -n 10 | \
-    ast-tool-py record --format final > recording.ff
+ast-tool-py random --sleep 0.2 | stdbuf -oL head -n 10 \
+    | ast-tool-py record --format final > recording.ff
 
 # replay at normal/full speed
 ast-tool-py replay recording.simple
@@ -337,11 +337,13 @@ zcat recording.simple.gz | ast-tool-py replay # or using 'zcat'
 
 *Running custom python script*
 
-This command dynamically imports a custom `python` script and runs required function
-(custom script entry point). The entry point function shall accept the following arguments:
+This command dynamically imports a custom `python` script and runs required
+function (custom script entry point). The entry point function shall accept
+the following arguments:
 
-- `ast` - asterix module (encoder/decoder), see:
-  [asterix python library](https://zoranbosnjak.github.io/asterix-lib-generator/python.html)
+- `base`, `gen` - base and generated asterix module (encoder/decoder), see
+  python asterix library:
+  [libasterix](https://github.com/zoranbosnjak/asterix-libs/tree/main/libs/python#readme)
 - `io` - standard input/output instance
 - `args` - program arguments
 
@@ -359,7 +361,7 @@ Custom script can use:
 
 ```python
 # -- custom.py script
-def custom(ast, io, args):
+def custom(base, gen, io, args):
     print("Hello from custom script!")
     print(args.args) # explicit arguments
     print(args)      # all program arguments
@@ -377,9 +379,17 @@ Basic filtering loop (transparent filter), use `io.rx` and `io.tx`.
 
 ```python
 # -- custom.py script
-def custom(ast, io, args):
+def custom(base, gen, io, args):
     for event in io.rx():
         io.tx(event)
+```
+
+Test:
+
+```bash
+ast-tool-py random \
+    | ast-tool-py custom --script custom.py --call custom \
+    | ast-tool-py decode
 ```
 
 #### Example: Channel filter
@@ -388,7 +398,7 @@ Drop events unless `channel == "ch1"`.
 
 ```python
 # -- custom.py script
-def custom(ast, io, args):
+def custom(base, gen, io, args):
     for event in io.rx():
         (t_mono, t_utc, channel, data) = event
         if channel != "ch1":
@@ -398,8 +408,8 @@ def custom(ast, io, args):
 
 ```bash
 # expect only 'ch1' on output
-ast-tool-py random --channel ch1 --channel ch2 --channel ch3 | \
-    ast-tool-py custom --script custom.py --call custom
+ast-tool-py random --channel ch1 --channel ch2 --channel ch3 \
+    | ast-tool-py custom --script custom.py --call custom
 ```
 
 #### Example: Make channel name configurable from command line
@@ -408,7 +418,7 @@ Use `args`.
 
 ```python
 # -- custom.py script
-def custom(ast, io, args):
+def custom(base, gen, io, args):
     valid_channels = args.args.strip().split()
     for event in io.rx():
         (t_mono, t_utc, channel, data) = event
@@ -417,20 +427,20 @@ def custom(ast, io, args):
         io.tx(event)
 ```
 
-Specify channels in command line argument.
+Specify channels with command line argument.
 
 ```bash
 # expect 'ch1' and 'ch2' on output
-ast-tool-py random --channel ch1 --channel ch2 --channel ch3 | \
-    ast-tool-py custom --script custom.py --call custom --args "ch1 ch2"
+ast-tool-py random --channel ch1 --channel ch2 --channel ch3 \
+    | ast-tool-py custom --script custom.py --call custom --args "ch1 ch2"
 ```
 
 ### Custom asterix processing examples
 
 Note: This project is using
-[python asterix library](https://zoranbosnjak.github.io/asterix-lib-generator/python.html)
-for asterix data processing. The `asterix` module is automatically imported and available
-in custom script (it does not require separate installation step).
+[libasterix](https://github.com/zoranbosnjak/asterix-libs/tree/main/libs/python#readme)
+for asterix data processing. The `asterix` module is automatically imported
+and available in custom script (it does not require separate installation step).
 
 In general, if both `rx` and `tx` are used, custom scripts are in the form similar to
 the code snipped below. User might decide to handle exceptions differently.
@@ -439,8 +449,8 @@ the code snipped below. User might decide to handle exceptions differently.
 # -- custom.py script
 
 # custom script entry point
-def custom(ast, io, args):
-    cfg = setup(ast)
+def custom(base, gen, io, args):
+    cfg = setup(base, gen)
     for event in io.rx():
         try:
             result = handle_event(cfg, event)
@@ -449,8 +459,8 @@ def custom(ast, io, args):
         io.tx(result)
 
 # prepare configuration for handle_event function
-def setup(ast):
-    return ast # for example if complete module is required
+def setup(base, gen):
+    return (base,gen) # for example if complete module is required
 
 # actual event handler
 def handle_event(cfg, event):
@@ -465,18 +475,26 @@ def handle_event(cfg, event):
 # -- custom.py script
 
 # custom script entry point
-def custom(ast, io, args):
-    cfg = setup(ast)
+def custom(base, gen, io, args):
+    cfg = setup(base)
     for event in io.rx():
         handle_event(cfg, event)
 
-def setup(ast):
-    return ast.RawDatablock.parse
+def setup(base):
+    return (base.RawDatablock, base.Bits)
 
-def handle_event(parse, event):
+def handle_event(cfg, event):
+    RawDatablock, Bits = cfg
     (t_mono, t_utc, channel, data) = event
-    raw_datablocks = parse(data)
+    raw_datablocks = RawDatablock.parse(Bits.from_bytes(data))
     print(t_utc, channel, len(raw_datablocks))
+```
+
+Test:
+
+```bash
+ast-tool-py random --channel ch1 --channel ch2 --channel ch3 \
+    | ast-tool-py custom --script custom.py --call custom
 ```
 
 #### Example: Search for some specific events
@@ -487,35 +505,35 @@ def handle_event(parse, event):
 # -- custom.py script
 
 # custom script entry point
-def custom(ast, io, args):
-    cfg = setup(ast)
+def custom(base, gen, io, args):
+    cfg = setup((base, gen))
     for event in io.rx():
         handle_event(cfg, event)
 
-def setup(ast):
-    opt = ast.ParsingOptions.default()
-    return (ast, opt)
+def setup(cfg):
+    base, gen = cfg
+    return (base, gen.Cat_034_1_29) # use cat 034, explicit edition
 
 def handle_event(cfg, event):
-    (ast, opt) = cfg
+    base, Spec = cfg
     (t_mono, t_utc, channel, data) = event
     # parse to raw datablocks
-    raw_datablocks = ast.RawDatablock.parse(data)
-    Spec = ast.CAT_034_1_29 # use cat 034, explicit edition
+    bits = base.Bits.from_bytes(data)
+    raw_datablocks = base.RawDatablock.parse(bits)
     for raw_db in raw_datablocks:
         # focus on one category only
-        if raw_db.category != Spec.cat:
+        if raw_db.get_category() != Spec.cv_category:
             continue
         # fully parse raw datablock
-        db = Spec.parse(raw_db, opt)
-        for rec in db.records:
+        records = Spec.cv_uap.parse(raw_db.get_raw_records())
+        for rec in records:
             handle_record(t_utc, channel, rec)
 
 def handle_record(t_utc, channel, rec):
     msg_type = rec.get_item('000')
     if msg_type is None:
         return
-    x = msg_type.to_uinteger()
+    x = msg_type.as_uint()
     s = None
     if x == 1:
         s = 'north marker'
@@ -525,25 +543,38 @@ def handle_record(t_utc, channel, rec):
         print(t_utc, channel, s)
 ```
 
+Test:
+
+```bash
+ast-tool-py --empty-selection --cat 34 1.29 random --channel ch1 --channel ch2 --channel ch3 \
+    | ast-tool-py custom --script custom.py --call custom
+```
+
 #### Example: Reverse datablocks in each datagram
 
 ```python
 # -- custom.py script
 
 # custom script entry point
-def custom(ast, io, args):
+def custom(base, gen, io, args):
     for event in io.rx():
         (t_mono, t_utc, channel, data) = event
-        data2 = handle_datagram(ast, data)
+        data2 = handle_datagram(base, data)
         event2 = (t_mono, t_utc, channel, data2)
         io.tx(event2)
 
-def handle_datagram(ast, data):
-    raw_datablocks = ast.RawDatablock.parse(data)
+def handle_datagram(base, data):
+    bits = base.Bits.from_bytes(data)
+    raw_datablocks = base.RawDatablock.parse(bits)
     if len(raw_datablocks) <= 1:
         return data
-    return b''.join([db.unparse() for db in reversed(raw_datablocks)])
+    return b''.join([db.unparse().to_bytes() for db in reversed(raw_datablocks)])
+```
 
+Test:
+
+```bash
+ast-tool-py random | ast-tool-py custom --script custom.py --call custom
 ```
 
 #### Example: Filter asterix by category
@@ -554,15 +585,16 @@ Accept category number as argument, drop other categories.
 # -- custom.py script
 
 # custom script entry point
-def custom(ast, io, args):
+def custom(base, gen, io, args):
     cat = int(args.args.strip())
     for event in io.rx():
         (t_mono, t_utc, channel, data) = event
-        lst = ast.RawDatablock.parse(data)
-        lst = [db for db in lst if db.category == cat]
+        bits = base.Bits.from_bytes(data)
+        lst = base.RawDatablock.parse(bits)
+        lst = [db for db in lst if db.get_category() == cat]
         if not lst:
             continue
-        data2 = b''.join([db.unparse() for db in lst])
+        data2 = b''.join([db.unparse().to_bytes() for db in lst])
         event2 = (t_mono, t_utc, channel, data2)
         io.tx(event2)
 ```
@@ -570,7 +602,9 @@ def custom(ast, io, args):
 Run custom filter on random data, filte out all categories but `62`.
 
 ```bash
-ast-tool-py random | ast-tool-py custom --script custom.py --call custom --args 62
+ast-tool-py random \
+    | ast-tool-py custom --script custom.py --call custom --args 62 \
+    | ast-tool-py decode --parsing-level 2 --truncate 80
 ```
 
 #### Example: Modify category `062`, set `SAC/SIC` codes in item `010` to zero
@@ -581,29 +615,29 @@ Keep other items unmodified.
 # -- custom.py script
 
 # custom script entry point
-def custom(ast, io, args):
-    opt = ast.ParsingOptions.default()
-    Spec = ast.CAT_062_1_20
+def custom(base, gen, io, args):
+    Spec = gen.Cat_062_1_20
     for event in io.rx():
         (t_mono, t_utc, channel, data) = event
-        lst = ast.RawDatablock.parse(data)
-        lst = [handle_datablock(opt, Spec, db) for db in lst]
-        data2 = b''.join([db.unparse() for db in lst])
+        bits = base.Bits.from_bytes(data)
+        lst = base.RawDatablock.parse(bits)
+        lst = [handle_datablock(Spec, db) for db in lst]
+        data2 = b''.join([db.unparse().to_bytes() for db in lst])
         event2 = (t_mono, t_utc, channel, data2)
         io.tx(event2)
 
-def handle_datablock(opt, Spec, raw_db):
-    if raw_db.category != Spec.cat:
+def handle_datablock(Spec, raw_db):
+    if raw_db.get_category() != Spec.cv_category:
         return raw_db
-    db = Spec.parse(raw_db, opt)
-    records = [handle_record(rec) for rec in db.records]
-    return Spec.make_datablock(records)
+    records1 = Spec.cv_uap.parse(raw_db.get_raw_records())
+    records2 = map(handle_record, records1)
+    return Spec.create(records2)
 
 def handle_record(rec):
-    return rec.modify_item('010', lambda _old: {'SAC': 0, 'SIC': 0})
+    return rec.set_item('010', (('SAC', 0), ('SIC', 0)))
 ```
 
-Check
+Test:
 
 ```bash
 ast-tool-py --empty-selection --cat 62 1.20 random | \
@@ -614,7 +648,9 @@ ast-tool-py --empty-selection --cat 62 1.20 random | \
 #### Example: Convert binary asterix to `json` output
 
 This example fully decodes and converts each *event* to `json` format.
-Obviously, there are multiple ways to perform such conversion. This is one example.
+Obviously, there are multiple ways to perform such conversion, depending
+on user preferences and information that needs to be preserved.
+This is one example.
 
 ```python
 # -- custom.py script
@@ -622,11 +658,11 @@ Obviously, there are multiple ways to perform such conversion. This is one examp
 import json
 
 # custom script entry point
-def custom(ast, io, args):
-    cfg = setup(ast, args)
+def custom(base, gen, io, args):
+    cfg = setup(base, gen, args)
     for event in io.rx():
         try:
-            obj = handle_event(cfg, event)
+            obj = convert_event(cfg, event)
         except Exception as e:
             raise Exception('problem: ', event, e)
         print(json.dumps(obj))
@@ -636,15 +672,15 @@ def string_to_edition(ed):
     a,b = ed.split('.')
     return (int(a), int(b))
 
-def get_selection(ast, empty, explicit_cats, explicit_refs):
+def get_selection(gen, empty, explicit_cats, explicit_refs):
     """Get category selection."""
 
     def get_latest(lst):
         return sorted(lst, key=lambda pair: string_to_edition(pair[0]), reverse=True)[0]
 
     # get latest
-    cats = {cat: get_latest(ast.manifest['CATS'][cat].items())[1] for cat in ast.manifest['CATS'].keys()}
-    refs = {cat: get_latest(ast.manifest['REFS'][cat].items())[1] for cat in ast.manifest['REFS'].keys()}
+    cats = {cat: get_latest(gen.manifest['CATS'][cat].items())[1] for cat in gen.manifest['CATS'].keys()}
+    refs = {cat: get_latest(gen.manifest['REFS'][cat].items())[1] for cat in gen.manifest['REFS'].keys()}
 
     # cleanup if required
     if empty:
@@ -661,129 +697,161 @@ def get_selection(ast, empty, explicit_cats, explicit_refs):
             a.update({cat: manifest[b][cat][ed]})
     return {'CATS': cats, 'REFS': refs}
 
-def get_expansions(ast, selection, expansions):
+def get_expansions(base, gen, selection, expansions):
     result = []
     for (cat, name) in expansions:
         cat = int(cat)
         assert cat in selection['REFS'].keys(), 'REF not defined'
         spec = selection['CATS'][cat]
-        subitem = spec.variation.spec(name)
-        assert issubclass(subitem, ast.Explicit)
+        subitem = spec.cv_record.spec(name)
+        assert issubclass(subitem.cv_rule.cv_variation, base.Explicit)
         result.append((cat, name))
     return result
 
-def setup(ast, args):
+def setup(base, gen, args):
     # use command line arguments for asterix category/edition selection
-    sel = get_selection(ast, args.empty_selection, args.cat or [], args.ref or [])
-    exp = get_expansions(ast, sel, args.expand or [])
-    opt = ast.ParsingOptions.default()
-    return (ast, sel, exp, opt)
+    sel = get_selection(gen, args.empty_selection, args.cat or [], args.ref or [])
+    exp = get_expansions(base, gen, sel, args.expand or [])
+    return (base, sel, exp)
 
-def handle_event(cfg, event):
+def convert_event(cfg, event):
     """Turn 'event' to json-serializable object"""
     (t_mono, t_utc, channel, data) = event
     return {
         'tMono':    t_mono,
         'tUtc':     t_utc.isoformat(),
         'channel':  channel,
-        'data':     handle_datagram(cfg, data),
+        'data':     convert_datagram(cfg, data),
     }
 
-def handle_datagram(cfg, data):
-    (ast, sel, exp, opt) = cfg
+def convert_datagram(cfg, data):
+    (base, sel, exp) = cfg
     # parse to raw datablocks
-    raw_datablocks = ast.RawDatablock.parse(data)
-    return [handle_datablock(cfg, raw_db) for raw_db in raw_datablocks]
+    bits = base.Bits.from_bytes(data)
+    raw_datablocks = base.RawDatablock.parse(bits)
+    return [convert_datablock(cfg, raw_db) for raw_db in raw_datablocks]
 
-def handle_datablock(cfg, raw_db):
-    (ast, sel, exp, opt) = cfg
-    cat = raw_db.category
+def convert_datablock(cfg, raw_db):
+    (base, sel, exp) = cfg
+    cat = raw_db.get_category()
     spec = sel['CATS'].get(cat)
     if spec is None: # asterix category unknown
-        return raw_db.unparse().hex()
-    db = spec.parse(raw_db, opt)
+        return raw_db.unparse().to_bytes().hex()
+    records = spec.cv_uap.parse(raw_db.get_raw_records())
     return {
         'cat': cat,
-        'records': [handle_record(cfg, cat, rec) for rec in db.records]
+        'records': [convert_record(cfg, cat, rec) for rec in records]
     }
 
-def handle_record(cfg, cat, rec):
-    (ast, sel, exp, opt) = cfg
+def convert_record(cfg, cat, rec):
+    (base, sel, exp) = cfg
 
-    def handle_variation(var, path):
-        cls = var.__class__
-        if isinstance(var, ast.Element):
-            raw = var.to_uinteger()
-            t = 'raw'
-            val = None
-            if hasattr(var, 'table_value'):
-                t = 'table'
-                tv = var.table_value
-                val = tv if tv is not None else 'undefined value'
-            elif hasattr(var, 'to_string'):
-                t = 'string'
-                val = var.to_string()
-            elif hasattr(var, 'to_quantity'):
-                t = 'quantity'
-                val = (var.to_quantity(), var.__class__.quantity.unit)
+    def convert_content(content):
+        if isinstance(content, base.ContentRaw):
+            return {'type': 'raw', 'raw': content.as_uint()}
+        elif isinstance(content, base.ContentTable):
+            return {'type': 'table', 'raw': content.as_uint(), 'str': content.table_value()}
+        elif isinstance(content, base.ContentString):
+            return {'type': 'string', 'raw': content.as_uint(), 'str': content.as_string()}
+        elif isinstance(content, base.ContentInteger):
+            return {'type': 'integer', 'raw': content.as_uint(), 'int': content.as_integer()}
+        elif isinstance(content, base.ContentQuantity):
+            return {'type': 'quantity', 'raw': content.as_uint(), 'float': content._as_quantity()
+                    , 'unit': content.__class__.cv_unit}
+        elif isinstance(content, base.ContentBds):
+            return {'type': 'bds', 'raw': content.as_uint()}
+        else:
+            raise Exception('internal error, unexpected content', content)
+
+    def convert_rulecontent(rule):
+        if isinstance(rule, base.RuleContentContextFree):
+            return convert_content(rule.content)
+        elif isinstance(rule, base.RuleContentDependent):
+            return '(content dependent structure...)'
+        else:
+            raise Exception('internal error, unexpected rule', rule)
+
+    def convert_variation(var, path):
+        if isinstance(var, base.Element):
             return {
-                'raw': raw,
-                'type': t,
-                'value': val
-                }
-        elif isinstance (var, ast.Group):
-            result = {}
-            for i in cls.subitems_list:
-                # regular subitem
-                if type(i) is tuple:
-                    name = i[0]
-                    sub = var.get_item(name)
-                    result[name] = handle_variation(sub, path+[name])
-                # spare subitem
-                else:
-                    pass
-            return result
-        elif isinstance (var, ast.Extended):
-            result = {}
-            for j in cls.subitems_list:
-                for k in j:
-                    if type(k) is tuple:
-                        name = k[0]
-                        sub = var.get_item(name)
-                        if sub is None:
-                            continue
-                        result[name] = handle_variation(sub, path+[name])
-                    else: # spare
-                        pass
-            return result
-        elif isinstance (var, ast.Repetitive):
-            return [handle_variation(sub, path+[cnt]) for (cnt, sub) in enumerate(var)]
-        elif isinstance (var, ast.Explicit):
+                'type': 'Element',
+                'content': convert_rulecontent(var.rule),
+            }
+        elif isinstance (var, base.Group):
+            return {
+                'type': 'Group',
+                'items': [convert_item(i, path) for i in var.arg]
+            }
+        elif isinstance (var, base.Extended):
+            items = []
+            for lists in var.arg:
+                for i in lists:
+                    if i is not None:
+                        items.append((convert_item(i, path),))
+                    else:
+                        items.append('(FX)')
+            return {
+                'type': 'Extended',
+                'items': items,
+            }
+        elif isinstance (var, base.Repetitive):
+            return {
+                'type': 'Repetitive',
+                'items': [convert_variation(sub, path+[cnt]) for (cnt, sub) in enumerate(var.arg)]
+            }
+        elif isinstance (var, base.Explicit):
             this_item = (cat, path[0])
-            if not this_item in exp:
-                # can not parse explicit item, return raw value
-                return var.raw.hex()
-            sub = sel['REFS'][cat].variation
-            bits = ast.Bits.from_bytes(var.raw)
-            (val, b) = sub.parse_bits(bits, opt)
-            if len(b):
-                raise ast.AsterixError('Unexpected remaining bits in explicit item')
-            return handle_variation(val, path)
-        elif isinstance (var, ast.Compound):
-            result = {}
-            for i in cls.subitems_list:
-                if i is None:
-                    continue
-                name = i[0]
-                sub = var.get_item(name)
-                if sub is None:
-                    continue
-                result[name] = handle_variation(sub, path+[name])
-            return result
+            b = var.get_bytes()
+            content = b.hex()
+            if this_item in exp:
+                sub = sel['REFS'][cat].cv_expansion
+                bits = base.Bits.from_bytes(b)
+                (val, remaining) = sub.parse(bits)
+                assert not len(remaining)
+                content = convert_expansion(val, path)
+            return {
+                'type': 'Explicit',
+                'content': content,
+            }
+        elif isinstance (var, base.Compound):
+            return {
+                'type': 'Compound',
+                'items': {name: convert_rulevariation(nsp.rule, path+[name]) for name, nsp in var.arg.items()},
+            }
         else:
             raise Exception('internal error, unexpected variation', var.variation, var)
 
-    return handle_variation(rec, [])
+    def convert_item(item, path):
+        if isinstance(item, base.Spare):
+            return item.as_uint()
+        elif isinstance(item, base.Item):
+            nsp = item.arg
+            name = nsp.__class__.cv_name
+            return (name, convert_rulevariation(nsp.rule, path+[name]))
+        else:
+            raise Exception('internal error, unexpected item', item)
+
+    def convert_rulevariation(rule, path):
+        if isinstance(rule, base.RuleVariationContextFree):
+            return convert_variation(rule.variation, path)
+        elif isinstance(rule, base.RuleVariationDependent):
+            return '(content dependent structure...)'
+        else:
+            raise Exception('internal error, unexpected rule', rule)
+
+    def convert_expansion(var, path):
+        return {name: convert_rulevariation(nsp.rule, path+[name]) for name, nsp in var.arg.items()}
+
+    result = {}
+    for ui in rec.cv_items_list:
+        if not issubclass(ui, base.UapItem):
+            continue
+        name = ui.cv_non_spare.cv_name
+        nsp = rec.get_item(name)
+        if nsp is None:
+            continue
+        result[name] = convert_rulevariation(nsp.rule, [name])
+    return result
 ```
 
 As an example:
@@ -793,7 +861,10 @@ As an example:
 - in addition, decode cat021 'RE' expansion field
 
 ```bash
-ast-tool-py random | ast-tool-py --expand 21 RE custom --script custom.py --call custom
+sudo apt install jq
+ast-tool-py --expand 21 RE random --seed 0 --populate-all-items \
+    | ast-tool-py --expand 21 RE custom --script custom.py --call custom \
+    | jq
 ```
 
 #### Restamp asterix data to current UTC time
@@ -811,39 +882,42 @@ Scenario:
 import datetime
 
 # cleanup entry point
-def cleanup(ast, io, args):
+def cleanup(base, gen, io, args):
     for event in io.rx():
         (t_mono, t_utc, channel, data) = event
-        try:
-            raw_datablocks = ast.RawDatablock.parse(data)
-        except: # skip non-asterix
+        bits = base.Bits.from_bytes(data)
+        result = base.RawDatablock.parse(bits)
+        if isinstance(result, ValueError): # skip non-asterix
             continue
         io.tx(event)
 
 # restamp entry point
-def restamp(ast, io, args):
-    opt = ast.ParsingOptions.default()
+def restamp(base, gen, io, args):
     # for each category specify (edition, item to modify)
     updates = {
-        1: (ast.CAT_001_1_4, "141"),
-        2: (ast.CAT_002_1_1, '030'),
-        19: (ast.CAT_019_1_3, '140'),
-        20: (ast.CAT_020_1_10, '140'),
-        34: (ast.CAT_034_1_29, '030'),
-        48: (ast.CAT_048_1_31, '140'),
+        1: (gen.Cat_001_1_4, "141"),
+        2: (gen.Cat_002_1_1, '030'),
+        19: (gen.Cat_019_1_3, '140'),
+        20: (gen.Cat_020_1_10, '140'),
+        34: (gen.Cat_034_1_29, '030'),
+        48: (gen.Cat_048_1_32, '140'),
         # add more categories here...
     }
 
     for event in io.rx():
         now = datetime.datetime.now(tz=datetime.timezone.utc)
         (t_mono, t_utc, channel, data) = event
-        raw_datablocks = [db for db in ast.RawDatablock.parse(data) if db.category in updates]
+        bits = base.Bits.from_bytes(data)
+        result = base.RawDatablock.parse(bits)
+        if isinstance(result, ValueError):
+            continue
+        raw_datablocks = [db for db in result if db.get_category() in updates]
         if not raw_datablocks:
             continue
         t2 = seconds_since_midnight(t_utc)
         t3 = seconds_since_midnight(now)
-        lst = [handle_datablock(t2, t3, opt, updates, db) for db in raw_datablocks]
-        data2 = b''.join([db.unparse() for db in lst])
+        lst = [handle_datablock(t2, t3, updates, db) for db in raw_datablocks]
+        data2 = b''.join([db.unparse().to_bytes() for db in lst])
         event2 = (t_mono, now, channel, data2)
         io.tx(event2)
 
@@ -853,32 +927,40 @@ def seconds_since_midnight(t):
     dt = t - midnight
     return dt.total_seconds()
 
-def handle_datablock(t2, t3, opt, updates, raw_db):
-    cat = raw_db.category
+def handle_datablock(t2, t3, updates, raw_db):
+    cat = raw_db.get_category()
     (Spec, name) = updates.get(cat)
-    db = Spec.parse(raw_db, opt)
-    records = [handle_record(t2, t3, rec, name) for rec in db.records]
-    return Spec.make_datablock(records)
+    result = Spec.cv_uap.parse(raw_db.get_raw_records())
+    assert not isinstance(result, ValueError)
+    records = [handle_record(t2, t3, rec, name) for rec in result]
+    return Spec.create(records)
 
 def handle_record(t2, t3, rec, name):
     # compensate original delay/jitter from the recording
     def stamp(t1):
-        t1 = t1.to_quantity()
+        t1 = t1.variation.content.as_quantity()
         original_delay = t2 - t1
         return t3 - original_delay
-    return rec.modify_item(name, stamp)
+    x = rec.get_item(name)
+    if x is None:
+        return rec
+    return rec.set_item(name, stamp(x))
 ```
 
-Run command:
+Test:
 
 ```bash
-cat recording.ff.gz | gunzip | ast-tool-py replay \
-        --channel ch1 \
-        --channel ch2 \
-        --format final | \
-    ast-tool-py custom --script custom.py --call cleanup | \
-    ast-tool-py custom --script custom.py --call restamp | \
-    ast-tool-py to-udp \
+# create recording file
+ast-tool-py random --seed 0 --sleep 0.05 --channel ch1 --channel ch2 \
+    | stdbuf -oL head -n 100 \
+    | ast-tool-py record > recording
+
+# replay, restamp, resend
+cat recording | ast-tool-py replay \
+    | ast-tool-py custom --script custom.py --call cleanup \
+    | ast-tool-py custom --script custom.py --call restamp \
+    | ast-tool-py to-udp \
         --unicast ch1 127.0.0.1 56001 \
         --unicast ch2 127.0.0.1 56002
 ```
+

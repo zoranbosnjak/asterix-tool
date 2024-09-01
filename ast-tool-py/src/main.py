@@ -284,7 +284,7 @@ class FmtBonita(Fmt):
             if first_packet_time is None:
                 first_packet_time = t_mono
             delta = t_mono - first_packet_time
-            t_utc = None
+            t_utc = datetime.datetime.now(tz=datetime.timezone.utc)
             if start_time is not None:
                 t_utc = start_time + datetime.timedelta(seconds=delta)
             data = bytes.fromhex(s.strip())
@@ -309,7 +309,12 @@ class FmtFinal(Fmt):
     def write_event(self, event: Event) -> None:
         (t_mono, _t_utc, channel, data) = event
         t_utc: datetime.datetime = _t_utc  # type: ignore
-        ch = bytes([int(channel or 0)])
+        try:
+            ch2 = int(channel)  # type: ignore
+        except ValueError:
+            ch2 = hash(channel)
+        ch2 %= 256
+        ch = ch2.to_bytes(1, byteorder='big')
         if self.day0 is None:
             self.day0 = t_utc.date()
         total_length = (12 + len(data)).to_bytes(2, byteorder='big')
@@ -383,10 +388,11 @@ def cmd_show_manifest(io: CIO, args: Any) -> None:
     def fmt(what: str, n: int, ed: str) -> str:
         return '{} {}, edition {}'.format(what, str(n).zfill(3), ed)
 
+    @no_type_check
     def loop(arg: str, what: str) -> None:
         for n in sorted(gen.manifest[arg]):
             d = gen.manifest[arg][n]
-            keys = d.keys()  # type: ignore
+            keys = d.keys()
             for ed in sorted(keys, key=string_to_edition, reverse=True):
                 print(fmt(what, n, ed))
                 if args.latest:
@@ -410,9 +416,9 @@ def get_selection(empty: bool,
 
     # get latest
     cats = {cat: get_latest(manifest['CATS'][cat].items())[1]  # type: ignore
-            for cat in manifest['CATS'].keys()}
+            for cat in manifest['CATS'].keys()}  # type: ignore
     refs = {cat: get_latest(manifest['REFS'][cat].items())[1]  # type: ignore
-            for cat in manifest['REFS'].keys()}
+            for cat in manifest['REFS'].keys()}  # type: ignore
 
     # cleanup if required
     if empty:
@@ -512,7 +518,7 @@ class AsterixSamples:
                 this_item = (cat, name)
                 if this_item not in self.expand:
                     return None
-                exp = self.refs[cat].expansion
+                exp = self.refs[cat].cv_expansion
                 d = {}
                 for (name, cls) in exp.cv_items_dict.items():
                     populate_this_item = self.populate_all_items or gen.bool()
@@ -620,8 +626,10 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
         def smax(n, s):
             return s if (len(s) <= n) else (s[0:n] + '|')
 
+        @no_type_check
         def truncate(s): return print(smax(args.truncate, s))
     else:
+        @no_type_check
         def truncate(s): return print(s)
 
     @no_type_check
@@ -680,7 +688,7 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
                 return
             sub = sel['REFS'][cat]
             bs = Bits.from_bytes(var.get_bytes())
-            result = sub.expansion.parse(bs)
+            result = sub.cv_expansion.parse(bs)
             if isinstance(result, ValueError):
                 truncate('Error! {}'.format(result))
                 truncate('Unable to parse expansion: {}'.format(bs))
@@ -705,6 +713,8 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
 
     @no_type_check
     def handle_item(cat, i, path, item):
+        if too_deep(i):
+            return
         if isinstance(item, Spare):
             bs = item.unparse()
             truncate(
@@ -718,6 +728,8 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
 
     @no_type_check
     def handle_rulevar(cat, i, path, rule):
+        if too_deep(i):
+            return
         if isinstance(rule, RuleVariationContextFree):
             handle_variation(cat, i, path, rule.variation)
         elif isinstance(rule, RuleVariationDependent):
@@ -727,6 +739,8 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
 
     @no_type_check
     def handle_nonspare(cat, i, path, nsp):
+        if too_deep(i):
+            return
         title = nsp.cv_title
         bs = nsp.unparse()
         truncate(
