@@ -43,7 +43,7 @@ python3.8 -m venv env
 source env/bin/activate
 python3 -m pip install --upgrade pip
 python --version # check version
-pip --version # check version
+python3 -m pip --version # check version
 python3 -m pip install wheel
 ```
 
@@ -79,9 +79,9 @@ mkdir ast-tool-py-bundle
 cd ast-tool-py-bundle
 
 # check pip version, upgrade if necessary (see note above)
-pip3 --version
+python3 -m pip --version
 python3 -m pip install --upgrade pip
-pip3 --version
+python3 -m pip --version
 # download python support packages and 'ast-tool-py' package
 python3 -m pip download -d . pip setuptools wheel
 python3 -m pip download -d . "git+https://github.com/zoranbosnjak/asterix-tool.git#subdirectory=ast-tool-py"
@@ -107,9 +107,9 @@ source env/bin/activate
 cd ast-tool-py-bundle
 
 # check pip version, upgrade if necessary (see note above)
-pip3 --version
+python3 -m pip --version
 python3 -m pip install --upgrade --no-index ./pip*
-pip3 --version
+python3 -m pip --version
 
 # install ast-tool-py package
 python3 -m pip install --no-index --find-links=./ ./ast-tool*
