@@ -25,7 +25,7 @@ import json
 import locale
 from enum import Enum
 
-__version__ = "0.16.1"
+__version__ = "0.16.2"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -1037,13 +1037,17 @@ def main() -> None:
 
     libasterix_version = importlib.metadata.version('libasterix')
 
-    parser.add_argument(
-        '--version',
-        action='version',
+    parser.add_argument('--version-tool', action='version',
+        version=__version__, help='show tool version number and exit')
+
+    parser.add_argument('--version-lib', action='version',
+        version=libasterix_version, help='show lib version number and exit')
+
+    parser.add_argument('--version', action='version',
         version='%(prog)s {}, libasterix {}'.format(
             __version__,
             libasterix_version),
-        help='show the version number and exit')
+        help='show program version number and exit')
 
     parser.add_argument(
         '--empty-selection',
