@@ -650,20 +650,14 @@ def custom(base, gen, io, args):
             raise Exception('problem: ', event, e)
         print(json.dumps(obj))
 
-def string_to_edition(ed):
-    """Convert edition string to a tuple, for example "1.2" -> (1,2)"""
-    a,b = ed.split('.')
-    return (int(a), int(b))
-
 def get_selection(gen, empty, explicit_cats, explicit_refs):
     """Get category selection."""
 
-    def get_latest(lst):
-        return sorted(lst, key=lambda pair: string_to_edition(pair[0]), reverse=True)[0]
+    manifest = gen.manifest
 
     # get latest
-    cats = {cat: get_latest(gen.manifest['CATS'][cat].items())[1] for cat in gen.manifest['CATS'].keys()}
-    refs = {cat: get_latest(gen.manifest['REFS'][cat].items())[1] for cat in gen.manifest['REFS'].keys()}
+    cats = {cat: manifest['CATS'][cat][-1] for cat in manifest['CATS']} # type: ignore
+    refs = {cat: manifest['REFS'][cat][-1] for cat in manifest['REFS']} # type: ignore
 
     # cleanup if required
     if empty:
@@ -671,13 +665,17 @@ def get_selection(gen, empty, explicit_cats, explicit_refs):
         refs = {}
 
     # update with explicit editions
-    for (a,b,c) in [
-        (cats, 'CATS', explicit_cats),
-        (refs, 'REFS', explicit_refs),
-        ]:
-        for (cat,ed) in c:
-            cat = int(cat)
-            a.update({cat: manifest[b][cat][ed]})
+    for (a, b, c) in [
+        (cats, manifest['CATS'], explicit_cats),
+        (refs, manifest['REFS'], explicit_refs),
+    ]:
+        for (cat_i, ed_s) in c:
+            cat = int(cat_i)
+            ed1, ed2 = ed_s.split('.')
+            ed = (int(ed1), int(ed2))
+            for spec in b[cat]: # type: ignore
+                if spec.cv_edition == ed:
+                    a.update({cat: spec})
     return {'CATS': cats, 'REFS': refs}
 
 def get_expansions(base, gen, selection, expansions):

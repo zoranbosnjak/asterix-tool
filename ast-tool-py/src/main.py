@@ -25,7 +25,7 @@ import json
 import locale
 from enum import Enum
 
-__version__ = "0.16.2"
+__version__ = "0.17.0"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -375,26 +375,14 @@ def format_find(lst: List[Any], name: str) -> Any:
     return None
 
 
-def string_to_edition(ed: str) -> Tuple[int, int]:
-    """Convert edition string to a tuple, for example "1.2" -> (1,2)"""
-    a, b = ed.split('.')
-    return (int(a), int(b))
-
-
 def cmd_show_manifest(io: CIO, args: Any) -> None:
-
-    def fmt(what: str, n: int, ed: str) -> str:
-        return '{} {}, edition {}'.format(what, str(n).zfill(3), ed)
 
     @no_type_check
     def loop(arg: str, what: str) -> None:
-        for n in sorted(gen.manifest[arg]):
-            d = gen.manifest[arg][n]
-            keys = d.keys()
-            for ed in sorted(keys, key=string_to_edition, reverse=True):
-                print(fmt(what, n, ed))
-                if args.latest:
-                    break
+        for cat in sorted(gen.manifest[arg]):
+            for spec in reversed(gen.manifest[arg][cat]):
+                ed_major, ed_minor = spec.cv_edition
+                print('{} {}, edition {}.{}'.format(what, str(cat).zfill(3), ed_major, ed_minor))
 
     loop('CATS', 'cat')
     loop('REFS', 'ref')
@@ -408,15 +396,9 @@ def get_selection(empty: bool,
 
     manifest = gen.manifest
 
-    def get_latest(lst: List[Any]) -> Any:
-        return sorted(lst, key=lambda pair: string_to_edition(pair[0]),
-                      reverse=True)[0]
-
     # get latest
-    cats = {cat: get_latest(manifest['CATS'][cat].items())[1]  # type: ignore
-            for cat in manifest['CATS'].keys()}  # type: ignore
-    refs = {cat: get_latest(manifest['REFS'][cat].items())[1]  # type: ignore
-            for cat in manifest['REFS'].keys()}  # type: ignore
+    cats = {cat: manifest['CATS'][cat][-1] for cat in manifest['CATS']} # type: ignore
+    refs = {cat: manifest['REFS'][cat][-1] for cat in manifest['REFS']} # type: ignore
 
     # cleanup if required
     if empty:
@@ -425,12 +407,16 @@ def get_selection(empty: bool,
 
     # update with explicit editions
     for (a, b, c) in [
-        (cats, 'CATS', explicit_cats),
-        (refs, 'REFS', explicit_refs),
+        (cats, manifest['CATS'], explicit_cats),
+        (refs, manifest['REFS'], explicit_refs),
     ]:
-        for (cat_i, ed) in c:
+        for (cat_i, ed_s) in c:
             cat = int(cat_i)
-            a.update({cat: manifest[b][cat][ed]})  # type: ignore
+            ed1, ed2 = ed_s.split('.')
+            ed = (int(ed1), int(ed2))
+            for spec in b[cat]: # type: ignore
+                if spec.cv_edition == ed:
+                    a.update({cat: spec})
     return {'CATS': cats, 'REFS': refs}
 
 
@@ -899,6 +885,9 @@ def cmd_inspect(io: CIO, args: Any) -> None:
     processed_categories: Set[int] = set()
     parse_errors: Dict[int, Any] = dict()
 
+    def str_edition(ed: Tuple[int, int]) -> str:
+        return '{}.{}'.format(ed[0], ed[1])
+
     @no_type_check
     def handle_event(s):
         nonlocal raw_datablock_errors, unknown_categories, processed_categories, parse_errors
@@ -908,25 +897,24 @@ def cmd_inspect(io: CIO, args: Any) -> None:
             raw_datablock_errors += 1
         for raw_db in raw_datablocks:
             cat = raw_db.get_category()
-            editions = gen.manifest['CATS'].get(cat)
-            if editions is None:
+            specs = gen.manifest['CATS'].get(cat)
+            if specs is None:
                 unknown_categories.add(cat)
             processed_categories.add(cat)
             bs = raw_db.get_raw_records()
-            for ed in editions:
-                Spec = gen.manifest['CATS'][cat][ed]
+            for Spec in specs:
                 uap = Spec.cv_uap
                 if issubclass(uap, UapSingle):
                     result = uap.parse(bs)
                     if isinstance(result, ValueError):
                         problems = parse_errors.get(cat, set())
-                        problems.add(ed)
+                        problems.add(Spec.cv_edition)
                         parse_errors[cat] = problems
                 elif issubclass(uap, UapMultiple):
                     results = spec.uap.parse_any_uap(bs)
                     if len(results) == 0:
                         problems = parse_errors.get(cat, set())
-                        problems.add(ed)
+                        problems.add(Spec.cv_edition)
                         parse_errors[cat] = problems
                 else:
                     raise Exception('internal error, unexpected type', uap)
@@ -943,16 +931,16 @@ def cmd_inspect(io: CIO, args: Any) -> None:
     print('unknown categories: {}'.format(sorted(unknown_categories)))
     print('success category/edition:')
     for cat in sorted(processed_categories):
-        editions = set(gen.manifest['CATS'][cat].keys())  # type: ignore
+        editions = {x.cv_edition for x in gen.manifest['CATS'][cat]} # type: ignore
         problems = parse_errors.get(cat, set())
         editions.difference_update(problems)
-        print('{} -> {}'.format(cat, sorted(editions, key=string_to_edition)))
+        print('{} -> {}'.format(cat, [str_edition(x) for x in sorted(editions)]))
     print('problems category/edition:')
     for cat in sorted(processed_categories):
         problems = parse_errors.get(cat)
         if not problems:
             continue
-        print('{} -> {}'.format(cat, sorted(problems, key=string_to_edition)))
+        print('{} -> {}'.format(cat, [str_edition(x) for x in sorted(problems)]))
 
 
 def cmd_record(io: CIO, args: Any) -> None:

@@ -34,6 +34,7 @@ let
 
     shellHook = ''
         export PYTHONPATH=$(pwd)/src:$PYTHONPATH
+        ast-tool-py() { python ./src/main.py "$@"; }
     '';
     };
 
@@ -43,7 +44,6 @@ let
     src = ./.;
     propagatedBuildInputs = deps;
     shellHook = ''
-        ast-tool() { python ./src/main.py "$@"; }
     '';
   };
 
