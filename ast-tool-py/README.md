@@ -480,6 +480,42 @@ ast-tool-py random --channel ch1 --channel ch2 --channel ch3 \
     | ast-tool-py custom --script custom.py --call custom
 ```
 
+#### Example: Extract SAC/SIC code from item '010' (any category)
+
+... ignore errors.
+
+```python
+# -- custom.py script
+
+def custom(base, gen, io, args):
+    manifest = gen.manifest
+    specs = {cat: manifest['CATS'][cat][-1] for cat in manifest['CATS']}
+    for event in io.rx():
+        try: handle_event(base, specs, event)
+        except: pass
+
+def handle_event(base, specs, event):
+    (t_mono, t_utc, channel, data) = event
+    bits = base.Bits.from_bytes(data)
+    raw_datablocks = base.RawDatablock.parse(bits)
+    for raw_db in raw_datablocks:
+        cat = raw_db.get_category()
+        spec = specs.get(cat)
+        records = spec.cv_uap.parse(raw_db.get_raw_records())
+        for record in spec.cv_uap.parse(raw_db.get_raw_records()):
+            i010 = record.get_item('010').variation
+            sac = i010.get_item('SAC').as_uint()
+            sic = i010.get_item('SIC').as_uint()
+            print(t_utc, channel, cat, (sac, sic))
+```
+
+Test:
+
+```bash
+ast-tool-py random --channel ch1 --channel ch2 --channel ch3 \
+    | ast-tool-py custom --script custom.py --call custom
+```
+
 #### Example: Search for some specific events
 
 ... for example *north marker* and *sector crossing* message in category 034.
