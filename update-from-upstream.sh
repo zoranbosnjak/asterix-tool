@@ -13,3 +13,14 @@ if [ -n "$changes1" ]; then
 fi
 
 nix-shell -p nix-prefetch-scripts --run "nix-prefetch-git ${src} > ${dst}"
+
+changes2=$(git status --short ${dst})
+if [ -n "$changes2" ]; then
+    # run all updaters
+    for i in $(find libs/ -type f | grep update.sh); do
+        cd $(dirname $i)
+        ./update.sh
+        cd -
+    done;
+fi
+
