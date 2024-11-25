@@ -25,7 +25,7 @@ import json
 import locale
 from enum import Enum
 
-__version__ = "0.17.2"
+__version__ = "0.18.0"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -444,12 +444,14 @@ class AsterixSamples:
                  sel: Dict[Any, Any], exp: Dict[Any, Any],
                  populate_all_items: bool,
                  max_datablocks: int,
-                 max_records: int) -> None:
+                 max_records: int,
+                 error_bit_flip: Optional[int]) -> None:
         self.gen = gen
         self.expand = set(exp)
         self.populate_all_items = populate_all_items
         self.max_datablocks = max_datablocks
         self.max_records = max_records
+        self.error_bit_flip = error_bit_flip
 
         # for some specs it is not possible to generate valid record,
         # without knowing the UAP, so skip those
@@ -560,6 +562,19 @@ class AsterixSamples:
         r = random_rec(uap.cv_record)
         return r  # type: ignore
 
+    def inject_errors(self, bs: bytes) -> bytes:
+        n = self.error_bit_flip
+        if n is None:
+            return bs
+        out = b''
+        for x in bs:
+            flip = self.gen.next() % n
+            if flip == 0:
+                bit_to_flip = self.gen.next() % 8
+                x ^= pow(2, bit_to_flip)
+            out += bytes([x])
+        return out
+
     def __next__(self) -> bytes:
         bs = b''
         n1 = self.gen.choose(list(range(self.max_datablocks))) + 1
@@ -573,7 +588,7 @@ class AsterixSamples:
                 records.append(rec)
             db = cls.create(records)
             bs += db.unparse().to_bytes()
-        return bs
+        return self.inject_errors(bs)
 
 
 def cmd_gen_random(io: CIO, args: Any) -> None:
@@ -592,7 +607,8 @@ def cmd_gen_random(io: CIO, args: Any) -> None:
             exp,
             populate_all_items,
             args.max_datablocks,
-            args.max_records):
+            args.max_records,
+            args.error_bit_flip):
         t_mono = time.monotonic()
         t_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         if args.channel:
@@ -1119,6 +1135,12 @@ def main() -> None:
         default=5,
         type=check_min(1),
         help='Max number of records per datablock, default: %(default)s')
+    parser_random.add_argument(
+        '--error-bit-flip',
+        required=False,
+        type=check_min(1),
+        metavar='N',
+        help='Random bit flip in every N-th byte')
 
     # 'decode' command
     parser_decode = subparsers.add_parser('decode', help='asterix decoder')
