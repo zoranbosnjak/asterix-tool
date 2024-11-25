@@ -18,6 +18,6 @@ if [ -n "$changes2" ]; then
     current_version=$(cat ${target} | grep "__version.*=" | sed 's/[^"]*//' | sed 's/\"//g')
     IFS='.' read -r -a array <<< "$current_version"
     new_version="${array[0]}.${array[1]}.$((array[2]+1))"
-    sed -i -e "s/__version__.*=.*/__version__ = \"$new_version\"/g" ${target}
+    sed -i -e "s/__version__ = \".*/__version__ = \"$new_version\"/g" ${target}
 fi
 
