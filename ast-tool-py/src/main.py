@@ -25,7 +25,7 @@ import json
 import locale
 from enum import Enum
 
-__version__ = "0.18.1"
+__version__ = "0.18.2"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -468,8 +468,6 @@ class AsterixSamples:
     def random_record(self, cat: int, cls: Type[AstSpec]) -> AstSpec:
         gen = self.gen
 
-        # def random_var(var : type[Variation], name : Optional[str] = None) ->
-        # Any:
         @no_type_check
         def random_var(var, name=None):
 
