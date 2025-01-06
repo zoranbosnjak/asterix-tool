@@ -2,7 +2,7 @@
 name = "ast-tool-py"
 dynamic = ["version"]
 authors = [
-  { name="Zoran Bošnjak", email="zoran.bosnjak@sloveniacontrol.si" },
+  { name="Zoran Bošnjak", email="zoran.bosnjak@via.si" },
 ]
 description = "Asterix data processing tool"
 readme = "README.md"
