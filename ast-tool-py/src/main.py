@@ -25,7 +25,7 @@ import json
 import locale
 from enum import Enum
 
-__version__ = "0.18.3"
+__version__ = "0.18.4"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -67,7 +67,7 @@ class CIO:
         try:
             print(s, flush=self.flush)
         except BrokenPipeError:
-            sys.stdout = None  # type: ignore
+            sys.stdout = None
             sys.exit(0)
 
     def tx_raw_bin(self, s: bytes) -> None:
@@ -76,7 +76,7 @@ class CIO:
             if self.flush:
                 sys.stdout.buffer.flush()
         except BrokenPipeError:
-            sys.stdout = None  # type: ignore
+            sys.stdout = None
             sys.exit(0)
 
     def tx(self, event: Event) -> None:
@@ -308,7 +308,7 @@ class FmtFinal(Fmt):
         (t_mono, _t_utc, channel, data) = event
         t_utc: datetime.datetime = _t_utc  # type: ignore
         try:
-            ch2 = int(channel)  # type: ignore
+            ch2 = int(channel or '')
         except ValueError:
             ch2 = hash(channel)
         ch2 %= 256
