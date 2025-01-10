@@ -20,7 +20,7 @@ ast-tool-py --version
 exit
 ```
 
-## publish/update project to pypi
+## Manually publish/update project to pypi
 
 ``` bash
 nix-shell
@@ -28,6 +28,11 @@ nix-shell
 git status
 python3 -m build
 ls -l dist/*
+
+# upload to testpypi
+twine upload --repository testpypi dist/*
+
+# upload to production pypi
 twine upload dist/*
 ```
 
