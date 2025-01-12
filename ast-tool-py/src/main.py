@@ -25,7 +25,7 @@ import json
 import locale
 from enum import Enum
 
-__version__ = "0.18.4"
+__version__ = "0.18.5"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
