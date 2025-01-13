@@ -1,5 +1,11 @@
 # Asterix processing tool - python version
 
+This tool builds on top of
+[libasterix](https://github.com/zoranbosnjak/asterix-libs/tree/main/libs/python#readme) -
+Asterix data processing library for python, which in turn uses asterix
+specifications from [asterix-specs](https://zoranbosnjak.github.io/asterix-specs/)
+project.
+
 Features:
 
 - random asterix data generator
@@ -11,12 +17,19 @@ Features:
 - simple integration with other standard command line tools via stdin/stdout
 - user defined asterix data processing with custom script
 
-## Installation
+## Installation and upgrade
 
-Install from python package index:
+Install/upgrade from python package index:
 
 ``` bash
+# regular install
 pip install ast-tool-py
+
+# install or upgrade to the latest version, including libasterix
+pip install --upgrade --upgrade-strategy=eager ast-tool-py
+
+# check versions
+ast-tool-py --version
 ```
 
 ### Other installation methods and remarks
