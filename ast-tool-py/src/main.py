@@ -19,13 +19,14 @@ import importlib.metadata
 import time
 import datetime
 import socket
+import struct
 import selectors
 import uuid
 import json
 import locale
 from enum import Enum
 
-__version__ = "0.18.6"
+__version__ = "0.19.0"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -846,11 +847,15 @@ def cmd_from_udp(io: CIO, args: Any) -> None:
         sock.setblocking(False)
         sel.register(sock, selectors.EVENT_READ)
         sockets[sock] = channel
-    for (channel, mcast, port, local_ip) in args.multicast:
+    for (channel, mcast, port) in args.multicast:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((mcast, int(port)))
-        mreq = socket.inet_aton(mcast) + socket.inet_aton(local_ip)
+        if args.local_ip is None:
+            mreq = struct.pack("=4sl", socket.inet_aton(mcast), socket.INADDR_ANY)
+        else:
+            mreq = struct.pack("=4s4s", socket.inet_aton(mcast),
+                               socket.inet_aton(args.local_ip))
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
         sock.setblocking(False)
         sel.register(sock, selectors.EVENT_READ)
@@ -873,16 +878,17 @@ def cmd_to_udp(io: CIO, args: Any) -> None:
     for (channel, ip, port) in args.unicast:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sockets.append((channel, sock, ip, int(port)))
-    for (channel, mcast, port, local_ip) in args.multicast:
+    for (channel, mcast, port) in args.multicast:
         sock = socket.socket(
             socket.AF_INET,
             socket.SOCK_DGRAM,
             socket.IPPROTO_UDP)
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, args.ttl)
-        sock.setsockopt(
-            socket.IPPROTO_IP,
-            socket.IP_MULTICAST_IF,
-            socket.inet_aton(local_ip))
+        if args.local_ip is not None:
+            sock.setsockopt(
+                socket.IPPROTO_IP,
+                socket.IP_MULTICAST_IF,
+                socket.inet_aton(args.local_ip))
         sockets.append((channel, sock, mcast, int(port)))
 
     # processing loop
@@ -1077,6 +1083,10 @@ def main() -> None:
                         type=check_ttl, default=32,  # type: ignore
                         help='Time to live for outgoing multicast traffic, default: %(default)s')
 
+    parser.add_argument('--multicast-if', dest='local_ip',
+                        type=str,
+                        help='Optional IP address of local interface to use for multicast.')
+
     parser.add_argument(
         '--simple-input',
         action='store_true',
@@ -1180,12 +1190,11 @@ def main() -> None:
         action='append',
         help='Multicast UDP input',
         default=[],
-        nargs=4,
+        nargs=3,
         metavar=(
             'channel',
             'mcast-ip',
-            'port',
-            'local-ip'))
+            'port'))
 
     # 'to-udp' command
     parser_to_udp = subparsers.add_parser(
@@ -1206,12 +1215,11 @@ def main() -> None:
         action='append',
         help='Multicast UDP output, use channel "*" for any channel',
         default=[],
-        nargs=4,
+        nargs=3,
         metavar=(
             'channel',
             'mcast-ip',
-            'port',
-            'local-ip'))
+            'port'))
 
     # 'inspect' command
     parser_inspect = subparsers.add_parser(
