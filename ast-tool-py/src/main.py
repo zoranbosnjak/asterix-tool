@@ -26,7 +26,7 @@ import json
 import locale
 from enum import Enum
 
-__version__ = "0.19.0"
+__version__ = "0.19.1"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -460,7 +460,8 @@ class AsterixSamples:
         for (cat, spec) in sel['CATS'].items():
             if issubclass(spec.cv_uap, UapSingle):
                 self.valid_specs[cat] = spec
-        assert self.valid_specs  # non-empty list is required
+        err = "non-empty list is required, only single UAP specs are supported"
+        assert self.valid_specs, err
         self.refs = sel['REFS']
 
     def __iter__(self) -> 'AsterixSamples':
