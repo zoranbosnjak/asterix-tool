@@ -26,7 +26,7 @@ import json
 import locale
 from enum import Enum
 
-__version__ = "0.19.1"
+__version__ = "0.20.0"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -753,13 +753,14 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
         handle_rulevar(cat, i + 1, path, nsp.rule)
 
     @no_type_check
-    def handle_record(cat, i, rec):
+    def handle_record(cat, i, rec, uap=None):
         if too_deep(i):
             return
         raw = rec.unparse().to_bytes()
         truncate(
-            '{}record: len={} bytes, hex={}'.format(
+            '{}record{}: len={} bytes, hex={}'.format(
                 '  ' * i,
+                '' if uap is None else ' (uap={})'.format(uap),
                 len(raw),
                 raw.hex()))
         for (name, nsp) in rec.items_regular.items():
@@ -791,24 +792,24 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
             for rec in result:
                 handle_record(cat, i + 1, rec)
         elif issubclass(uap, UapMultiple):
+            def find_uap_by_type(rec):
+                for name, cls in uap.cv_uaps.items():
+                    if isinstance(rec, cls):
+                        return name
+                return None
             results = spec.cv_uap.parse_any_uap(bs)
             if len(results) == 0:
                 truncate('Unable to parse datablock: {}'.format(d))
                 if args.stop_on_error:
                     sys.exit(1)
                 return
-            elif len(results) == 1:
-                truncate('{}multiple UAP record, looks like:'.format(
-                    '  ' * (i + 1)))
-                result = results[0]
-                for rec in result:
-                    handle_record(cat, i + 2, rec)
             else:
                 for (n, result) in enumerate(results):
                     truncate(
-                        '{}result ({}) - multiple parsing results:'.format('  ' * (i + 1), n))
+                        '{}Multiple UAP, guessing possible result ({}/{}):'\
+                        .format('  ' * (i + 1), n+1, len(results)))
                     for rec in result:
-                        handle_record(cat, i + 2, rec)
+                        handle_record(cat, i + 2, rec, find_uap_by_type(rec))
         else:
             raise Exception('internal error, unexpected type', uap)
 
