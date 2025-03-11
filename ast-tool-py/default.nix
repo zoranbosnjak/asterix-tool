@@ -29,12 +29,13 @@ let
 
   env = pkgs.mkShell {
     packages = [
-        (pkgs.python3.withPackages (python-pkgs: deps))
+      (pkgs.python3.withPackages (python-pkgs: deps))
     ];
-
+    LOCALE_ARCHIVE = "${pkgs.glibcLocales}/lib/locale/locale-archive";
     shellHook = ''
-        export PYTHONPATH=$(pwd)/src:$PYTHONPATH
-        ast-tool-py() { python ./src/main.py "$@"; }
+      export LC_ALL=C.UTF-8
+      export PYTHONPATH=$(pwd)/src:$PYTHONPATH
+      ast-tool-py() { python ./src/main.py "$@"; }
     '';
     };
 
