@@ -44,8 +44,6 @@ let
     format = "pyproject";
     src = ./.;
     propagatedBuildInputs = deps;
-    shellHook = ''
-    '';
   };
 
 in if inShell == false
