@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.0 (2025-03-07)
+
+* With multiple UAPs, try different decoding combinations.
+
 ## 0.19.0 (2025-02-03)
 
 * Multicast local interface IP argument is removed from `from-udp --multicast`
