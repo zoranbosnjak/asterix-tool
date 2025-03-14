@@ -26,7 +26,7 @@ import json
 import locale
 from enum import Enum
 
-__version__ = "0.20.1"
+__version__ = "0.20.2"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -871,7 +871,7 @@ def cmd_from_udp(io: CIO, args: Any) -> None:
             t_utc = datetime.datetime.now(tz=datetime.timezone.utc)
             f = key.fileobj
             channel = sockets[f]  # type: ignore
-            (data, addr) = sock.recvfrom(pow(2, 16))
+            (data, addr) = f.recvfrom(pow(2, 16)) # type: ignore
             io.tx((t_mono, t_utc, channel, data))
 
 
