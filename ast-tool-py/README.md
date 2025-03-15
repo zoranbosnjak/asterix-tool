@@ -214,7 +214,7 @@ ast-tool-py random | while read x; do echo "$x"; sleep 0.5; done
 ast-tool-py random | pv -qL 300
 
 # prepend/append some string to generated samples in simple format
-ast-tool-py -s random | awk '{print "0: "$1}'
+ast-tool-py -s random | stdbuf -oL awk '{print "0: "$1}'
 
 # set random channel name for each event, choose from ['ch1', 'ch2']
 ast-tool-py random --channel ch1 --channel ch2
@@ -429,6 +429,107 @@ Specify channels with command line argument.
 # expect 'ch1' and 'ch2' on output
 ast-tool-py random --channel ch1 --channel ch2 --channel ch3 \
     | ast-tool-py custom --script custom.py --call custom --args "ch1 ch2"
+```
+
+#### Example: Switch between several UDP streams
+
+Scenario:
+
+- There are several UDP stream with the same content, perhaps received via
+  different routes.
+- We want to create one redundant UDP stream by switching between inputs,
+  that is: if one input becomes inactive, switch to another input.
+- We want to set priority and timeout per stream from command line in the
+  form: `--input {priority}:{channel}:{timeout}`
+
+For example:
+
+- 127.0.0.1:56001 (input priority 1, timeout 3.0)
+- 127.0.0.1:56002 (input priority 2, timeout 3.0)
+- 127.0.0.1:56003 (input priority 2, timeout 3.0)
+- 127.0.0.1:56004 (output)
+
+A solution requires the following processing stages:
+
+- `from-udp` with multiple inputs, to combine inputs, set distinct channel
+  name for each input.
+- `custom` script, to implement stream switching, based on channel name.
+- `to-udp` to forward the resulting stream to required output.
+
+```python
+# -- custom.py script
+
+from typing import *
+from dataclasses import dataclass
+import argparse
+
+@dataclass
+class Channel:
+    priority: int
+    name: str
+    timeout: float
+
+@dataclass
+class Active:
+    t_mono: float
+    channel: Channel
+
+def parse_channel(s: str) -> Channel:
+    prio, name, timeout = s.split(':')
+    return Channel(int(prio), name, float(timeout))
+
+def custom(base: Any, gen: Any, io: Any, args: Any) -> Any:
+    parser = argparse.ArgumentParser(description='Custom filter parser.')
+    parser.add_argument('--input', type=parse_channel, action='append')
+    args2 = parser.parse_args(args.args.strip().split())
+    channels = {ch.name: ch for ch in args2.input}
+
+    active: Optional[Active] = None
+    for event in io.rx():
+        (t_mono, _t_utc, channel, _data) = event
+        rx_channel = channels.get(channel)
+        if rx_channel is None:
+            continue
+
+        # check timeout
+        if active is not None:
+            dt = t_mono - active.t_mono
+            if dt > active.channel.timeout:
+                active = None
+
+        # forward or not
+        forward = True if active is None else \
+                rx_channel.name == active.channel.name \
+                or rx_channel.priority < active.channel.priority
+        if forward:
+            active = Active(t_mono, rx_channel)
+            io.tx(event)
+```
+
+Test (use the following commands concurrently):
+
+```bash
+# simulate AA, BB, CC input streams (try switching on/off individual streams)
+ast-tool-py -s random --sleep 1 | stdbuf -oL awk '{print "AA"}' | \
+    ast-tool-py -s to-udp --unicast "*" 127.0.0.1 56001
+
+ast-tool-py -s random --sleep 1 | stdbuf -oL awk '{print "BB"}' | \
+    ast-tool-py -s to-udp --unicast "*" 127.0.0.1 56002
+
+ast-tool-py -s random --sleep 1 | stdbuf -oL awk '{print "CC"}' | \
+    ast-tool-py -s to-udp --unicast "*" 127.0.0.1 56003
+
+# run stream switching stages
+ast-tool-py from-udp \
+    --unicast A 127.0.0.1 56001 \
+    --unicast B 127.0.0.1 56002 \
+    --unicast C 127.0.0.1 56003 \
+| ast-tool-py custom --script custom.py --call custom \
+    --args "--input 1:A:3.0 --input 2:B:3.0 --input 2:C:3.0" \
+| ast-tool-py to-udp --unicast "*" 127.0.0.1 56004
+
+# monitor result stream (should be active as long as one is active)
+ast-tool-py from-udp --unicast test 127.0.0.1 56004
 ```
 
 ### Custom asterix processing examples
