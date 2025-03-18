@@ -24,7 +24,6 @@ import selectors
 import uuid
 import json
 import locale
-from enum import Enum
 
 __version__ = "0.20.2"
 
