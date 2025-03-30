@@ -25,7 +25,7 @@ import uuid
 import json
 import locale
 
-__version__ = "0.20.3"
+__version__ = "0.20.4"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
