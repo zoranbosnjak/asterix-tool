@@ -25,7 +25,7 @@ import uuid
 import json
 import locale
 
-__version__ = "0.20.4"
+__version__ = "0.20.5"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -1080,11 +1080,11 @@ def main() -> None:
         action='store_true',
         help='Do not check spare bits for zero value when parsing')
 
-    parser.add_argument('--multicast-ttl', dest='ttl',
+    parser.add_argument('--ttl', dest='ttl',
                         type=check_ttl, default=32,  # type: ignore
                         help='Time to live for outgoing multicast traffic, default: %(default)s')
 
-    parser.add_argument('--multicast-if', dest='local_ip',
+    parser.add_argument('--local-ip', dest='local_ip',
                         type=str,
                         help='Optional IP address of local interface to use for multicast.')
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.20.5 (2025-05-09)
+
+* Global argument rename `--multicast-ttl` to `--ttl`.
+* Global argument rename `--multicast-if` to `--local-ip`
+
 ## 0.20.0 (2025-03-07)
 
 * With multiple UAPs, try different decoding combinations.
