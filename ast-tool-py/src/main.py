@@ -5,10 +5,6 @@
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-import asterix.generated as gen
-import asterix.base as base
-from asterix.base import *
-from scapy.all import rdpcap, IP, UDP  # type: ignore
 from typing import *
 import argparse
 import fileinput
@@ -24,8 +20,16 @@ import selectors
 import uuid
 import json
 import locale
+import asterix.base as base
+from asterix.base import *
 
-__version__ = "0.20.6"
+# skip some imports (and features) if fast startup is required
+fast = len(sys.argv) >= 2 and sys.argv[1] == '--fast-startup'
+if not fast:
+    import asterix.generated as gen
+    from scapy.all import rdpcap, UDP  # type: ignore
+
+__version__ = "0.21.0"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -364,7 +368,9 @@ class FmtFinal(Fmt):
                     yield i
 
 
-format_input = [FmtSimple, FmtVcr, FmtPcap, FmtBonita, FmtFinal]
+format_input = [FmtSimple, FmtVcr, FmtBonita, FmtFinal]
+if not fast:
+    format_input.append(FmtPcap)
 format_output = [FmtSimple, FmtVcr, FmtFinal]
 
 
@@ -1005,11 +1011,12 @@ def cmd_custom(io: CIO, args: Any) -> None:
 
     # Create and call user function with the following arguments
     #   - asterix base module (already imported)
-    #   - asterix generated module (already imported)
+    #   - asterix generated module (if imported, otherwise None)
     #   - IO instance for standard input/output
     #   - all command line arguments
     f = run_globals[args.call]  # type: ignore
-    f(base, gen, io, args)  # type: ignore
+    gen2 = None if fast else gen
+    f(base, gen2, io, args)  # type: ignore
 
 
 def check_ttl(arg: int) -> int:
@@ -1046,6 +1053,11 @@ def main() -> None:
 
     libasterix_version = importlib.metadata.version('libasterix')
 
+    parser.add_argument(
+        '--fast-startup',
+        action='store_true',
+        help='Reduce features for faster startup time, this argument must be set first')
+
     parser.add_argument('--version-tool', action='version',
         version=__version__, help='show tool version number and exit')
 
@@ -1058,27 +1070,28 @@ def main() -> None:
             libasterix_version),
         help='show program version number and exit')
 
-    parser.add_argument(
-        '--empty-selection',
-        action='store_true',
-        help='Use empty initial cat/ref selection instead of latest editions')
+    if not fast:
+        parser.add_argument(
+            '--empty-selection',
+            action='store_true',
+            help='Use empty initial cat/ref selection instead of latest editions')
 
-    parser.add_argument('--cat', nargs=2, metavar=('CAT', 'EDITION'),
-                        action='append',
-                        help='Explicit category selection')
+        parser.add_argument('--cat', nargs=2, metavar=('CAT', 'EDITION'),
+                            action='append',
+                            help='Explicit category selection')
 
-    parser.add_argument('--ref', nargs=2, metavar=('CAT', 'EDITION'),
-                        action='append',
-                        help='Explicit expansion selection')
+        parser.add_argument('--ref', nargs=2, metavar=('CAT', 'EDITION'),
+                            action='append',
+                            help='Explicit expansion selection')
 
-    parser.add_argument('--expand', nargs=2, metavar=('CAT', 'ITEM-NAME'),
-                        action='append',
-                        help='Expand CAT/ITEM-NAME with REF expansion')
+        parser.add_argument('--expand', nargs=2, metavar=('CAT', 'ITEM-NAME'),
+                            action='append',
+                            help='Expand CAT/ITEM-NAME with REF expansion')
 
-    parser.add_argument(
-        '--no-check-spare',
-        action='store_true',
-        help='Do not check spare bits for zero value when parsing')
+        parser.add_argument(
+            '--no-check-spare',
+            action='store_true',
+            help='Do not check spare bits for zero value when parsing')
 
     parser.add_argument('--ttl', dest='ttl',
                         type=check_ttl, default=32,  # type: ignore
@@ -1109,68 +1122,74 @@ def main() -> None:
 
     subparsers = parser.add_subparsers(required=True, help='sub-commands')
 
-    # 'manifest' command
-    parser_manifest = subparsers.add_parser('manifest',
-                                            help='show available categories')
-    parser_manifest.set_defaults(func=cmd_show_manifest)
-    parser_manifest.add_argument('--latest', action='store_true',
-                                 help='show latest editions only')
+    if not fast:
+        # 'manifest' command
+        parser_manifest = subparsers.add_parser('manifest',
+                                                help='show available categories')
+        parser_manifest.set_defaults(func=cmd_show_manifest)
+        parser_manifest.add_argument('--latest', action='store_true',
+                                     help='show latest editions only')
 
-    # 'random' command
-    parser_random = subparsers.add_parser(
-        'random', help='asterix sample generator')
-    parser_random.set_defaults(func=cmd_gen_random)
-    parser_random.add_argument('--sleep', type=float,
-                               help="Sleep 't' seconds between random samples")
-    parser_random.add_argument('--seed', type=int,
-                               help='Randomm generator seed value')
-    parser_random.add_argument(
-        '--populate-all-items',
-        action='store_true',
-        help='Populate all defined items instead of random selection')
-    parser_random.add_argument(
-        '--channel',
-        metavar='STR',
-        action='append',
-        default=[],
-        help='Channel name (can be specified multiple times)')
-    parser_random.add_argument(
-        '--max-datablocks',
-        default=5,
-        type=check_min(1),
-        help='Max number of datablocks per datagram, default: %(default)s')
-    parser_random.add_argument(
-        '--max-records',
-        default=5,
-        type=check_min(1),
-        help='Max number of records per datablock, default: %(default)s')
-    parser_random.add_argument(
-        '--error-bit-flip',
-        required=False,
-        type=check_min(1),
-        metavar='N',
-        help='Random bit flip in every N-th byte')
+        # 'random' command
+        parser_random = subparsers.add_parser(
+            'random', help='asterix sample generator')
+        parser_random.set_defaults(func=cmd_gen_random)
+        parser_random.add_argument('--sleep', type=float,
+                                   help="Sleep 't' seconds between random samples")
+        parser_random.add_argument('--seed', type=int,
+                                   help='Randomm generator seed value')
+        parser_random.add_argument(
+            '--populate-all-items',
+            action='store_true',
+            help='Populate all defined items instead of random selection')
+        parser_random.add_argument(
+            '--channel',
+            metavar='STR',
+            action='append',
+            default=[],
+            help='Channel name (can be specified multiple times)')
+        parser_random.add_argument(
+            '--max-datablocks',
+            default=5,
+            type=check_min(1),
+            help='Max number of datablocks per datagram, default: %(default)s')
+        parser_random.add_argument(
+            '--max-records',
+            default=5,
+            type=check_min(1),
+            help='Max number of records per datablock, default: %(default)s')
+        parser_random.add_argument(
+            '--error-bit-flip',
+            required=False,
+            type=check_min(1),
+            metavar='N',
+            help='Random bit flip in every N-th byte')
 
-    # 'decode' command
-    parser_decode = subparsers.add_parser('decode', help='asterix decoder')
-    parser_decode.set_defaults(func=cmd_asterix_decoder)
-    parser_decode.add_argument(
-        '--truncate',
-        type=int,
-        metavar='N',
-        default=0,
-        help='truncate long data lines to N characters or 0 for none, \
-            default: %(default)s')
-    parser_decode.add_argument('--stop-on-error',
-                               action='store_true',
-                               help='exit on first parsing error')
-    parser_decode.add_argument(
-        '-l',
-        '--parsing-level',
-        type=int,
-        metavar='N',
-        default=0,
-        help='limit parsing depth, 0 for none, default: %(default)s')
+        # 'decode' command
+        parser_decode = subparsers.add_parser('decode', help='asterix decoder')
+        parser_decode.set_defaults(func=cmd_asterix_decoder)
+        parser_decode.add_argument(
+            '--truncate',
+            type=int,
+            metavar='N',
+            default=0,
+            help='truncate long data lines to N characters or 0 for none, \
+                default: %(default)s')
+        parser_decode.add_argument('--stop-on-error',
+                                   action='store_true',
+                                   help='exit on first parsing error')
+        parser_decode.add_argument(
+            '-l',
+            '--parsing-level',
+            type=int,
+            metavar='N',
+            default=0,
+            help='limit parsing depth, 0 for none, default: %(default)s')
+
+        # 'inspect' command
+        parser_inspect = subparsers.add_parser(
+            'inspect', help='report asterix parsing status per category/edition')
+        parser_inspect.set_defaults(func=cmd_inspect)
 
     # 'from-udp' command
     parser_from_udp = subparsers.add_parser(
@@ -1221,11 +1240,6 @@ def main() -> None:
             'channel',
             'mcast-ip',
             'port'))
-
-    # 'inspect' command
-    parser_inspect = subparsers.add_parser(
-        'inspect', help='report asterix parsing status per category/edition')
-    parser_inspect.set_defaults(func=cmd_inspect)
 
     # 'record' command
     parser_record = subparsers.add_parser('record',

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.21.0 (2025-05-16)
+
+* `--fast-startup` argument added to reduce program startup time, if some
+  features are not required (mostly related to generated asterix module).
+
 ## 0.20.5 (2025-05-09)
 
 * Global argument rename `--multicast-ttl` to `--ttl`.

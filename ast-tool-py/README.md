@@ -17,6 +17,12 @@ Features:
 - simple integration with other standard command line tools via stdin/stdout
 - user defined asterix data processing with custom script
 
+**Note**: The `libasterix` module contain huge generated python module.
+If asterix related features are not required (for example for UDP data
+forwarding only) and the startup time is an issue, it can be reduced
+significantly by using `--fast-startup` argument. The same applies for
+python `scapy` module, used for `pcap` file format.
+
 ## Installation and upgrade
 
 Install/upgrade from python package index:
@@ -262,8 +268,8 @@ Examples:
 ast-tool-py random | ast-tool-py to-udp --unicast "*" 127.0.0.1 56780
 
 # forward UDP from one port to another
-ast-tool-py from-udp --unicast "ch1" 127.0.0.1 56780 \
-    | ast-tool-py to-udp --unicast "*" 127.0.0.1 56781
+ast-tool-py --fast-startup from-udp --unicast "ch1" 127.0.0.1 56780 \
+    | ast-tool-py --fast-startup to-udp --unicast "*" 127.0.0.1 56781
 
 # decode data from UDP
 ast-tool-py from-udp --unicast "ch1" 127.0.0.1 56781 | ast-tool-py decode
@@ -337,9 +343,10 @@ This command dynamically imports a custom `python` script and runs required
 function (custom script entry point). The entry point function shall accept
 the following arguments:
 
-- `base`, `gen` - base and generated asterix module (encoder/decoder), see
-  python asterix library:
-  [libasterix](https://github.com/zoranbosnjak/asterix-libs/tree/main/libs/python#readme)
+- `base` - base asterix module
+- `gen` - generated asterix module (encoder/decoder), see python asterix library:
+  [libasterix](https://github.com/zo/asterix-libs/tree/main/libs/python#readme).
+  **Note**: This argument is `None` if `--fast-startup` argument is specified.
 - `io` - standard input/output instance
 - `args` - program arguments
 
