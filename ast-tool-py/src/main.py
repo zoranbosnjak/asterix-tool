@@ -29,7 +29,7 @@ if not fast:
     import asterix.generated as gen
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.22.0"
+__version__ = "0.22.1"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -684,7 +684,9 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
 
         elif isinstance(var, Repetitive):
             for cnt, sub in enumerate(var.arg):
-                truncate('{}subitem ({})'.format('  ' * i, cnt))
+                s = sub.unparse()
+                truncate('{}subitem ({}), len={} bits, bin={}'\
+                         .format('  ' * i, cnt, len(s), s))
                 handle_variation(cat, i + 1, path + ['({})'.format(cnt)], sub)
 
         elif isinstance(var, Explicit):
