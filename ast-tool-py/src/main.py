@@ -29,7 +29,7 @@ if not fast:
     import asterix.generated as gen
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.22.1"
+__version__ = "0.23.0"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -449,6 +449,7 @@ class AsterixSamples:
     def __init__(self, gen: PCG32,
                  sel: Dict[Any, Any], exp: Dict[Any, Any],
                  populate_all_items: bool,
+                 include_multi_uap: bool,
                  max_datablocks: int,
                  max_records: int,
                  error_bit_flip: Optional[int]) -> None:
@@ -463,7 +464,7 @@ class AsterixSamples:
         # without knowing the UAP, so skip those
         self.valid_specs = {}
         for (cat, spec) in sel['CATS'].items():
-            if issubclass(spec.cv_uap, UapSingle):
+            if include_multi_uap or issubclass(spec.cv_uap, UapSingle):
                 self.valid_specs[cat] = spec
         err = "non-empty list is required, only single UAP specs are supported"
         assert self.valid_specs, err
@@ -564,7 +565,13 @@ class AsterixSamples:
             return t.create(d)
 
         uap = cls.cv_uap  # type: ignore
-        r = random_rec(uap.cv_record)
+        if issubclass(uap, UapSingle):
+            rec_class = uap.cv_record
+        elif issubclass(uap, UapMultiple):
+            rec_class = self.gen.choose(list(uap.cv_uaps.values()))
+        else:
+            raise Exception('internal error, unexpected type', uap)
+        r = random_rec(rec_class)
         return r  # type: ignore
 
     def inject_errors(self, bs: bytes) -> bytes:
@@ -601,6 +608,7 @@ def cmd_gen_random(io: CIO, args: Any) -> None:
     sel = get_selection(args.empty_selection, args.cat or [], args.ref or [])
     exp = get_expansions(sel, args.expand or [])
     populate_all_items = args.populate_all_items
+    include_multi_uap = args.include_multi_uap
     seed = args.seed
     if seed is None:
         seed = random.randint(0, pow(2, 64) - 1)
@@ -611,6 +619,7 @@ def cmd_gen_random(io: CIO, args: Any) -> None:
             sel,
             exp,
             populate_all_items,
+            include_multi_uap,
             args.max_datablocks,
             args.max_records,
             args.error_bit_flip):
@@ -1144,6 +1153,11 @@ def main() -> None:
             '--populate-all-items',
             action='store_true',
             help='Populate all defined items instead of random selection')
+        parser_random.add_argument(
+            '--include-multi-uap',
+            action='store_true',
+            help='Include multiple UAP categories. Generated record might not \
+                    be correct according to the record selector item value.')
         parser_random.add_argument(
             '--channel',
             metavar='STR',
