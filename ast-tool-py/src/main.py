@@ -29,7 +29,7 @@ if not fast:
     import asterix.generated as gen
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.23.1"
+__version__ = "0.23.2"
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
