@@ -952,7 +952,7 @@ def cmd_inspect(io: CIO, args: Any) -> None:
                         problems.add(Spec.cv_edition)
                         parse_errors[cat] = problems
                 elif issubclass(uap, UapMultiple):
-                    results = spec.uap.parse_any_uap(bs)
+                    results = Spec.cv_uap.parse_any_uap(bs)
                     if len(results) == 0:
                         problems = parse_errors.get(cat, set())
                         problems.add(Spec.cv_edition)
