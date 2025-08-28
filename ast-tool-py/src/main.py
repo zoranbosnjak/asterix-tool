@@ -670,7 +670,8 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
                         tv = '(undefined value)'
                     dsc = 'value: {} -> "{}"'.format(x, tv)
                 elif isinstance(content, ContentString):
-                    s = content.as_string()
+                    s = content.as_string().encode('utf-8')
+                    s = repr(s)[2:-1] # strip off b'...'
                     dsc = 'value: {}, str: "{}"'.format(x, s)
                 elif isinstance(content, ContentInteger):
                     val = content.as_integer()
