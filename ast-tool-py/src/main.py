@@ -739,6 +739,11 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
             truncate(
                 '{}(Spare): len={} bits, bin={}'.format(
                     '  ' * i, len(bs), bs))
+            if args.check_spare_bits:
+                if bs.to_uinteger() != 0:
+                    truncate('Error! Non-zero spare bit(s)')
+                    if args.stop_on_error:
+                        sys.exit(1)
         elif isinstance(item, Item):
             name = item.arg.__class__.cv_name
             handle_nonspare(cat, i, path + [name], item.arg)
@@ -1102,11 +1107,6 @@ def main() -> None:
                             action='append',
                             help='Expand CAT/ITEM-NAME with REF expansion')
 
-        parser.add_argument(
-            '--no-check-spare',
-            action='store_true',
-            help='Do not check spare bits for zero value when parsing')
-
     parser.add_argument('--ttl', dest='ttl',
                         type=check_ttl, default=32,  # type: ignore
                         help='Time to live for outgoing multicast traffic, default: %(default)s')
@@ -1194,9 +1194,14 @@ def main() -> None:
             default=0,
             help='truncate long data lines to N characters or 0 for none, \
                 default: %(default)s')
-        parser_decode.add_argument('--stop-on-error',
-                                   action='store_true',
-                                   help='exit on first parsing error')
+        parser_decode.add_argument(
+            '--check-spare-bits',
+            action='store_true',
+            help='Check spare bits for zero value')
+        parser_decode.add_argument(
+            '--stop-on-error',
+            action='store_true',
+            help='exit on first parsing error')
         parser_decode.add_argument(
             '-l',
             '--parsing-level',
