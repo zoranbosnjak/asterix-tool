@@ -672,6 +672,9 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
                 elif isinstance(content, ContentString):
                     s = content.as_string()
                     dsc = 'value: {}, str: "{}"'.format(x, s)
+                elif isinstance(content, ContentInteger):
+                    val = content.as_integer()
+                    dsc = 'value: {}, int: {}'.format(x, val)
                 elif isinstance(content, ContentQuantity):
                     dsc = 'value: {}, quantity: {} {}'.format(
                         x, content.as_quantity(), content.__class__.cv_unit)
