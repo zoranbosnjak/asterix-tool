@@ -725,6 +725,11 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
                 handle_nonspare(cat, i, path + [name], nsp)
 
         elif isinstance(var, Compound):
+            # fspec is not stored, need to re-parse
+            result = Fspec.parse(var.bs)
+            assert not isinstance(result, ValueError)
+            (fspec, _remaining) = result
+            truncate('{}(FSPEC): {}'.format('  ' * i, fspec.bs))
             for (name, nsp) in var.arg.items():
                 handle_nonspare(cat, i, path + [name], nsp)
         else:
@@ -787,6 +792,11 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
                 '' if uap is None else ' (uap={})'.format(uap),
                 len(raw),
                 raw.hex()))
+        # fspec is not stored, need to re-parse
+        result = Fspec.parse(rec.bs)
+        assert not isinstance(result, ValueError)
+        (fspec, _remaining) = result
+        truncate('{}(FSPEC): {}'.format('  ' * (i+1), fspec.bs))
         for (name, nsp) in rec.items_regular.items():
             handle_nonspare(cat, i + 1, [name], nsp)
 
