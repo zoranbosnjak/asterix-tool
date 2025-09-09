@@ -11,6 +11,7 @@ import fileinput
 import random
 import os
 import sys
+import importlib.util
 import importlib.metadata
 import time
 import datetime
@@ -26,10 +27,19 @@ from asterix.base import *
 # skip some imports (and features) if fast startup is required
 fast = len(sys.argv) >= 2 and sys.argv[1] == '--fast-startup'
 if not fast:
-    import asterix.generated as gen
+    import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.24.0"
+__version__ = "0.25.0"
+
+# Import module from some source path
+@no_type_check
+def import_from_path(module_name, file_path):
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
 
 # 'Event' in this context is a tuple, containing:
 #   - monotonic time
@@ -381,12 +391,12 @@ def format_find(lst: List[Any], name: str) -> Any:
     return None
 
 
-def cmd_show_manifest(io: CIO, args: Any) -> None:
+def cmd_show_manifest(generated: Any, io: CIO, args: Any) -> None:
 
     @no_type_check
     def loop(arg: str, what: str) -> None:
-        for cat in sorted(gen.manifest[arg]):
-            for spec in reversed(gen.manifest[arg][cat]):
+        for cat in sorted(generated.manifest[arg]):
+            for spec in reversed(generated.manifest[arg][cat]):
                 ed_major, ed_minor = spec.cv_edition
                 print('{} {}, edition {}.{}'.format(what, str(cat).zfill(3), ed_major, ed_minor))
 
@@ -394,17 +404,17 @@ def cmd_show_manifest(io: CIO, args: Any) -> None:
     loop('REFS', 'ref')
 
 
-def get_selection(empty: bool,
+def get_selection(generated: Any, empty: bool,
                   explicit_cats: List[Tuple[str, str]],
                   explicit_refs: List[Tuple[str, str]]
                   ) -> Dict[str, Dict[int, AstSpec]]:
     """Get category selection."""
 
-    manifest = gen.manifest
+    manifest = generated.manifest
 
     # get latest
-    cats = {cat: manifest['CATS'][cat][-1] for cat in manifest['CATS']} # type: ignore
-    refs = {cat: manifest['REFS'][cat][-1] for cat in manifest['REFS']} # type: ignore
+    cats = {cat: manifest['CATS'][cat][-1] for cat in manifest['CATS']}
+    refs = {cat: manifest['REFS'][cat][-1] for cat in manifest['REFS']}
 
     # cleanup if required
     if empty:
@@ -420,7 +430,7 @@ def get_selection(empty: bool,
             cat = int(cat_i)
             ed1, ed2 = ed_s.split('.')
             ed = (int(ed1), int(ed2))
-            for spec in b[cat]: # type: ignore
+            for spec in b[cat]:
                 if spec.cv_edition == ed:
                     a.update({cat: spec})
     return {'CATS': cats, 'REFS': refs}
@@ -603,9 +613,10 @@ class AsterixSamples:
         return self.inject_errors(bs)
 
 
-def cmd_gen_random(io: CIO, args: Any) -> None:
+def cmd_gen_random(generated: Any, io: CIO, args: Any) -> None:
     """Generate random samples."""
-    sel = get_selection(args.empty_selection, args.cat or [], args.ref or [])
+    sel = get_selection(generated, args.empty_selection,
+                        args.cat or [], args.ref or [])
     exp = get_expansions(sel, args.expand or [])
     populate_all_items = args.populate_all_items
     include_multi_uap = args.include_multi_uap
@@ -632,8 +643,9 @@ def cmd_gen_random(io: CIO, args: Any) -> None:
             time.sleep(args.sleep)
 
 
-def cmd_asterix_decoder(io: CIO, args: Any) -> None:
-    sel = get_selection(args.empty_selection, args.cat or [], args.ref or [])
+def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
+    sel = get_selection(generated, args.empty_selection,
+                        args.cat or [], args.ref or [])
     exp = get_expansions(sel, args.expand or [])
     if args.truncate:
         @no_type_check
@@ -875,7 +887,7 @@ def cmd_asterix_decoder(io: CIO, args: Any) -> None:
         handle_event(t_utc, data)
 
 
-def cmd_from_udp(io: CIO, args: Any) -> None:
+def cmd_from_udp(generated: Any, io: CIO, args: Any) -> None:
     sockets = {}
     sel = selectors.DefaultSelector()
     for (channel, ip, port) in args.unicast:
@@ -910,7 +922,7 @@ def cmd_from_udp(io: CIO, args: Any) -> None:
             io.tx((t_mono, t_utc, channel, data))
 
 
-def cmd_to_udp(io: CIO, args: Any) -> None:
+def cmd_to_udp(generated: Any, io: CIO, args: Any) -> None:
     sockets = []
     for (channel, ip, port) in args.unicast:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -936,7 +948,7 @@ def cmd_to_udp(io: CIO, args: Any) -> None:
                 sock.sendto(data, (ip, port))
 
 
-def cmd_inspect(io: CIO, args: Any) -> None:
+def cmd_inspect(generated: Any, io: CIO, args: Any) -> None:
     raw_datablock_errors = 0
     unknown_categories: Set[int] = set()
     processed_categories: Set[int] = set()
@@ -1000,13 +1012,13 @@ def cmd_inspect(io: CIO, args: Any) -> None:
         print('{} -> {}'.format(cat, [str_edition(x) for x in sorted(problems)]))
 
 
-def cmd_record(io: CIO, args: Any) -> None:
+def cmd_record(generated: Any, io: CIO, args: Any) -> None:
     fmt = format_find(format_output, args.format)(io)
     for event in io.rx():
         fmt.write_event(event)
 
 
-def cmd_replay(io: CIO, args: Any) -> None:
+def cmd_replay(generated: Any, io: CIO, args: Any) -> None:
     fmt = format_find(format_input, args.format)(io)
     offset = None  # not known until the first event
     for event in fmt.events(args.infile):
@@ -1023,7 +1035,7 @@ def cmd_replay(io: CIO, args: Any) -> None:
             io.tx(event)
 
 
-def cmd_custom(io: CIO, args: Any) -> None:
+def cmd_custom(generated: Any, io: CIO, args: Any) -> None:
     # import custom script
     filename = args.script
     p = os.path.dirname(os.path.abspath(filename))
@@ -1045,7 +1057,7 @@ def cmd_custom(io: CIO, args: Any) -> None:
     #   - IO instance for standard input/output
     #   - all command line arguments
     f = run_globals[args.call]  # type: ignore
-    gen2 = None if fast else gen
+    gen2 = None if fast else generated
     f(base, gen2, io, args)  # type: ignore
 
 
@@ -1101,6 +1113,11 @@ def main() -> None:
         help='show program version number and exit')
 
     if not fast:
+        parser.add_argument(
+            '--custom-generated',
+            metavar='FILE',
+            help='Use custom asterix specification generated file in place of default generated.py from the libasterix library')
+
         parser.add_argument(
             '--empty-selection',
             action='store_true',
@@ -1322,8 +1339,13 @@ def main() -> None:
         args.simple or args.simple_output,
         not args.no_flush)
 
+    generated = generated_orig
+    if not fast:
+        if args.custom_generated is not None:
+            generated = import_from_path('asterix.generated', args.custom_generated)
+
     try:
-        args.func(io, args)
+        args.func(generated, io, args)
     except KeyboardInterrupt:
         sys.exit(0)
 
