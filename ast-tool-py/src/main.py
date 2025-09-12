@@ -30,7 +30,7 @@ if not fast:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.25.0"
+__version__ = "0.25.1"
 
 # Import module from some source path
 @no_type_check
@@ -795,6 +795,18 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
         handle_rulevar(cat, i + 1, path, nsp.rule)
 
     @no_type_check
+    def handle_rfs(cat, i, rfs_count, rfs_max, rfs):
+        if rfs_max > 1:
+            truncate('{}(RFS {}/{})'.format(
+                '  ' * i,
+                rfs_count + 1,
+                rfs_max))
+        else:
+            truncate('{}(RFS)'.format('  ' * i))
+        for (name, nsp) in rfs:
+            handle_nonspare(cat, i + 1, [name], nsp)
+
+    @no_type_check
     def handle_record(cat, i, rec, uap=None):
         if too_deep(i):
             return
@@ -810,8 +822,27 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
         assert not isinstance(result, ValueError)
         (fspec, _remaining) = result
         truncate('{}(FSPEC): {}'.format('  ' * (i+1), fspec.bs))
-        for (name, nsp) in rec.items_regular.items():
-            handle_nonspare(cat, i + 1, [name], nsp)
+        rfs_count = 0
+        rfs_max = 0
+        for ispec in rec.__class__.cv_items_list:
+            if issubclass(ispec, UapItemRFS):
+                rfs_max += 1
+        for ispec in rec.__class__.cv_items_list:
+            if issubclass(ispec, UapItem):
+                name = ispec.cv_non_spare.cv_name
+                nsp = rec.items_regular.get(name)
+                if nsp is not None:
+                    handle_nonspare(cat, i + 1, [name], nsp)
+            elif issubclass(ispec, UapItemSpare):
+                pass
+            elif issubclass(ispec, UapItemRFS):
+                try: rfs = rec.items_rfs[rfs_count]
+                except IndexError: rfs = None
+                if rfs is not None:
+                    handle_rfs(cat, i + 1, rfs_count, rfs_max, rfs)
+                rfs_count += 1
+            else:
+                raise Exception('internal error, unexpected item_spec', ispec)
 
     @no_type_check
     def handle_datablock(i, db):
