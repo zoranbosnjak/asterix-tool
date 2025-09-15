@@ -30,7 +30,7 @@ if not fast:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.25.2"
+__version__ = "0.25.3"
 
 # Import module from some source path
 @no_type_check
@@ -739,7 +739,7 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
 
         elif isinstance(var, Compound):
             # fspec is not stored, need to re-parse
-            result = Fspec.parse(var.bs)
+            result = Fspec.parse(var.__class__.cv_fspec_max_bytes, var.bs)
             assert not isinstance(result, ValueError)
             (fspec, _remaining) = result
             truncate('{}(FSPEC): {}'.format('  ' * i, fspec.bs))
@@ -818,7 +818,7 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
                 len(raw),
                 raw.hex()))
         # fspec is not stored, need to re-parse
-        result = Fspec.parse(rec.bs)
+        result = Fspec.parse(rec.__class__.cv_fspec_max_bytes, rec.bs)
         assert not isinstance(result, ValueError)
         (fspec, _remaining) = result
         truncate('{}(FSPEC): {}'.format('  ' * (i+1), fspec.bs))
@@ -877,6 +877,7 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
                 return None
             results = spec.cv_uap.parse_any_uap(bs)
             if len(results) == 0:
+                truncate('Error! Multiple UAP, no possible results')
                 truncate('Unable to parse datablock: {}'.format(d))
                 if args.stop_on_error:
                     sys.exit(1)
