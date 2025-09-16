@@ -1000,7 +1000,7 @@ def cmd_inspect(generated: Any, io: CIO, args: Any) -> None:
             raw_datablock_errors += 1
         for raw_db in raw_datablocks:
             cat = raw_db.get_category()
-            specs = gen.manifest['CATS'].get(cat)
+            specs = generated.manifest['CATS'].get(cat)
             if specs is None:
                 unknown_categories.add(cat)
             processed_categories.add(cat)
@@ -1034,7 +1034,7 @@ def cmd_inspect(generated: Any, io: CIO, args: Any) -> None:
     print('unknown categories: {}'.format(sorted(unknown_categories)))
     print('success category/edition:')
     for cat in sorted(processed_categories):
-        editions = {x.cv_edition for x in gen.manifest['CATS'][cat]} # type: ignore
+        editions = {x.cv_edition for x in generated.manifest['CATS'][cat]}
         problems = parse_errors.get(cat, set())
         editions.difference_update(problems)
         print('{} -> {}'.format(cat, [str_edition(x) for x in sorted(editions)]))
