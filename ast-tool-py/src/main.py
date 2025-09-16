@@ -30,7 +30,7 @@ if not fast:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.25.3"
+__version__ = "0.25.4"
 
 # Import module from some source path
 @no_type_check
@@ -739,7 +739,8 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
 
         elif isinstance(var, Compound):
             # fspec is not stored, need to re-parse
-            result = Fspec.parse(var.__class__.cv_fspec_max_bytes, var.bs)
+            result = Fspec.parse(ParsingMode.StrictParsing, \
+                                 var.__class__.cv_fspec_max_bytes, var.bs)
             assert not isinstance(result, ValueError)
             (fspec, _remaining) = result
             truncate('{}(FSPEC): {}'.format('  ' * i, fspec.bs))
@@ -818,7 +819,8 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
                 len(raw),
                 raw.hex()))
         # fspec is not stored, need to re-parse
-        result = Fspec.parse(rec.__class__.cv_fspec_max_bytes, rec.bs)
+        result = Fspec.parse(ParsingMode.StrictParsing, \
+                             rec.__class__.cv_fspec_max_bytes, rec.bs)
         assert not isinstance(result, ValueError)
         (fspec, _remaining) = result
         truncate('{}(FSPEC): {}'.format('  ' * (i+1), fspec.bs))
