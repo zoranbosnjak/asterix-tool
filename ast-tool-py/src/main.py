@@ -30,7 +30,7 @@ if not fast:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.25.4"
+__version__ = "0.25.5"
 
 # Import module from some source path
 @no_type_check
