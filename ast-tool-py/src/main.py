@@ -26,11 +26,13 @@ from asterix.base import *
 
 # skip some imports (and features) if fast startup is required
 fast = len(sys.argv) >= 2 and sys.argv[1] == '--fast-startup'
-if not fast:
+if fast:
+    generated_orig : Optional[Any] = None
+else:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.25.5"
+__version__ = "0.26.0"
 
 # Import module from some source path
 @no_type_check
