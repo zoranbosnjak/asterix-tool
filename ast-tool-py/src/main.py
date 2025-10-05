@@ -32,7 +32,7 @@ else:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.26.0"
+__version__ = "0.26.1"
 
 # Import module from some source path
 @no_type_check
