@@ -32,7 +32,7 @@ else:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.26.1"
+__version__ = "0.26.2"
 
 # Import module from some source path
 @no_type_check
@@ -1005,6 +1005,7 @@ def cmd_inspect(generated: Any, io: CIO, args: Any) -> None:
             specs = generated.manifest['CATS'].get(cat)
             if specs is None:
                 unknown_categories.add(cat)
+                continue
             processed_categories.add(cat)
             bs = raw_db.get_raw_records()
             for Spec in specs:
