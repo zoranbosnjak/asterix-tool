@@ -2,39 +2,41 @@
 
 # Asterix data processing tool
 
+from asterix.base import *
+import asterix.base as base
+import locale
+import json
+import uuid
+import selectors
+import struct
+import socket
+import datetime
+import time
+import importlib.metadata
+import importlib.util
+import sys
+import os
+import random
+import fileinput
+import argparse
+from typing import *
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-from typing import *
-import argparse
-import fileinput
-import random
-import os
-import sys
-import importlib.util
-import importlib.metadata
-import time
-import datetime
-import socket
-import struct
-import selectors
-import uuid
-import json
-import locale
-import asterix.base as base
-from asterix.base import *
 
 # skip some imports (and features) if fast startup is required
 fast = len(sys.argv) >= 2 and sys.argv[1] == '--fast-startup'
 if fast:
-    generated_orig : Optional[Any] = None
+    generated_orig: Optional[Any] = None
 else:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.26.2"
+__version__ = "0.26.3"
 
 # Import module from some source path
+
+
 @no_type_check
 def import_from_path(module_name, file_path):
     spec = importlib.util.spec_from_file_location(module_name, file_path)
@@ -48,6 +50,7 @@ def import_from_path(module_name, file_path):
 #   - UTC time
 #   - channel name
 #   - actual data bytes
+
 
 Event: TypeAlias = Tuple[float,
                          Optional[datetime.datetime],
@@ -185,7 +188,7 @@ class FmtSimple(Fmt):
         (t_mono, t_utc, channel, data) = event
         if not channel:
             channel = '-'
-        t_mono_ns = round(t_mono * 1000 * 1000 * 1000)
+        t_mono_ns = round(t_mono * 1_000_000_000)
         t_utc_iso = t_utc.isoformat() if t_utc is not None else None
         self.io.tx_raw('{} {} {} {}'.format(t_utc_iso,
                                             data.hex(), channel, t_mono_ns))
@@ -196,7 +199,7 @@ class FmtSimple(Fmt):
             t_utc = datetime.datetime.fromisoformat(t)
             data = bytes.fromhex(s)
             channel = None if ch == '-' else ch
-            t_mono = int(t_mono_ns) / (1000 * 1000 * 1000)
+            t_mono = int(t_mono_ns) / 1_000_000_000
             yield (t_mono, t_utc, channel, data)
 
 
@@ -218,7 +221,7 @@ class FmtVcr(Fmt):
             if t_utc is not None else None
         rec = {
             "channel": channel,
-            "tMono": round(t_mono * 1000 * 1000 * 1000),
+            "tMono": round(t_mono * 1_000_000_000),
             "tUtc": tUtc_s,
             "session": self.session,
             "track": track,
@@ -235,12 +238,13 @@ class FmtVcr(Fmt):
     def events(self, infile: str) -> Generator[Event, None, None]:
         for line in fileinput.input(infile or '-'):
             o = json.loads(line)
-            t_mono = o['tMono'] / (1000 * 1000 * 1000)
-            # datetime does not support nanoseconds, round to microseconds
-            t_utc = o['tUtc'].split('.')
-            subseconds = float('0.' + t_utc[-1][:-1])
-            microseconds = round(subseconds * 1000 * 1000)
-            t_utc = ''.join(t_utc[:-1]) + '.{:06d}Z'.format(microseconds)
+            t_mono = o['tMono'] / 1_000_000_000
+            # datetime does not support nanoseconds,
+            # keep at most 6 decimal digits
+            t_utc, subseconds = o['tUtc'].split('.')
+            subseconds = subseconds[:-1]  # remove trailing 'Z'
+            subseconds = subseconds[0:6]  # keep the first part
+            t_utc = ''.join(t_utc) + '.{}Z'.format(subseconds)
             t_utc = datetime.datetime.strptime(
                 t_utc, self.__class__.time_format)
             t_utc = t_utc.replace(tzinfo=datetime.timezone.utc)
@@ -400,7 +404,12 @@ def cmd_show_manifest(generated: Any, io: CIO, args: Any) -> None:
         for cat in sorted(generated.manifest[arg]):
             for spec in reversed(generated.manifest[arg][cat]):
                 ed_major, ed_minor = spec.cv_edition
-                print('{} {}, edition {}.{}'.format(what, str(cat).zfill(3), ed_major, ed_minor))
+                print(
+                    '{} {}, edition {}.{}'.format(
+                        what,
+                        str(cat).zfill(3),
+                        ed_major,
+                        ed_minor))
 
     loop('CATS', 'cat')
     loop('REFS', 'ref')
@@ -685,7 +694,7 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
                     dsc = 'value: {} -> "{}"'.format(x, tv)
                 elif isinstance(content, ContentString):
                     s = content.as_string().encode('utf-8')
-                    s = repr(s)[2:-1] # strip off b'...'
+                    s = repr(s)[2:-1]  # strip off b'...'
                     dsc = 'value: {}, str: "{}"'.format(x, s)
                 elif isinstance(content, ContentInteger):
                     val = content.as_integer()
@@ -712,7 +721,7 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
         elif isinstance(var, Repetitive):
             for cnt, sub in enumerate(var.arg):
                 s = sub.unparse()
-                truncate('{}subitem ({}), len={} bits, bin={}'\
+                truncate('{}subitem ({}), len={} bits, bin={}'
                          .format('  ' * i, cnt, len(s), s))
                 handle_variation(cat, i + 1, path + ['({})'.format(cnt)], sub)
 
@@ -741,7 +750,7 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
 
         elif isinstance(var, Compound):
             # fspec is not stored, need to re-parse
-            result = Fspec.parse(ParsingMode.StrictParsing, \
+            result = Fspec.parse(ParsingMode.StrictParsing,
                                  var.__class__.cv_fspec_max_bytes, var.bs)
             assert not isinstance(result, ValueError)
             (fspec, _remaining) = result
@@ -821,11 +830,11 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
                 len(raw),
                 raw.hex()))
         # fspec is not stored, need to re-parse
-        result = Fspec.parse(ParsingMode.StrictParsing, \
+        result = Fspec.parse(ParsingMode.StrictParsing,
                              rec.__class__.cv_fspec_max_bytes, rec.bs)
         assert not isinstance(result, ValueError)
         (fspec, _remaining) = result
-        truncate('{}(FSPEC): {}'.format('  ' * (i+1), fspec.bs))
+        truncate('{}(FSPEC): {}'.format('  ' * (i + 1), fspec.bs))
         rfs_count = 0
         rfs_max = 0
         for ispec in rec.__class__.cv_items_list:
@@ -840,8 +849,10 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
             elif issubclass(ispec, UapItemSpare):
                 pass
             elif issubclass(ispec, UapItemRFS):
-                try: rfs = rec.items_rfs[rfs_count]
-                except IndexError: rfs = None
+                try:
+                    rfs = rec.items_rfs[rfs_count]
+                except IndexError:
+                    rfs = None
                 if rfs is not None:
                     handle_rfs(cat, i + 1, rfs_count, rfs_max, rfs)
                 rfs_count += 1
@@ -889,8 +900,8 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
             else:
                 for (n, result) in enumerate(results):
                     truncate(
-                        '{}Multiple UAP, guessing possible result ({}/{}):'\
-                        .format('  ' * (i + 1), n+1, len(results)))
+                        '{}Multiple UAP, guessing possible result ({}/{}):'
+                        .format('  ' * (i + 1), n + 1, len(results)))
                     for rec in result:
                         handle_record(cat, i + 2, rec, find_uap_by_type(rec))
         else:
@@ -937,7 +948,10 @@ def cmd_from_udp(generated: Any, io: CIO, args: Any) -> None:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((mcast, int(port)))
         if args.local_ip is None:
-            mreq = struct.pack("=4sl", socket.inet_aton(mcast), socket.INADDR_ANY)
+            mreq = struct.pack(
+                "=4sl",
+                socket.inet_aton(mcast),
+                socket.INADDR_ANY)
         else:
             mreq = struct.pack("=4s4s", socket.inet_aton(mcast),
                                socket.inet_aton(args.local_ip))
@@ -954,7 +968,7 @@ def cmd_from_udp(generated: Any, io: CIO, args: Any) -> None:
             t_utc = datetime.datetime.now(tz=datetime.timezone.utc)
             f = key.fileobj
             channel = sockets[f]  # type: ignore
-            (data, addr) = f.recvfrom(pow(2, 16)) # type: ignore
+            (data, addr) = f.recvfrom(pow(2, 16))  # type: ignore
             io.tx((t_mono, t_utc, channel, data))
 
 
@@ -1040,13 +1054,15 @@ def cmd_inspect(generated: Any, io: CIO, args: Any) -> None:
         editions = {x.cv_edition for x in generated.manifest['CATS'][cat]}
         problems = parse_errors.get(cat, set())
         editions.difference_update(problems)
-        print('{} -> {}'.format(cat, [str_edition(x) for x in sorted(editions)]))
+        print('{} -> {}'.format(cat, [str_edition(x)
+              for x in sorted(editions)]))
     print('problems category/edition:')
     for cat in sorted(processed_categories):
         problems = parse_errors.get(cat)
         if not problems:
             continue
-        print('{} -> {}'.format(cat, [str_edition(x) for x in sorted(problems)]))
+        print('{} -> {}'.format(cat, [str_edition(x)
+              for x in sorted(problems)]))
 
 
 def cmd_record(generated: Any, io: CIO, args: Any) -> None:
@@ -1137,17 +1153,23 @@ def main() -> None:
         action='store_true',
         help='Reduce features for faster startup time, this argument must be set first')
 
-    parser.add_argument('--version-tool', action='version',
-        version=__version__, help='show tool version number and exit')
+    parser.add_argument(
+        '--version-tool',
+        action='version',
+        version=__version__,
+        help='show tool version number and exit')
 
-    parser.add_argument('--version-lib', action='version',
-        version=libasterix_version, help='show lib version number and exit')
+    parser.add_argument(
+        '--version-lib',
+        action='version',
+        version=libasterix_version,
+        help='show lib version number and exit')
 
     parser.add_argument('--version', action='version',
-        version='%(prog)s {}, libasterix {}'.format(
-            __version__,
-            libasterix_version),
-        help='show program version number and exit')
+                        version='%(prog)s {}, libasterix {}'.format(
+                            __version__,
+                            libasterix_version),
+                        help='show program version number and exit')
 
     if not fast:
         parser.add_argument(
@@ -1176,9 +1198,11 @@ def main() -> None:
                         type=check_ttl, default=32,  # type: ignore
                         help='Time to live for outgoing multicast traffic, default: %(default)s')
 
-    parser.add_argument('--local-ip', dest='local_ip',
-                        type=str,
-                        help='Optional IP address of local interface to use for multicast.')
+    parser.add_argument(
+        '--local-ip',
+        dest='local_ip',
+        type=str,
+        help='Optional IP address of local interface to use for multicast.')
 
     parser.add_argument(
         '--simple-input',
@@ -1203,8 +1227,8 @@ def main() -> None:
 
     if not fast:
         # 'manifest' command
-        parser_manifest = subparsers.add_parser('manifest',
-                                                help='show available categories')
+        parser_manifest = subparsers.add_parser(
+            'manifest', help='show available categories')
         parser_manifest.set_defaults(func=cmd_show_manifest)
         parser_manifest.add_argument('--latest', action='store_true',
                                      help='show latest editions only')
@@ -1213,8 +1237,10 @@ def main() -> None:
         parser_random = subparsers.add_parser(
             'random', help='asterix sample generator')
         parser_random.set_defaults(func=cmd_gen_random)
-        parser_random.add_argument('--sleep', type=float,
-                                   help="Sleep 't' seconds between random samples")
+        parser_random.add_argument(
+            '--sleep',
+            type=float,
+            help="Sleep 't' seconds between random samples")
         parser_random.add_argument('--seed', type=int,
                                    help='Randomm generator seed value')
         parser_random.add_argument(
@@ -1379,7 +1405,8 @@ def main() -> None:
     generated = generated_orig
     if not fast:
         if args.custom_generated is not None:
-            generated = import_from_path('asterix.generated', args.custom_generated)
+            generated = import_from_path(
+                'asterix.generated', args.custom_generated)
 
     try:
         args.func(generated, io, args)
