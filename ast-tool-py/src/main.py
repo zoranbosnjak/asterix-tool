@@ -32,7 +32,7 @@ else:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.26.3"
+__version__ = "0.27.0"
 
 # Import module from some source path
 
@@ -890,20 +890,26 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
                     if isinstance(rec, cls):
                         return name
                 return None
-            results = spec.cv_uap.parse_any_uap(bs)
-            if len(results) == 0:
-                truncate('Error! Multiple UAP, no possible results')
-                truncate('Unable to parse datablock: {}'.format(d))
+            max_depth = args.multi_uap_max_parsing_depth
+            results = spec.cv_uap.parse_any_uap(bs, max_depth)
+            if isinstance(results, ValueError):
+                truncate('Error! {}'.format(results))
                 if args.stop_on_error:
                     sys.exit(1)
-                return
             else:
-                for (n, result) in enumerate(results):
-                    truncate(
-                        '{}Multiple UAP, guessing possible result ({}/{}):'
-                        .format('  ' * (i + 1), n + 1, len(results)))
-                    for rec in result:
-                        handle_record(cat, i + 2, rec, find_uap_by_type(rec))
+                if len(results) == 0:
+                    truncate('Error! Multiple UAP, no possible results')
+                    truncate('Unable to parse datablock: {}'.format(d))
+                    if args.stop_on_error:
+                        sys.exit(1)
+                    return
+                else:
+                    for (n, result) in enumerate(results):
+                        truncate(
+                            '{}Multiple UAP, guessing possible result ({}/{}):'
+                            .format('  ' * (i + 1), n + 1, len(results)))
+                        for rec in result:
+                            handle_record(cat, i + 2, rec, find_uap_by_type(rec))
         else:
             raise Exception('internal error, unexpected type', uap)
 
@@ -1031,8 +1037,9 @@ def cmd_inspect(generated: Any, io: CIO, args: Any) -> None:
                         problems.add(Spec.cv_edition)
                         parse_errors[cat] = problems
                 elif issubclass(uap, UapMultiple):
-                    results = Spec.cv_uap.parse_any_uap(bs)
-                    if len(results) == 0:
+                    max_depth = args.multi_uap_max_parsing_depth
+                    results = Spec.cv_uap.parse_any_uap(bs, max_depth)
+                    if isinstance(results, ValueError) or len(results) == 0:
                         problems = parse_errors.get(cat, set())
                         problems.add(Spec.cv_edition)
                         parse_errors[cat] = problems
@@ -1172,6 +1179,12 @@ def main() -> None:
                         help='show program version number and exit')
 
     if not fast:
+        parser.add_argument(
+            '--multi-uap-max-parsing-depth',
+            type=int,
+            default=None,
+            help='Limit max parsing depth when parsing multi UAP category')
+
         parser.add_argument(
             '--custom-generated',
             metavar='FILE',
