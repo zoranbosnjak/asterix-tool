@@ -32,7 +32,7 @@ else:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.27.6"
+__version__ = "0.27.7"
 
 # Import module from some source path
 
@@ -909,7 +909,8 @@ def cmd_asterix_decoder(generated: Any, io: CIO, args: Any) -> None:
                             '{}Multiple UAP, guessing possible result ({}/{}):'
                             .format('  ' * (i + 1), n + 1, len(results)))
                         for rec in result:
-                            handle_record(cat, i + 2, rec, find_uap_by_type(rec))
+                            handle_record(
+                                cat, i + 2, rec, find_uap_by_type(rec))
         else:
             raise Exception('internal error, unexpected type', uap)
 
