@@ -21,8 +21,13 @@ import fileinput
 import argparse
 from typing import *
 import warnings
+import signal
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
+try:
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+except BaseException:
+    pass  # in case if not available
 
 # skip some imports (and features) if fast startup is required
 fast = len(sys.argv) >= 2 and sys.argv[1] == '--fast-startup'
@@ -32,7 +37,7 @@ else:
     import asterix.generated as generated_orig
     from scapy.all import rdpcap, UDP  # type: ignore
 
-__version__ = "0.27.14"
+__version__ = "0.27.15"
 
 # Import module from some source path
 
@@ -59,7 +64,7 @@ Event: TypeAlias = Tuple[float,
 
 
 class CIO:
-    """Input/output helper class, handles broken pipe exception and automatic flush.
+    """Input/output helper class, handles automatic flush.
     """
 
     def __init__(self, s_in: bool, s_out: bool, flush: bool) -> None:
@@ -83,20 +88,12 @@ class CIO:
             yield (t_mono, t_utc, channel, data)
 
     def tx_raw(self, s: str) -> None:
-        try:
-            print(s, flush=self.flush)
-        except BrokenPipeError:
-            sys.stdout = None
-            sys.exit(0)
+        print(s, flush=self.flush)
 
     def tx_raw_bin(self, s: bytes) -> None:
-        try:
-            sys.stdout.buffer.write(s)
-            if self.flush:
-                sys.stdout.buffer.flush()
-        except BrokenPipeError:
-            sys.stdout = None
-            sys.exit(0)
+        sys.stdout.buffer.write(s)
+        if self.flush:
+            sys.stdout.buffer.flush()
 
     def tx(self, event: Event) -> None:
         (t_mono, t_utc, channel, data) = event
